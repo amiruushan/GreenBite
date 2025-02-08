@@ -48,7 +48,7 @@ class UserProfileScreen extends StatelessWidget {
       children: [
         const CircleAvatar(
           radius: 60,
-          backgroundImage: AssetImage('assets/pro.jpg'),
+          backgroundImage: AssetImage('assets/user.jpg'),
         ),
         const SizedBox(height: 16),
         const Text(
@@ -141,8 +141,8 @@ class UserProfileScreen extends StatelessWidget {
       children: [
         _buildMenuButton(Icons.settings, 'Settings'),
         const SizedBox(height: 12),
-        _buildMenuButton(Icons.message, 'Messages'),
-        const SizedBox(height: 12),
+        // _buildMenuButton(Icons.message, 'Messages'),
+        // const SizedBox(height: 12),
         _buildMenuButton(Icons.logout, 'Log out'),
       ],
     );
@@ -150,6 +150,7 @@ class UserProfileScreen extends StatelessWidget {
 
   Widget _buildMenuButton(IconData icon, String label) {
     return Container(
+      width: 300,
       decoration: BoxDecoration(
         color: Colors.green,
         borderRadius: BorderRadius.circular(12),
