@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/user_profile/edit_information.dart';
 
 class UserProfileScreen extends StatelessWidget {
-  const UserProfileScreen({super.key});
+   UserProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

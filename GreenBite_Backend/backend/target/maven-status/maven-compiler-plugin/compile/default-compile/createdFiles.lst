@@ -1,0 +1,16 @@
+com/greenbite/backend/service/EmailService.class
+com/greenbite/backend/dto/RegisterUserDto.class
+com/greenbite/backend/service/JwtService.class
+com/greenbite/backend/config/EmailConfiguration.class
+com/greenbite/backend/dto/VerifyUserDto.class
+com/greenbite/backend/repository/UserRepository.class
+com/greenbite/backend/config/JwtAuthenticationFilter.class
+com/greenbite/backend/service/AuthenticationService.class
+com/greenbite/backend/BackendApplication.class
+com/greenbite/backend/dto/LoginUserDto.class
+com/greenbite/backend/model/User.class
+com/greenbite/backend/controller/AuthenticationController.class
+com/greenbite/backend/service/UserService.class
+com/greenbite/backend/reponses/LoginResponse.class
+com/greenbite/backend/config/SecurityConfiguration.class
+com/greenbite/backend/config/ApplicationConfiguration.class
