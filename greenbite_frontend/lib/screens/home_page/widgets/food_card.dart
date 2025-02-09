@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:green_bite_vishwa/models/food_item.dart';
+import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
 
 class FoodCard extends StatelessWidget {
   final FoodItem foodItem;

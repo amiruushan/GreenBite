@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:green_bite_vishwa/data/dummy_data.dart';
-import 'package:green_bite_vishwa/widgets/category_card.dart';
-import 'package:green_bite_vishwa/widgets/food_card.dart';
+import 'package:greenbite_frontend/screens/home_page/data/dummy_data.dart';
+import 'package:greenbite_frontend/screens/home_page/widgets/category_card.dart';
+import 'package:greenbite_frontend/screens/home_page/widgets/food_card.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
