@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/screens/user_profile/edit_information.dart';
 
 class UserProfileScreen extends StatelessWidget {
   const UserProfileScreen({super.key});
@@ -16,7 +17,7 @@ class UserProfileScreen extends StatelessWidget {
               const SizedBox(height: 20),
               _buildProfileHeader(),
               const SizedBox(height: 30),
-              _buildQuickActions(),
+              _buildQuickActions(context),
               const SizedBox(height: 30),
               _buildStats(),
               const SizedBox(height: 30),
@@ -70,37 +71,49 @@ class UserProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickActions() {
+  Widget _buildQuickActions(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildActionButton(Icons.calendar_today, 'Activities'),
-        _buildActionButton(Icons.payment, 'Payments'),
-        _buildActionButton(Icons.edit, 'Edit'),
+        _buildActionButton(Icons.calendar_today, 'Activities', context),
+        _buildActionButton(Icons.payment, 'Payments', context),
+        _buildActionButton(Icons.edit, 'Edit', context),
       ],
     );
   }
 
-  Widget _buildActionButton(IconData icon, String label) {
-    return Container(
-      width: 90,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, size: 24),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 12),
-          ),
-        ],
+
+  Widget _buildActionButton(IconData icon, String label, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (label == 'Edit') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const EditInformation()),
+          );
+        }
+      },
+      child: Container(
+        width: 90,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 24),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 12),
+            ),
+          ],
+        ),
       ),
     );
   }
+
 
   Widget _buildStats() {
     return Row(
