@@ -19,6 +19,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   List<FoodItem> foodItems = [];
+  Set<FoodItem> favoriteItems = {}; // Use a Set to avoid duplicates
 
   @override
   void initState() {
@@ -45,6 +46,16 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _toggleFavorite(FoodItem item) {
+    setState(() {
+      if (favoriteItems.contains(item)) {
+        favoriteItems.remove(item);
+      } else {
+        favoriteItems.add(item);
+      }
+    });
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -54,14 +65,18 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> screens = [
-      HomePageContent(foodItems: foodItems), // ✅ Always updated
+      HomePageContent(
+        foodItems: foodItems,
+        favoriteItems: favoriteItems,
+        onToggleFavorite: _toggleFavorite,
+      ),
       const SearchScreen(),
-      const FavoritesScreen(),
+      FavoritesScreen(favoriteItems: favoriteItems.toList()),
       UserProfileScreen(),
     ];
 
     return Scaffold(
-      body: screens[_selectedIndex], // ✅ Always shows the latest data
+      body: screens[_selectedIndex],
       bottomNavigationBar: BottomNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
@@ -73,7 +88,15 @@ class _HomePageState extends State<HomePage> {
 // ✅ Extracted Home Page Content Widget
 class HomePageContent extends StatelessWidget {
   final List<FoodItem> foodItems;
-  const HomePageContent({super.key, required this.foodItems});
+  final Set<FoodItem> favoriteItems;
+  final Function(FoodItem) onToggleFavorite;
+
+  const HomePageContent({
+    super.key,
+    required this.foodItems,
+    required this.favoriteItems,
+    required this.onToggleFavorite,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -103,8 +126,7 @@ class HomePageContent extends StatelessWidget {
         ],
       ),
       body: foodItems.isEmpty
-          ? const Center(
-              child: CircularProgressIndicator()) // ✅ Show loading indicator
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -151,11 +173,16 @@ class HomePageContent extends StatelessWidget {
                       separatorBuilder: (context, index) =>
                           const SizedBox(width: 10),
                       itemBuilder: (context, index) {
+                        final item = foodItems[index];
                         return SizedBox(
                           width: MediaQuery.of(context).size.width * 0.4,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: FoodCard(foodItem: foodItems[index]),
+                            child: FoodCard(
+                              foodItem: item,
+                              isFavorite: favoriteItems.contains(item),
+                              onFavoritePressed: () => onToggleFavorite(item),
+                            ),
                           ),
                         );
                       },
@@ -172,9 +199,14 @@ class HomePageContent extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: foodItems.length,
                     itemBuilder: (context, index) {
+                      final item = foodItems[index];
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10),
-                        child: FoodCard(foodItem: foodItems[index]),
+                        child: FoodCard(
+                          foodItem: item,
+                          isFavorite: favoriteItems.contains(item),
+                          onFavoritePressed: () => onToggleFavorite(item),
+                        ),
                       );
                     },
                   ),

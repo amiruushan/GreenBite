@@ -3,8 +3,15 @@ import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
 
 class FoodCard extends StatelessWidget {
   final FoodItem foodItem;
+  final bool isFavorite;
+  final VoidCallback onFavoritePressed;
 
-  const FoodCard({super.key, required this.foodItem});
+  const FoodCard({
+    super.key,
+    required this.foodItem,
+    required this.isFavorite,
+    required this.onFavoritePressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +21,7 @@ class FoodCard extends StatelessWidget {
       margin: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min, // This will help reduce extra space
+        mainAxisSize: MainAxisSize.min,
         children: [
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
@@ -27,38 +34,50 @@ class FoodCard extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize:
-                  MainAxisSize.min, // This will help reduce extra space
+            child: Row(
               children: [
-                Text(
-                  foodItem.name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        foodItem.name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        foodItem.restaurant,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        "\$${foodItem.price.toStringAsFixed(2)}",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  foodItem.restaurant,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
+                IconButton(
+                  icon: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: isFavorite ? Colors.red : Colors.grey,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  "\$${foodItem.price.toStringAsFixed(2)}",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.green,
-                  ),
+                  onPressed: onFavoritePressed,
                 ),
               ],
             ),
