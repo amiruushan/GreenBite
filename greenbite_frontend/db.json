@@ -1,0 +1,44 @@
+{
+  "foodItems": [
+    {
+      "name": "Pizza Slice",
+      "restaurant": "Joe's Pizzeria",
+      "imageUrl": "https://picsum.photos/250?image=9",
+      "price": 3.99,
+      "description": "A delicious slice of cheesy pizza with fresh toppings.",
+      "id": "5dcf"
+    },
+    {
+      "id": "f7e8",
+      "name": "Sushi Box",
+      "restaurant": "Sakura Sushi",
+      "imageUrl": "https://picsum.photos/250?image=10",
+      "price": 5.99,
+      "description": "A box of assorted sushi rolls with fresh fish and rice."
+    },
+    {
+      "id": "4f13",
+      "name": "Sushi gyat",
+      "restaurant": "Sakura Sushi",
+      "imageUrl": "https://picsum.photos/250?image=10",
+      "price": 5.99,
+      "description": "A box of assorted sushi rolls with fresh fish and rice."
+    },
+    {
+      "id": "dffd",
+      "name": "Sushi gyat",
+      "restaurant": "Sakura Sushi",
+      "imageUrl": "https://picsum.photos/250?image=10",
+      "price": 5.99,
+      "description": "A box of assorted sushi rolls with fresh fish and rice."
+    },
+    {
+      "id": "d979",
+      "name": "Sushi brotherrr",
+      "restaurant": "Sakura Sushi",
+      "imageUrl": "https://picsum.photos/250?image=10",
+      "price": 5.99,
+      "description": "A box of assorted sushi rolls with fresh fish and rice."
+    }
+  ]
+}

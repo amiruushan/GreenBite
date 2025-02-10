@@ -19,6 +19,13 @@
       "imageUrl": "https://picsum.photos/250?image=11",
       "price": 2.49,
       "description": "A buttery and flaky French croissant, perfect for breakfast."
+    },
+    {
+      "name": "rice and curry",
+      "restaurant": "bath Bakery",
+      "imageUrl": "https://picsum.photos/250?image=11",
+      "price": 2.49,
+      "description": "A buttery and flaky French croissant, perfect for breakfast."
     }
   ]
   
