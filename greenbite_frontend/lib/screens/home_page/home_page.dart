@@ -132,13 +132,29 @@ class HomePageContent extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: "Search for food...",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: "Search for food...",
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        border: InputBorder.none,
+                        prefixIcon:
+                            const Icon(Icons.search, color: Colors.green),
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 15),
                       ),
-                      prefixIcon: const Icon(Icons.search),
                     ),
                   ),
                   const SizedBox(height: 20),

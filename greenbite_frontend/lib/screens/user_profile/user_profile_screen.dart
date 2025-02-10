@@ -2,13 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/user_profile/edit_information.dart';
 
 class UserProfileScreen extends StatelessWidget {
-   UserProfileScreen({super.key});
+  const UserProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: _buildAppBar(),
+      appBar: AppBar(
+        title: const Text("Green Bite"),
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
+        ),
+        centerTitle: true,
+        backgroundColor: const Color.fromARGB(255, 117, 237, 123),
+        leading: IconButton(
+          icon: const Icon(Icons.support_agent),
+          onPressed: () {
+            print("Support icon tapped");
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.shopping_cart),
+            onPressed: () {
+              print("Cart icon tapped");
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -25,21 +48,6 @@ class UserProfileScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  AppBar _buildAppBar() {
-    return AppBar(
-      title: const Text(
-        'User Profile',
-        style: TextStyle(color: Colors.black),
-      ),
-      backgroundColor: Colors.white,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: Colors.black),
-        onPressed: () {},
       ),
     );
   }
@@ -82,7 +90,6 @@ class UserProfileScreen extends StatelessWidget {
     );
   }
 
-
   Widget _buildActionButton(IconData icon, String label, BuildContext context) {
     return GestureDetector(
       onTap: () {
@@ -113,7 +120,6 @@ class UserProfileScreen extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildStats() {
     return Row(
