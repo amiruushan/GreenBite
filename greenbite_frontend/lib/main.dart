@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/screens/home_page/home_page.dart';
 import 'package:greenbite_frontend/screens/user_profile/user_profile_screen.dart';
 import 'screens/user_profile/edit_information.dart';
 
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
         useMaterial3: true,
       ),
-      home:  UserProfileScreen(),
+      home: HomePage(),
     );
   }
 }

@@ -2,9 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/home_page/data/dummy_data.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/category_card.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/food_card.dart';
+import 'package:greenbite_frontend/widgets/bottom_nav_bar.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,14 +27,14 @@ class HomePage extends StatelessWidget {
         title: const Text("Green Bite"),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.account_circle),
+          icon: const Icon(Icons.support_agent),
           onPressed: () {
             print("Profile icon tapped");
           },
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.support_agent),
+            icon: const Icon(Icons.shopping_cart),
             onPressed: () {
               print("Support icon tapped");
             },
@@ -108,6 +122,10 @@ class HomePage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavBar(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
       ),
     );
   }
