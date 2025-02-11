@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
 import 'package:greenbite_frontend/screens/user_profile/allergies.dart';
 import 'package:greenbite_frontend/screens/user_profile/edit_information.dart';
 
@@ -29,13 +30,13 @@ class UserProfileScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.shopping_cart),
             onPressed: () {
-              print("Cart icon tapped");
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const CartScreen()));
             },
           ),
         ],
       ),
       // _________________Top AppBar Ends__________________
-
 
       body: SingleChildScrollView(
         child: Padding(
@@ -103,8 +104,7 @@ class UserProfileScreen extends StatelessWidget {
             context,
             MaterialPageRoute(builder: (context) => const EditInformation()),
           );
-        }
-        else if (label == 'Allergies') {
+        } else if (label == 'Allergies') {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const Allergies()),

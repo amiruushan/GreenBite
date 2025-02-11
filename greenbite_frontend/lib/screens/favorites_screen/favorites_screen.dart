@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/food_card.dart';
 
@@ -54,7 +55,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           IconButton(
             icon: const Icon(Icons.shopping_cart),
             onPressed: () {
-              print("Cart icon tapped");
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const CartScreen()));
             },
           ),
         ],

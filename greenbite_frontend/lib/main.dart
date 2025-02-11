@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:greenbite_frontend/screens/splash_screen/splash_screen.dart';
+import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:greenbite_frontend/screens/home_page/home_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => CartProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -12,12 +19,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "GreenddBite",
+      title: "Green Bite",
       theme: ThemeData(
         primarySwatch: Colors.green,
         useMaterial3: true,
       ),
-      home: SplashScreen(),
+      home: const HomePage(),
     );
   }
 }
