@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/splash_screen/splash_screen.dart';
+import 'package:greenbite_frontend/screens/store_dashboard/store_dashboard.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
         useMaterial3: true,
       ),
-      home: SplashScreen(),
+      home: const StoreDashboard(),
     );
   }
 }
