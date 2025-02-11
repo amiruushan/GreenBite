@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
         favoriteItems: favoriteItems,
         onToggleFavorite: _toggleFavorite,
       ),
-      const SearchScreen(),
+      SearchScreen(foodItems: foodItems),
       FavoritesScreen(favoriteItems: favoriteItems.toList()),
       UserProfileScreen(),
     ];
