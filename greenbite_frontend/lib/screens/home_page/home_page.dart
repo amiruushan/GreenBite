@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/favorites_screen/favorites_screen.dart';
@@ -120,7 +121,8 @@ class HomePageContent extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.shopping_cart),
             onPressed: () {
-              print("Cart icon tapped");
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const CartScreen()));
             },
           ),
         ],
