@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
-import 'package:provider/provider.dart';
-import 'package:greenbite_frontend/screens/home_page/home_page.dart';
+import 'package:greenbite_frontend/screens/splash_screen/splash_screen.dart';
 
 void main() {
   runApp(
@@ -24,7 +22,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      home: SplashScreen(),
     );
   }
 }
