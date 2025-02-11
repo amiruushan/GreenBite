@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/screens/splash_screen/splash_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(
