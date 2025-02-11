@@ -4,6 +4,7 @@ class FoodItem {
   final String imageUrl;
   final double price;
   final String description;
+  final String category;
 
   FoodItem({
     required this.name,
@@ -11,6 +12,7 @@ class FoodItem {
     required this.imageUrl,
     required this.price,
     required this.description,
+    required this.category,
   });
 
   // Convert JSON to FoodItem
@@ -20,7 +22,7 @@ class FoodItem {
       restaurant: json['restaurant'],
       imageUrl: json['imageUrl'],
       price: (json['price'] as num).toDouble(), // Ensure price is double
-      description: json['description'],
+      description: json['description'], category: json['category'],
     );
   }
 
@@ -32,6 +34,7 @@ class FoodItem {
       'imageUrl': imageUrl,
       'price': price,
       'description': description,
+      'category': category
     };
   }
 }
