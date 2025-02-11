@@ -20,9 +20,10 @@ public class ApplicationConfiguration {
 
     @Bean
     UserDetailsService userDetailsService() {
-        return email -> userRepository.findByEmail(email)
+        return email -> userRepository.findByUsernameOrEmail(email,email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
+
 
     @Bean
     BCryptPasswordEncoder passwordEncoder() {
