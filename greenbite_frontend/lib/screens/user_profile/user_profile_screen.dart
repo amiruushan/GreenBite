@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/screens/user_profile/allergies.dart';
 import 'package:greenbite_frontend/screens/user_profile/edit_information.dart';
 
 class UserProfileScreen extends StatelessWidget {
@@ -8,15 +9,16 @@ class UserProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      // _________________Top AppBar__________________
       appBar: AppBar(
-        title: const Text("Green Bite"),
+        title: const Text("GreenBite"),
         titleTextStyle: const TextStyle(
           color: Colors.white,
           fontSize: 30,
           fontWeight: FontWeight.bold,
         ),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 117, 237, 123),
+        backgroundColor: Colors.green,
         leading: IconButton(
           icon: const Icon(Icons.support_agent),
           onPressed: () {
@@ -32,6 +34,9 @@ class UserProfileScreen extends StatelessWidget {
           ),
         ],
       ),
+      // _________________Top AppBar Ends__________________
+
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -84,7 +89,7 @@ class UserProfileScreen extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         _buildActionButton(Icons.calendar_today, 'Activities', context),
-        _buildActionButton(Icons.payment, 'Payments', context),
+        _buildActionButton(Icons.no_food_outlined, 'Allergies', context),
         _buildActionButton(Icons.edit, 'Edit', context),
       ],
     );
@@ -97,6 +102,12 @@ class UserProfileScreen extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const EditInformation()),
+          );
+        }
+        else if (label == 'Allergies') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Allergies()),
           );
         }
       },
