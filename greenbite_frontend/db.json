@@ -1,9 +1,10 @@
 {
   "userProfile": {
-    "name": "John Deezel",
+    "id": 1,
+    "username": "John Doe",
     "email": "john.doe@example.com",
-    "profilePictureUrl": "https://picsum.photos/250?image=9",
-    "phoneNumber": "+1234562555",
-    "address": "123 Main St, City, Counties"
+    "profilePictureUrl": "https://picsum.photos/250?image=80",
+    "phoneNumber": "+1234567890",
+    "address": "123 Main St, City, Country"
   }
 }
