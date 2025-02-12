@@ -91,7 +91,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
                       // User Name
                       Text(
-                        _userProfile!.name,
+                        _userProfile!.username,
                         style: const TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.bold,

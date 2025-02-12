@@ -21,7 +21,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.userProfile.name);
+    _nameController = TextEditingController(text: widget.userProfile.username);
     _emailController = TextEditingController(text: widget.userProfile.email);
     _phoneController =
         TextEditingController(text: widget.userProfile.phoneNumber);
@@ -43,7 +43,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() => _isSaving = true);
 
     final updatedProfile = UserProfile(
-      name: _nameController.text.trim(),
+      username: _nameController.text.trim(),
       email: _emailController.text.trim(),
       profilePictureUrl:
           widget.userProfile.profilePictureUrl, // Keep existing picture
