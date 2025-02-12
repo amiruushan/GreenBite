@@ -43,6 +43,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() => _isSaving = true);
 
     final updatedProfile = UserProfile(
+      id: widget.userProfile.id, // ✅ Keep the same ID
       username: _nameController.text.trim(),
       email: _emailController.text.trim(),
       profilePictureUrl:
