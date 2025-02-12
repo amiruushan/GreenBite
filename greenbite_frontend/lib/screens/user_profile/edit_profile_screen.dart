@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile.dart';
+import 'package:greenbite_frontend/screens/user_profile/models/user_profile_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final UserProfile userProfile;
@@ -15,6 +16,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
   late TextEditingController _addressController;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -36,37 +38,102 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
-  void _saveProfile() {
-    // TODO: Implement save logic (Update backend or local storage)
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Profile updated successfully!")),
+  // ✅ Save changes (PUT request)
+  Future<void> _saveProfile() async {
+    setState(() => _isSaving = true);
+
+    final updatedProfile = UserProfile(
+      name: _nameController.text.trim(),
+      email: _emailController.text.trim(),
+      profilePictureUrl:
+          widget.userProfile.profilePictureUrl, // Keep existing picture
+      phoneNumber: _phoneController.text.trim(),
+      address: _addressController.text.trim(),
     );
+
+    bool success = await UserProfileService.updateUserProfile(updatedProfile);
+
+    setState(() => _isSaving = false);
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Profile updated successfully!")),
+      );
+      Navigator.pop(context, updatedProfile); // Return updated profile
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to update profile. Try again.")),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text("Edit Profile"), backgroundColor: Colors.blue),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        title: const Text("Edit Profile",
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        backgroundColor: Colors.green,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            _buildTextField("Name", _nameController),
-            _buildTextField("Email", _emailController),
-            _buildTextField("Phone", _phoneController),
-            _buildTextField("Address", _addressController),
+            // ✅ Profile Picture Update Option
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                CircleAvatar(
+                  radius: 60,
+                  backgroundImage:
+                      NetworkImage(widget.userProfile.profilePictureUrl),
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.green,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon:
+                          const Icon(Icons.edit, color: Colors.white, size: 20),
+                      onPressed: () {
+                        // TODO: Implement profile picture change functionality
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: _saveProfile,
-              icon: const Icon(Icons.save, color: Colors.white),
-              label: const Text("Save Changes",
-                  style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+
+            // ✅ Input Fields
+            _buildTextField("Full Name", _nameController, Icons.person),
+            _buildTextField("Email Address", _emailController, Icons.email),
+            _buildTextField("Phone Number", _phoneController, Icons.phone),
+            _buildTextField(
+                "Home Address", _addressController, Icons.location_on),
+            const SizedBox(height: 20),
+
+            // ✅ Save Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _isSaving ? null : _saveProfile,
+                icon: _isSaving
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Icon(Icons.save, color: Colors.white),
+                label: const Text("Save Changes",
+                    style: TextStyle(fontSize: 18, color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
               ),
             ),
           ],
@@ -75,14 +142,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller) {
+  // ✅ Custom Text Field with Icon
+  Widget _buildTextField(
+      String label, TextEditingController controller, IconData icon) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          prefixIcon: Icon(icon, color: Colors.green),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          filled: true,
+          fillColor: Colors.grey[100],
         ),
       ),
     );
