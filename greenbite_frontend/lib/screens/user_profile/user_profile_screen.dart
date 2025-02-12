@@ -20,7 +20,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _fetchUserProfile();
   }
 
-  // Fetch user profile data
+  // ✅ Fetch user profile data
   Future<void> _fetchUserProfile() async {
     try {
       final userProfile = await UserProfileService.fetchUserProfile();
@@ -36,7 +36,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
-  // Handle user sign out (Placeholder function)
+  // ✅ Navigate to Edit Screen & Update UI After Saving
+  Future<void> _editProfile() async {
+    final updatedProfile = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProfileScreen(userProfile: _userProfile!),
+      ),
+    );
+
+    // ✅ If user saved changes, update UI
+    if (updatedProfile != null && updatedProfile is UserProfile) {
+      setState(() {
+        _userProfile = updatedProfile;
+      });
+    }
+  }
+
+  // ✅ Sign Out (Placeholder)
   void _signOut() {
     print("User signed out"); // TODO: Implement real sign-out logic
     ScaffoldMessenger.of(context).showSnackBar(
@@ -48,10 +65,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Profile',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Profile',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Colors.green,
       ),
@@ -107,16 +122,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         icon: Icons.edit,
                         text: "Edit Profile",
                         color: Colors.blue,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  EditProfileScreen(userProfile: _userProfile!),
-                            ),
-                          );
-                        },
+                        onPressed: _editProfile,
                       ),
+
                       SizedBox(height: 20),
 
                       // Sign Out Button
@@ -150,11 +158,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   // Widget to display buttons
-  Widget _buildActionButton(
-      {required IconData icon,
-      required String text,
-      required Color color,
-      required VoidCallback onPressed}) {
+  Widget _buildActionButton({
+    required IconData icon,
+    required String text,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(

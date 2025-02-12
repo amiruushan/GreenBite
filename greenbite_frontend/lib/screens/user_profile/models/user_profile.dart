@@ -13,7 +13,7 @@ class UserProfile {
     required this.address,
   });
 
-  // Factory method to create a UserProfile from JSON
+  // ✅ Convert JSON to UserProfile
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
       name: json['name'],
@@ -22,5 +22,16 @@ class UserProfile {
       phoneNumber: json['phoneNumber'],
       address: json['address'],
     );
+  }
+
+  // ✅ Convert UserProfile to JSON (Fix for update function)
+  Map<String, dynamic> toJson() {
+    return {
+      "name": name,
+      "email": email,
+      "profilePictureUrl": profilePictureUrl,
+      "phoneNumber": phoneNumber,
+      "address": address,
+    };
   }
 }

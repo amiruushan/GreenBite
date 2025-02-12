@@ -1,29 +1,45 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'user_profile.dart'; // Import the UserProfile model
+import 'user_profile.dart';
 
 class UserProfileService {
-  static const String _baseUrl =
-      'http://10.0.2.2:3000'; // Use 10.0.2.2 for Android emulator
+  static const String _baseUrl = 'http://10.0.2.2:3000'; // JSON Server URL
 
-  // Fetch user profile data from the JSON server
+  // ✅ Fetch User Profile
   static Future<UserProfile> fetchUserProfile() async {
     try {
       final response = await http.get(Uri.parse('$_baseUrl/userProfile'));
 
       if (response.statusCode == 200) {
-        // Parse the JSON response
         final Map<String, dynamic> data = json.decode(response.body);
-        print('Fetched data: $data'); // Debugging
         return UserProfile.fromJson(data);
       } else {
-        print(
-            'Failed to load user profile. Status code: ${response.statusCode}');
         throw Exception('Failed to load user profile');
       }
     } catch (e) {
-      print('Error fetching user profile: $e');
-      throw Exception('Failed to load user profile');
+      throw Exception('Error fetching user profile: $e');
+    }
+  }
+
+  // ✅ FIX: Add this function to update user profile (PUT request)
+  static Future<bool> updateUserProfile(UserProfile updatedProfile) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$_baseUrl/userProfile'),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode(
+            updatedProfile.toJson()), // Ensure `toJson()` exists in UserProfile
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        print('Failed to update profile. Status: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error updating profile: $e');
+      return false;
     }
   }
 }
