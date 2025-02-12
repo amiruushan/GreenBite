@@ -3,27 +3,36 @@ import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
 import 'package:provider/provider.dart';
 
-class FoodDetailScreen extends StatelessWidget {
+class FoodDetailScreen extends StatefulWidget {
   final FoodItem foodItem;
 
   const FoodDetailScreen({super.key, required this.foodItem});
 
   @override
+  State<FoodDetailScreen> createState() => _FoodDetailScreenState();
+}
+
+class _FoodDetailScreenState extends State<FoodDetailScreen> {
+  int selectedQuantity = 1; // Initial selected quantity
+
+  @override
   Widget build(BuildContext context) {
+    int maxQuantity = int.tryParse(widget.foodItem.quantity) ?? 1;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(foodItem.name),
+        title: Text(widget.foodItem.name),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Full-Size Image
+            // Food Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
-                foodItem.imageUrl,
+                widget.foodItem.imageUrl,
                 width: double.infinity,
                 height: 200,
                 fit: BoxFit.cover,
@@ -33,27 +42,21 @@ class FoodDetailScreen extends StatelessWidget {
 
             // Food Name
             Text(
-              foodItem.name,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              widget.foodItem.name,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
 
             // Restaurant Name
             Text(
-              foodItem.restaurant,
-              style: const TextStyle(
-                fontSize: 18,
-                color: Colors.grey,
-              ),
+              widget.foodItem.restaurant,
+              style: const TextStyle(fontSize: 18, color: Colors.grey),
             ),
             const SizedBox(height: 20),
 
             // Price
             Text(
-              "\$${foodItem.price.toStringAsFixed(2)}",
+              "\$${widget.foodItem.price.toStringAsFixed(2)}",
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w500,
@@ -65,18 +68,45 @@ class FoodDetailScreen extends StatelessWidget {
             // Description
             const Text(
               "Description",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Text(
-              foodItem.description,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+              widget.foodItem.description,
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            const SizedBox(height: 20),
+
+            // Quantity Selector
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.remove_circle, color: Colors.red),
+                  onPressed: selectedQuantity > 1
+                      ? () {
+                          setState(() {
+                            selectedQuantity--;
+                          });
+                        }
+                      : null,
+                ),
+                Text(
+                  "$selectedQuantity / $maxQuantity",
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_circle, color: Colors.green),
+                  onPressed: selectedQuantity < maxQuantity
+                      ? () {
+                          setState(() {
+                            selectedQuantity++;
+                          });
+                        }
+                      : null,
+                ),
+              ],
             ),
             const SizedBox(height: 20),
 
@@ -87,10 +117,15 @@ class FoodDetailScreen extends StatelessWidget {
                 onPressed: () {
                   final cartProvider =
                       Provider.of<CartProvider>(context, listen: false);
-                  cartProvider.addToCart(foodItem);
+
+                  for (int i = 0; i < selectedQuantity; i++) {
+                    cartProvider.addToCart(widget.foodItem);
+                  }
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text("${foodItem.name} added to cart!"),
+                      content: Text(
+                          "${widget.foodItem.name} x$selectedQuantity added to cart!"),
                     ),
                   );
                 },
@@ -101,12 +136,9 @@ class FoodDetailScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  "Add to Cart",
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white,
-                  ),
+                child: Text(
+                  "Add $selectedQuantity to Cart",
+                  style: const TextStyle(fontSize: 18, color: Colors.white),
                 ),
               ),
             ),
