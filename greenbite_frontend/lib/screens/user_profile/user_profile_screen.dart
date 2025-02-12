@@ -1,197 +1,173 @@
 import 'package:flutter/material.dart';
-import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
-import 'package:greenbite_frontend/screens/user_profile/allergies.dart';
-import 'package:greenbite_frontend/screens/user_profile/edit_information.dart';
+import 'package:greenbite_frontend/screens/user_profile/models/user_profile.dart';
+import 'package:greenbite_frontend/screens/user_profile/models/user_profile_service.dart';
+import 'package:greenbite_frontend/screens/user_profile/edit_profile_screen.dart';
 
-class UserProfileScreen extends StatelessWidget {
+class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
+
+  @override
+  State<UserProfileScreen> createState() => _UserProfileScreenState();
+}
+
+class _UserProfileScreenState extends State<UserProfileScreen> {
+  UserProfile? _userProfile;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserProfile();
+  }
+
+  // Fetch user profile data
+  Future<void> _fetchUserProfile() async {
+    try {
+      final userProfile = await UserProfileService.fetchUserProfile();
+      setState(() {
+        _userProfile = userProfile;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print("Error fetching user profile: $e");
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // Handle user sign out (Placeholder function)
+  void _signOut() {
+    print("User signed out"); // TODO: Implement real sign-out logic
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Signed out successfully!")),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      // _________________Top AppBar__________________
       appBar: AppBar(
-        title: const Text("GreenBite"),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 30,
-          fontWeight: FontWeight.bold,
+        title: const Text(
+          'Profile',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         backgroundColor: Colors.green,
-        leading: IconButton(
-          icon: const Icon(Icons.support_agent),
-          onPressed: () {
-            print("Support icon tapped");
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const CartScreen()));
-            },
-          ),
-        ],
       ),
-      // _________________Top AppBar Ends__________________
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _userProfile == null
+              ? const Center(
+                  child: Text('Failed to load user profile',
+                      style: TextStyle(fontSize: 18, color: Colors.grey)))
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Profile Picture
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundImage:
+                            NetworkImage(_userProfile!.profilePictureUrl),
+                      ),
+                      const SizedBox(height: 16),
 
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              _buildProfileHeader(),
-              const SizedBox(height: 30),
-              _buildQuickActions(context),
-              const SizedBox(height: 30),
-              _buildStats(),
-              const SizedBox(height: 30),
-              _buildMenuOptions(),
-            ],
-          ),
-        ),
-      ),
+                      // User Name
+                      Text(
+                        _userProfile!.name,
+                        style: const TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Email
+                      Text(
+                        _userProfile!.email,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Info Cards
+                      _buildInfoCard(
+                          Icons.phone, "Phone", _userProfile!.phoneNumber),
+                      _buildInfoCard(
+                          Icons.location_on, "Address", _userProfile!.address),
+
+                      const SizedBox(height: 20),
+
+                      // Edit Profile Button
+                      _buildActionButton(
+                        icon: Icons.edit,
+                        text: "Edit Profile",
+                        color: Colors.blue,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  EditProfileScreen(userProfile: _userProfile!),
+                            ),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 20),
+
+                      // Sign Out Button
+                      _buildActionButton(
+                        icon: Icons.logout,
+                        text: "Sign Out",
+                        color: Colors.red,
+                        onPressed: _signOut,
+                      ),
+                    ],
+                  ),
+                ),
     );
   }
 
-  Widget _buildProfileHeader() {
-    return Column(
-      children: [
-        const CircleAvatar(
-          radius: 60,
-          backgroundImage: AssetImage('assets/user.jpg'),
-        ),
-        const SizedBox(height: 16),
-        const Text(
-          'Lohan Gunathilaka',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'lohan@jamal.com',
-          style: TextStyle(
-            color: Colors.grey,
-            fontSize: 16,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildQuickActions(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _buildActionButton(Icons.calendar_today, 'Activities', context),
-        _buildActionButton(Icons.no_food_outlined, 'Allergies', context),
-        _buildActionButton(Icons.edit, 'Edit', context),
-      ],
-    );
-  }
-
-  Widget _buildActionButton(IconData icon, String label, BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        if (label == 'Edit') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const EditInformation()),
-          );
-        } else if (label == 'Allergies') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const Allergies()),
-          );
-        }
-      },
-      child: Container(
-        width: 90,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.grey[300],
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, size: 24),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: const TextStyle(fontSize: 12),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStats() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _buildStatItem('0', 'Orders\nin Progress'),
-        _buildStatItem('5', 'Total\nOrders'),
-        _buildStatItem('35', 'Total\nPoints'),
-      ],
-    );
-  }
-
-  Widget _buildStatItem(String value, String label) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: Colors.grey,
-            fontSize: 14,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMenuOptions() {
-    return Column(
-      children: [
-        _buildMenuButton(Icons.settings, 'Settings'),
-        const SizedBox(height: 12),
-        // _buildMenuButton(Icons.message, 'Messages'),
-        // const SizedBox(height: 12),
-        _buildMenuButton(Icons.logout, 'Log out'),
-      ],
-    );
-  }
-
-  Widget _buildMenuButton(IconData icon, String label) {
-    return Container(
-      width: 300,
-      decoration: BoxDecoration(
-        color: Colors.green,
-        borderRadius: BorderRadius.circular(12),
-      ),
+  // Widget to display user info
+  Widget _buildInfoCard(IconData icon, String title, String value) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
-        leading: Icon(icon, color: Colors.white),
+        leading: Icon(icon, color: Colors.green),
         title: Text(
-          label,
-          style: const TextStyle(color: Colors.white),
+          title,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
-        onTap: () {},
+        subtitle: Text(value, style: const TextStyle(fontSize: 14)),
+      ),
+    );
+  }
+
+  // Widget to display buttons
+  Widget _buildActionButton(
+      {required IconData icon,
+      required String text,
+      required Color color,
+      required VoidCallback onPressed}) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, color: Colors.white),
+        label: Text(text,
+            style: const TextStyle(fontSize: 18, color: Colors.white)),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          backgroundColor: color,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       ),
     );
   }
