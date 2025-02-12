@@ -4,7 +4,7 @@ import 'user_profile.dart';
 
 class UserProfileService {
   static const String _baseUrl =
-      'http://10.0.2.2:3000/userProfile'; // JSON Server URL
+      'http://127.0.0.1:8080/api/users/2'; // JSON Server URL
 
   // ✅ Fetch User Profile
   static Future<UserProfile> fetchUserProfile() async {
@@ -26,7 +26,8 @@ class UserProfileService {
   static Future<bool> updateUserProfile(UserProfile updatedProfile) async {
     try {
       final response = await http.put(
-        Uri.parse('$_baseUrl/${updatedProfile.id}'), // ✅ Include ID in URL
+        Uri.parse(
+            'http://127.0.0.1:8080/api/users/update'), // ✅ Include ID in URL
         headers: {"Content-Type": "application/json"},
         body: json.encode(
             updatedProfile.toJson()), // Ensure `toJson()` exists in UserProfile
