@@ -1,43 +1,53 @@
 class FoodItem {
+  final String id;
   final String name;
-  final String restaurant;
-  final String imageUrl;
-  final double price;
   final String description;
-  final String category;
+  final double price;
   String quantity;
+  final String photo;
+  final List<String> tags;
+  final String restaurant; // Assuming you want to keep this field
+  final String category; // New category field
 
-  FoodItem(
-      {required this.name,
-      required this.restaurant,
-      required this.imageUrl,
-      required this.price,
-      required this.description,
-      required this.category,
-      required this.quantity});
+  FoodItem({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.price,
+    required this.quantity,
+    required this.photo,
+    required this.tags,
+    required this.restaurant,
+    required this.category, // Added category as a required field
+  });
 
-  // Convert JSON to FoodItem
   factory FoodItem.fromJson(Map<String, dynamic> json) {
     return FoodItem(
-        name: json['name'],
-        restaurant: json['restaurant'],
-        imageUrl: json['imageUrl'],
-        price: (json['price'] as num).toDouble(), // Ensure price is double
-        description: json['description'],
-        category: json['category'],
-        quantity: json['quantity'].toString());
+      id: json['id'].toString(),
+      name: json['name'],
+      description: json['description'],
+      price: (json['price'] as num).toDouble(),
+      quantity: json['quantity'].toString(),
+      photo: json['photo'],
+      tags: List<String>.from(json['tags']),
+      restaurant:
+          json['restaurant'] ?? 'Unknown', // Default value if not provided
+      category:
+          json['category'] ?? 'Uncategorized', // Default value for category
+    );
   }
 
-  // Convert FoodItem to JSON
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
-      'restaurant': restaurant,
-      'imageUrl': imageUrl,
-      'price': price,
       'description': description,
-      'category': category,
-      'quantity': quantity
+      'price': price,
+      'quantity': quantity,
+      'photo': photo,
+      'tags': tags,
+      'restaurant': restaurant,
+      'category': category, // Added category to JSON serialization
     };
   }
 }

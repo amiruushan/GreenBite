@@ -32,7 +32,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
-                widget.foodItem.imageUrl,
+                widget.foodItem.photo,
                 width: double.infinity,
                 height: 200,
                 fit: BoxFit.cover,

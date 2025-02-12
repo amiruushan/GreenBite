@@ -19,13 +19,15 @@ class CartProvider extends ChangeNotifier {
     } else {
       // ✅ Add the item with the correct quantity
       _cartItems.add(FoodItem(
+        id: item.id,
         name: item.name,
         restaurant: item.restaurant,
-        imageUrl: item.imageUrl,
+        photo: item.photo,
         price: item.price,
         description: item.description,
         category: item.category,
         quantity: selectedQuantity.toString(), // ✅ Set correct quantity
+        tags: item.tags,
       ));
     }
     notifyListeners();

@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadFoodItems() async {
     try {
       final response =
-          await http.get(Uri.parse('http://10.0.2.2:3000/foodItems'));
+          await http.get(Uri.parse('http://127.0.0.1:8080/api/food-items/get'));
 
       if (response.statusCode == 200) {
         List<dynamic> jsonResponse = json.decode(response.body);
