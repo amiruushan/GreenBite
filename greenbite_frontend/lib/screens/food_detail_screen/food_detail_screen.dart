@@ -13,7 +13,7 @@ class FoodDetailScreen extends StatefulWidget {
 }
 
 class _FoodDetailScreenState extends State<FoodDetailScreen> {
-  int selectedQuantity = 1; // Initial selected quantity
+  int selectedQuantity = 1; // ✅ Track selected quantity
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Food Image
+            // ✅ Food Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
@@ -40,21 +40,21 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Food Name
+            // ✅ Food Name
             Text(
               widget.foodItem.name,
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
 
-            // Restaurant Name
+            // ✅ Restaurant Name
             Text(
               widget.foodItem.restaurant,
               style: const TextStyle(fontSize: 18, color: Colors.grey),
             ),
             const SizedBox(height: 20),
 
-            // Price
+            // ✅ Price
             Text(
               "\$${widget.foodItem.price.toStringAsFixed(2)}",
               style: const TextStyle(
@@ -65,7 +65,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Description
+            // ✅ Description
             const Text(
               "Description",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -77,7 +77,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Quantity Selector
+            // ✅ Quantity Selector
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -110,7 +110,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Add to Cart Button
+            // ✅ Add to Cart Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -118,9 +118,8 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                   final cartProvider =
                       Provider.of<CartProvider>(context, listen: false);
 
-                  for (int i = 0; i < selectedQuantity; i++) {
-                    cartProvider.addToCart(widget.foodItem);
-                  }
+                  // ✅ Pass the correct selected quantity
+                  cartProvider.addToCart(widget.foodItem, selectedQuantity);
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(

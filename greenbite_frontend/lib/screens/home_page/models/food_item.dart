@@ -5,7 +5,7 @@ class FoodItem {
   final double price;
   final String description;
   final String category;
-  final String quantity;
+  String quantity;
 
   FoodItem(
       {required this.name,
