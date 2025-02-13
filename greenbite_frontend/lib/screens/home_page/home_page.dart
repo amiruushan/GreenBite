@@ -29,18 +29,35 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadFoodItems() async {
+    final userId = 1; // Replace with the actual user ID
     try {
-      final response =
+      // Fetch all food items
+      final foodResponse =
           await http.get(Uri.parse('http://127.0.0.1:8080/api/food-items/get'));
 
-      if (response.statusCode == 200) {
-        List<dynamic> jsonResponse = json.decode(response.body);
+      // Fetch favorite items
+      final favoriteResponse = await http
+          .get(Uri.parse('http://127.0.0.1:8080/api/favorites/user/$userId'));
+
+      if (foodResponse.statusCode == 200 &&
+          favoriteResponse.statusCode == 200) {
+        List<dynamic> foodJson = json.decode(foodResponse.body);
+        List<dynamic> favoriteJson = json.decode(favoriteResponse.body);
+
+        // Convert food items
+        List<FoodItem> allFoodItems =
+            foodJson.map((data) => FoodItem.fromJson(data)).toList();
+
+        // Convert favorites
+        Set<FoodItem> favorites =
+            favoriteJson.map((data) => FoodItem.fromJson(data)).toSet();
+
         setState(() {
-          foodItems =
-              jsonResponse.map((data) => FoodItem.fromJson(data)).toList();
+          foodItems = allFoodItems;
+          favoriteItems = favorites; // ✅ Ensure the favorite icon is updated
         });
       } else {
-        print("Failed to load food items");
+        print("Failed to load food or favorite items");
       }
     } catch (e) {
       print("Error fetching data: $e");
