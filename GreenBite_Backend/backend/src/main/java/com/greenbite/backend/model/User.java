@@ -18,28 +18,42 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     @Column(unique = true, nullable = false)
     private String username;
+
     @Column(unique = true, nullable = false)
     private String email;
+
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "profile_picture_url")
+    private String profilePictureUrl; // ✅ New field
+
+    @Column(name = "phone_number")
+    private String phoneNumber; // ✅ New field
+
+    @Column(name = "address")
+    private String address; // ✅ New field
+
     @Column(name = "verification_code")
     private String verificationCode;
+
     @Column(name = "verification_expiration")
     private LocalDateTime verificationCodeExpiresAt;
 
     private boolean enabled;
 
-    //constructor for creating an unverified user
+    // Constructor for creating an unverified user
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;
     }
-    //default constructor
-    public User(){
+
+    // Default constructor
+    public User() {
     }
 
     @Override
@@ -47,7 +61,6 @@ public class User implements UserDetails {
         return List.of();
     }
 
-    //TODO: add proper boolean checks
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -72,10 +85,10 @@ public class User implements UserDetails {
     public String getUsername() {
         return username;
     }
+
     @Override
     public String getPassword() {
         return password;
     }
-
-
 }
+
