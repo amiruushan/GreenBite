@@ -91,6 +91,13 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _removeFavorite(FoodItem item) {
+    setState(() {
+      favoriteItems.removeWhere((fav) => fav.id == item.id);
+      ;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final int userId = 1;
@@ -101,7 +108,10 @@ class _HomePageState extends State<HomePage> {
         onToggleFavorite: _toggleFavorite,
       ),
       SearchScreen(foodItems: foodItems),
-      FavoritesScreen(userId: userId),
+      FavoritesScreen(
+        userId: userId,
+        onRemoveFavorite: _removeFavorite,
+      ),
       UserProfileScreen(),
     ];
 
@@ -251,8 +261,10 @@ class HomePageContent extends StatelessWidget {
                         padding: const EdgeInsets.only(bottom: 10),
                         child: FoodCard(
                           foodItem: item,
-                          isFavorite: favoriteItems.contains(item),
-                          onFavoritePressed: () => onToggleFavorite(item),
+                          isFavorite: favoriteItems
+                              .contains(item), // ✅ Checks correctly
+                          onFavoritePressed: () =>
+                              onToggleFavorite(item), // ✅ Toggle function
                         ),
                       );
                     },

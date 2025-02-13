@@ -7,8 +7,13 @@ import 'package:greenbite_frontend/screens/home_page/widgets/food_card.dart';
 
 class FavoritesScreen extends StatefulWidget {
   final int userId; // Get user ID dynamically
+  final Function(FoodItem) onRemoveFavorite;
 
-  const FavoritesScreen({super.key, required this.userId});
+  const FavoritesScreen({
+    super.key,
+    required this.userId,
+    required this.onRemoveFavorite,
+  });
 
   @override
   State<FavoritesScreen> createState() => _FavoritesScreenState();
@@ -50,8 +55,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     }
   }
 
-  void _toggleFavorite(FoodItem item) async {
-    final userId = widget.userId; // Use the passed user ID
+  void _removeFavorite(FoodItem item) async {
+    final userId = widget.userId;
 
     try {
       final response = await http.delete(
@@ -64,14 +69,21 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         setState(() {
           favoriteItems.remove(item); // Remove item from UI
         });
+        widget.onRemoveFavorite(item); // Update HomePage state
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Removed from favorites!")),
         );
       } else {
         print("Failed to remove favorite. Status: ${response.statusCode}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to remove favorite!")),
+        );
       }
     } catch (e) {
       print("Error removing favorite: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("An error occurred!")),
+      );
     }
   }
 
@@ -114,7 +126,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         foodItem: item,
                         isFavorite: true,
                         onFavoritePressed: () {
-                          _toggleFavorite(item);
+                          _removeFavorite(item);
                         },
                       ),
                     );
