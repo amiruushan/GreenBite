@@ -3,12 +3,13 @@ import 'package:http/http.dart' as http;
 import 'user_profile.dart';
 
 class UserProfileService {
-  static const String _baseUrl = 'http://10.0.2.2:3000'; // JSON Server URL
+  static const String _baseUrl =
+      'http://127.0.0.1:8080/api/users/2'; // JSON Server URL
 
   // ✅ Fetch User Profile
   static Future<UserProfile> fetchUserProfile() async {
     try {
-      final response = await http.get(Uri.parse('$_baseUrl/userProfile'));
+      final response = await http.get(Uri.parse(_baseUrl));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
@@ -21,11 +22,12 @@ class UserProfileService {
     }
   }
 
-  // ✅ FIX: Add this function to update user profile (PUT request)
+  // ✅ FIX: Update user profile using PUT request with ID
   static Future<bool> updateUserProfile(UserProfile updatedProfile) async {
     try {
       final response = await http.put(
-        Uri.parse('$_baseUrl/userProfile'),
+        Uri.parse(
+            'http://127.0.0.1:8080/api/users/update'), // ✅ Include ID in URL
         headers: {"Content-Type": "application/json"},
         body: json.encode(
             updatedProfile.toJson()), // Ensure `toJson()` exists in UserProfile

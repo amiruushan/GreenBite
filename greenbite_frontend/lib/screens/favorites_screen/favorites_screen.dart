@@ -1,146 +1,137 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/food_card.dart';
 
 class FavoritesScreen extends StatefulWidget {
-  final List<FoodItem> favoriteItems;
+  final int userId; // Get user ID dynamically
+  final Function(FoodItem) onRemoveFavorite;
 
-  const FavoritesScreen({super.key, required this.favoriteItems});
+  const FavoritesScreen({
+    super.key,
+    required this.userId,
+    required this.onRemoveFavorite,
+  });
 
   @override
   State<FavoritesScreen> createState() => _FavoritesScreenState();
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
-  String searchQuery = "";
-  List<FoodItem> filteredFavorites = [];
+  List<FoodItem> favoriteItems = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    filteredFavorites = widget.favoriteItems;
+    _fetchFavorites();
   }
 
-  void _searchFavorites(String query) {
-    setState(() {
-      searchQuery = query;
-      filteredFavorites = widget.favoriteItems
-          .where((item) =>
-              item.name.toLowerCase().contains(query.toLowerCase()) ||
-              item.restaurant.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-    });
+  Future<void> _fetchFavorites() async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://127.0.0.1:8080/api/favorites/user/${widget.userId}'),
+      );
+
+      if (response.statusCode == 200) {
+        var decodedResponse = json.decode(response.body);
+
+        if (decodedResponse is List) {
+          setState(() {
+            favoriteItems =
+                decodedResponse.map((data) => FoodItem.fromJson(data)).toList();
+            isLoading = false;
+          });
+        } else {
+          print("Unexpected response format: $decodedResponse");
+        }
+      } else {
+        print("Failed to fetch favorites. Status: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error fetching favorites: $e");
+    }
+  }
+
+  void _removeFavorite(FoodItem item) async {
+    final userId = widget.userId;
+
+    try {
+      final response = await http.delete(
+        Uri.parse(
+          'http://127.0.0.1:8080/api/favorites/remove/$userId/${item.id}',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          favoriteItems.remove(item); // Remove item from UI
+        });
+        widget.onRemoveFavorite(item); // Update HomePage state
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Removed from favorites!")),
+        );
+      } else {
+        print("Failed to remove favorite. Status: ${response.statusCode}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to remove favorite!")),
+        );
+      }
+    } catch (e) {
+      print("Error removing favorite: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("An error occurred!")),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Green Bite"),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 30,
-          fontWeight: FontWeight.bold,
-        ),
+        title: const Text("Favorites"),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 117, 237, 123),
-        leading: IconButton(
-          icon: const Icon(Icons.support_agent),
-          onPressed: () {
-            print("Support icon tapped");
-          },
-        ),
+        backgroundColor: Colors.green,
         actions: [
           IconButton(
             icon: const Icon(Icons.shopping_cart),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const CartScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CartScreen()),
+              );
             },
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ✅ Search Bar
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    spreadRadius: 2,
-                    offset: const Offset(0, 2),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : favoriteItems.isEmpty
+              ? const Center(
+                  child: Text(
+                    "No favorites yet!",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                ],
-              ),
-              child: TextField(
-                onChanged: _searchFavorites,
-                decoration: InputDecoration(
-                  hintText: "Search favorites...",
-                  hintStyle: const TextStyle(color: Colors.grey),
-                  border: InputBorder.none,
-                  prefixIcon: const Icon(Icons.search, color: Colors.green),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 15),
-                ),
-              ),
-            ),
-            const SizedBox(height: 15),
-
-            // ✅ Display Favorites or Show "No Favorites" Message
-            Expanded(
-              child: filteredFavorites.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.favorite_border,
-                              size: 60, color: Colors.grey.shade400),
-                          const SizedBox(height: 10),
-                          const Text(
-                            "No favorites found!",
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Text(
-                            "Try searching for something else.",
-                            style: TextStyle(fontSize: 16, color: Colors.grey),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: favoriteItems.length,
+                  itemBuilder: (context, index) {
+                    final item = favoriteItems[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: FoodCard(
+                        foodItem: item,
+                        isFavorite: true,
+                        onFavoritePressed: () {
+                          _removeFavorite(item);
+                        },
                       ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.only(top: 8),
-                      itemCount: filteredFavorites.length,
-                      itemBuilder: (context, index) {
-                        final item = filteredFavorites[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: FoodCard(
-                            foodItem: item,
-                            isFavorite: true,
-                            onFavoritePressed: () {
-                              // Handle favorite removal if needed
-                            },
-                          ),
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
-      ),
+                    );
+                  },
+                ),
     );
   }
 }

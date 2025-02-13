@@ -6,7 +6,8 @@ class FoodItem {
   String quantity;
   final String photo;
   final List<String> tags;
-  final String restaurant; // Assuming you want to keep this field
+  final String restaurant;
+  final int shopId; // Assuming you want to keep this field
   final String category; // New category field
 
   FoodItem({
@@ -18,6 +19,7 @@ class FoodItem {
     required this.photo,
     required this.tags,
     required this.restaurant,
+    required this.shopId,
     required this.category, // Added category as a required field
   });
 
@@ -29,11 +31,12 @@ class FoodItem {
       price: (json['price'] as num).toDouble(),
       quantity: json['quantity'].toString(),
       photo: json['photo'],
-      tags: List<String>.from(json['tags']),
-      restaurant:
-          json['restaurant'] ?? 'Unknown', // Default value if not provided
-      category:
-          json['category'] ?? 'Uncategorized', // Default value for category
+      shopId: json['shopId'],
+      tags: json['tags'] is List
+          ? List<String>.from(json['tags'])
+          : json['tags'].toString().split(','), // ✅ Convert string to list
+      restaurant: json['restaurant'] ?? 'Unknown',
+      category: json['category'] ?? 'Uncategorized',
     );
   }
 
@@ -47,7 +50,17 @@ class FoodItem {
       'photo': photo,
       'tags': tags,
       'restaurant': restaurant,
+      'shopId': shopId,
       'category': category, // Added category to JSON serialization
     };
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is FoodItem && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
 }

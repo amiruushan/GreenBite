@@ -29,32 +29,77 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadFoodItems() async {
+    final userId = 1; // Replace with the actual user ID
     try {
-      final response =
+      // Fetch all food items
+      final foodResponse =
           await http.get(Uri.parse('http://127.0.0.1:8080/api/food-items/get'));
 
-      if (response.statusCode == 200) {
-        List<dynamic> jsonResponse = json.decode(response.body);
+      // Fetch favorite items
+      final favoriteResponse = await http
+          .get(Uri.parse('http://127.0.0.1:8080/api/favorites/user/$userId'));
+
+      if (foodResponse.statusCode == 200 &&
+          favoriteResponse.statusCode == 200) {
+        List<dynamic> foodJson = json.decode(foodResponse.body);
+        List<dynamic> favoriteJson = json.decode(favoriteResponse.body);
+
+        // Convert food items
+        List<FoodItem> allFoodItems =
+            foodJson.map((data) => FoodItem.fromJson(data)).toList();
+
+        // Convert favorites
+        Set<FoodItem> favorites =
+            favoriteJson.map((data) => FoodItem.fromJson(data)).toSet();
+
         setState(() {
-          foodItems =
-              jsonResponse.map((data) => FoodItem.fromJson(data)).toList();
+          foodItems = allFoodItems;
+          favoriteItems = favorites; // ✅ Ensure the favorite icon is updated
         });
       } else {
-        print("Failed to load food items");
+        print("Failed to load food or favorite items");
       }
     } catch (e) {
       print("Error fetching data: $e");
     }
   }
 
-  void _toggleFavorite(FoodItem item) {
-    setState(() {
+  void _toggleFavorite(FoodItem item) async {
+    final userId = 1; // Replace with actual user ID if available
+
+    try {
       if (favoriteItems.contains(item)) {
-        favoriteItems.remove(item);
+        // If already in favorites, remove from backend
+        final response = await http.delete(
+          Uri.parse(
+              'http://127.0.0.1:8080/api/favorites/remove/$userId/${item.id}'),
+        );
+
+        if (response.statusCode == 200) {
+          setState(() {
+            favoriteItems.remove(item);
+          });
+        } else {
+          print("Failed to remove favorite. Status: ${response.statusCode}");
+        }
       } else {
-        favoriteItems.add(item);
+        // If not in favorites, add to backend
+        final response = await http.post(
+          Uri.parse(
+              'http://127.0.0.1:8080/api/favorites/add?userId=$userId&foodItemId=${item.id}'),
+        );
+
+        if (response.statusCode == 200) {
+          setState(() {
+            favoriteItems.add(item);
+          });
+        } else {
+          print("Failed to add favorite. Status: ${response.statusCode}");
+        }
       }
-    });
+    } catch (e) {
+      print("Error updating favorites: $e");
+    }
   }
 
   void _onItemTapped(int index) {
@@ -63,8 +108,16 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _removeFavorite(FoodItem item) {
+    setState(() {
+      favoriteItems.removeWhere((fav) => fav.id == item.id);
+      ;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final int userId = 1;
     final List<Widget> screens = [
       HomePageContent(
         foodItems: foodItems,
@@ -72,7 +125,10 @@ class _HomePageState extends State<HomePage> {
         onToggleFavorite: _toggleFavorite,
       ),
       SearchScreen(foodItems: foodItems),
-      FavoritesScreen(favoriteItems: favoriteItems.toList()),
+      FavoritesScreen(
+        userId: userId,
+        onRemoveFavorite: _removeFavorite,
+      ),
       UserProfileScreen(),
     ];
 
@@ -222,8 +278,10 @@ class HomePageContent extends StatelessWidget {
                         padding: const EdgeInsets.only(bottom: 10),
                         child: FoodCard(
                           foodItem: item,
-                          isFavorite: favoriteItems.contains(item),
-                          onFavoritePressed: () => onToggleFavorite(item),
+                          isFavorite: favoriteItems
+                              .contains(item), // ✅ Checks correctly
+                          onFavoritePressed: () =>
+                              onToggleFavorite(item), // ✅ Toggle function
                         ),
                       );
                     },

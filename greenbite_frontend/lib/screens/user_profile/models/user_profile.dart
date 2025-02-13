@@ -1,12 +1,14 @@
 class UserProfile {
-  final String name;
+  final int id;
+  final String username;
   final String email;
   final String profilePictureUrl;
   final String phoneNumber;
   final String address;
 
   UserProfile({
-    required this.name,
+    required this.id,
+    required this.username,
     required this.email,
     required this.profilePictureUrl,
     required this.phoneNumber,
@@ -16,7 +18,8 @@ class UserProfile {
   // ✅ Convert JSON to UserProfile
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
-      name: json['name'],
+      id: json['id'],
+      username: json['username'],
       email: json['email'],
       profilePictureUrl: json['profilePictureUrl'],
       phoneNumber: json['phoneNumber'],
@@ -27,7 +30,8 @@ class UserProfile {
   // ✅ Convert UserProfile to JSON (Fix for update function)
   Map<String, dynamic> toJson() {
     return {
-      "name": name,
+      "id": id,
+      "username": username,
       "email": email,
       "profilePictureUrl": profilePictureUrl,
       "phoneNumber": phoneNumber,
