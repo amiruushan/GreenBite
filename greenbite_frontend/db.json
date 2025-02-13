@@ -1,10 +1,92 @@
 {
-  "userProfile": {
-    "id": 1,
-    "username": "John Doe",
-    "email": "john.doe@example.com",
-    "profilePictureUrl": "https://picsum.photos/250?image=80",
-    "phoneNumber": "+1234567890",
-    "address": "123 Main St, City, Country"
-  }
+  "foodItems": [
+    {
+      "id": "1",
+      "name": "Margherita Pizza",
+      "description": "Classic Italian pizza with fresh tomatoes, basil, and mozzarella.",
+      "price": 9.99,
+      "quantity": "10",
+      "photo": "https://picsum.photos/250?image=1",
+      "tags": ["vegetarian", "cheese", "Italian"],
+      "restaurant": "Joe's Pizzeria",
+      "category": "Pizza"
+    },
+    {
+      "id": "2",
+      "name": "Spicy Tuna Sushi",
+      "description": "Fresh tuna rolls with a spicy mayo sauce.",
+      "price": 12.99,
+      "quantity": "15",
+      "photo": "https://picsum.photos/250?image=2",
+      "tags": ["Japanese", "seafood", "sushi"],
+      "restaurant": "Sakura Sushi",
+      "category": "Sushi"
+    },
+    {
+      "id": "3",
+      "name": "Chicken Burger",
+      "description": "Crispy chicken patty with fresh lettuce, tomato, and mayo.",
+      "price": 7.99,
+      "quantity": "20",
+      "photo": "https://picsum.photos/250?image=3",
+      "tags": ["fast food", "chicken", "burger"],
+      "restaurant": "Burger Hub",
+      "category": "Burgers"
+    },
+    {
+      "id": "4",
+      "name": "Vegan Caesar Salad",
+      "description": "Crisp romaine lettuce, vegan caesar dressing, and crunchy croutons.",
+      "price": 6.99,
+      "quantity": "10",
+      "photo": "https://picsum.photos/250?image=4",
+      "tags": ["healthy", "vegan", "salad"],
+      "restaurant": "Green Bites",
+      "category": "Salads"
+    },
+    {
+      "id": "5",
+      "name": "BBQ Ribs",
+      "description": "Slow-cooked ribs with smoky BBQ sauce.",
+      "price": 18.99,
+      "quantity": "8",
+      "photo": "https://picsum.photos/250?image=5",
+      "tags": ["barbecue", "meat", "American"],
+      "restaurant": "Smokey's Grill",
+      "category": "Grill"
+    },
+    {
+      "id": "6",
+      "name": "Penne Alfredo",
+      "description": "Creamy alfredo sauce with parmesan and grilled chicken.",
+      "price": 11.49,
+      "quantity": "12",
+      "photo": "https://picsum.photos/250?image=6",
+      "tags": ["pasta", "Italian", "creamy"],
+      "restaurant": "Pasta Palace",
+      "category": "Pasta"
+    },
+    {
+      "id": "7",
+      "name": "Chocolate Lava Cake",
+      "description": "Decadent chocolate cake with a gooey molten center.",
+      "price": 5.99,
+      "quantity": "14",
+      "photo": "https://picsum.photos/250?image=7",
+      "tags": ["dessert", "chocolate", "cake"],
+      "restaurant": "Sweet Treats",
+      "category": "Desserts"
+    },
+    {
+      "id": "8",
+      "name": "Mango Smoothie",
+      "description": "Refreshing mango smoothie with yogurt and honey.",
+      "price": 4.49,
+      "quantity": "25",
+      "photo": "https://picsum.photos/250?image=8",
+      "tags": ["smoothie", "fruit", "healthy"],
+      "restaurant": "Fresh Blends",
+      "category": "Drinks"
+    }
+  ]
 }
