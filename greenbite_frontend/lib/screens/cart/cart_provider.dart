@@ -27,6 +27,7 @@ class CartProvider extends ChangeNotifier {
         description: item.description,
         category: item.category,
         quantity: selectedQuantity.toString(), // ✅ Set correct quantity
+        shopId: item.shopId,
         tags: item.tags,
       ));
     }

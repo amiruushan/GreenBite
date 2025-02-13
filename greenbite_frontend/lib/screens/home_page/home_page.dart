@@ -30,8 +30,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadFoodItems() async {
     try {
-      final response = await http
-          .get(Uri.parse('http://192.168.1.2:8080/api/food-items/get'));
+      final response =
+          await http.get(Uri.parse('http://127.0.0.1:8080/api/food-items/get'));
 
       if (response.statusCode == 200) {
         List<dynamic> jsonResponse = json.decode(response.body);
@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
         // If already in favorites, remove from backend
         final response = await http.delete(
           Uri.parse(
-              'http://192.168.1.2:8080/api/favorites/remove?userId=$userId&foodItemId=${item.id}'),
+              'http://127.0.0.1:8080/api/favorites/remove/$userId/${item.id}'),
         );
 
         if (response.statusCode == 200) {
@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
         // If not in favorites, add to backend
         final response = await http.post(
           Uri.parse(
-              'http://192.168.1.2:8080/api/favorites/add?userId=$userId&foodItemId=${item.id}'),
+              'http://127.0.0.1:8080/api/favorites/add?userId=$userId&foodItemId=${item.id}'),
         );
 
         if (response.statusCode == 200) {

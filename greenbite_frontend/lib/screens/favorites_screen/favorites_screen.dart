@@ -27,17 +27,21 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   Future<void> _fetchFavorites() async {
     try {
       final response = await http.get(
-        Uri.parse(
-            'http://192.168.1.2:8080/api/favorites/user/${widget.userId}'),
+        Uri.parse('http://127.0.0.1:8080/api/favorites/user/${widget.userId}'),
       );
 
       if (response.statusCode == 200) {
-        List<dynamic> jsonResponse = json.decode(response.body);
-        setState(() {
-          favoriteItems =
-              jsonResponse.map((data) => FoodItem.fromJson(data)).toList();
-          isLoading = false;
-        });
+        var decodedResponse = json.decode(response.body);
+
+        if (decodedResponse is List) {
+          setState(() {
+            favoriteItems =
+                decodedResponse.map((data) => FoodItem.fromJson(data)).toList();
+            isLoading = false;
+          });
+        } else {
+          print("Unexpected response format: $decodedResponse");
+        }
       } else {
         print("Failed to fetch favorites. Status: ${response.statusCode}");
       }
@@ -52,7 +56,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     try {
       final response = await http.delete(
         Uri.parse(
-          'http://192.168.1.2:8080/api/favorites/remove?userId=$userId&foodItemId=${item.id}',
+          'http://127.0.0.1:8080/api/favorites/remove/$userId/${item.id}',
         ),
       );
 
