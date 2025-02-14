@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/home_page/models/shop_item.dart';
+import 'package:greenbite_frontend/screens/home_page/widgets/shop_details_page.dart';
 import 'dart:convert'; // For JSON parsing
 import 'package:http/http.dart' as http;
+// Import the ShopDetailsPage
 
 class ShopsTab extends StatefulWidget {
   const ShopsTab({super.key});
@@ -87,30 +89,41 @@ class _ShopsTabState extends State<ShopsTab> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(16),
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          shop.imageUrl, // Shop's image URL
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ShopDetailsPage(
+                                shopId: "1"), // ✅ Pass shopId correctly
+                          ),
+                        );
+                      },
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(16),
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            shop.imageUrl, // Shop's image URL
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                      title: Text(
-                        shop.name, // Shop name
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                        title: Text(
+                          shop.name, // Shop name
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
                         ),
-                      ),
-                      subtitle: Text(
-                        shop.description, // Shop description
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
+                        subtitle: Text(
+                          shop.description, // Shop description
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
                     ),
