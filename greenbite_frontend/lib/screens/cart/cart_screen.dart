@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
+import 'package:greenbite_frontend/screens/checkout_page/checkout_page.dart';
 import 'package:provider/provider.dart';
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
 
@@ -92,7 +93,7 @@ class CartScreen extends StatelessWidget {
                                 ),
                               ),
 
-                              // Quantity Display (Static, No +/- Buttons)
+                              // Quantity Display
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 8),
@@ -108,6 +109,16 @@ class CartScreen extends StatelessWidget {
                                     color: Colors.green,
                                   ),
                                 ),
+                              ),
+                              const SizedBox(width: 12),
+
+                              // Remove Button (Trash Icon)
+                              IconButton(
+                                icon:
+                                    const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {
+                                  cartProvider.removeItem(item);
+                                },
                               ),
                             ],
                           ),
@@ -161,7 +172,11 @@ class CartScreen extends StatelessWidget {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            // Implement checkout logic
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CheckoutPage()));
                           },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),

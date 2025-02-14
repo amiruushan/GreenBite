@@ -32,7 +32,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   Future<void> _fetchFavorites() async {
     try {
       final response = await http.get(
-        Uri.parse('http://127.0.0.1:8080/api/favorites/user/${widget.userId}'),
+        Uri.parse(
+            'http://192.168.1.6:8080/api/favorites/user/${widget.userId}'),
       );
 
       if (response.statusCode == 200) {
@@ -61,7 +62,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     try {
       final response = await http.delete(
         Uri.parse(
-          'http://127.0.0.1:8080/api/favorites/remove/$userId/${item.id}',
+          'http://192.168.1.6:8080/api/favorites/remove/$userId/${item.id}',
         ),
       );
 

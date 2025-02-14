@@ -6,18 +6,19 @@ class CartProvider extends ChangeNotifier {
 
   List<FoodItem> get cartItems => _cartItems;
 
-  // ✅ Ensure this method accepts two arguments
+  // ✅ Add to cart (updates quantity if item exists)
   void addToCart(FoodItem item, int selectedQuantity) {
     final existingItemIndex =
         _cartItems.indexWhere((cartItem) => cartItem.name == item.name);
 
     if (existingItemIndex != -1) {
-      // ✅ Increase quantity by the selected amount
-      _cartItems[existingItemIndex].quantity =
-          (int.parse(_cartItems[existingItemIndex].quantity) + selectedQuantity)
-              .toString();
+      // ✅ Convert quantity to int and increase it
+      int updatedQuantity =
+          (int.tryParse(_cartItems[existingItemIndex].quantity) ?? 1) +
+              selectedQuantity;
+      _cartItems[existingItemIndex].quantity = updatedQuantity.toString();
     } else {
-      // ✅ Add the item with the correct quantity
+      // ✅ Add new item with selected quantity
       _cartItems.add(FoodItem(
         id: item.id,
         name: item.name,
@@ -26,7 +27,7 @@ class CartProvider extends ChangeNotifier {
         price: item.price,
         description: item.description,
         category: item.category,
-        quantity: selectedQuantity.toString(), // ✅ Set correct quantity
+        quantity: selectedQuantity.toString(),
         shopId: item.shopId,
         tags: item.tags,
       ));
@@ -34,11 +35,28 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void removeFromCart(FoodItem item) {
-    _cartItems.removeWhere((cartItem) => cartItem.name == item.name);
+  // ✅ Fixed: Renamed to `removeItem` (match call in CartScreen)
+  void removeItem(FoodItem item) {
+    final existingItemIndex =
+        _cartItems.indexWhere((cartItem) => cartItem.name == item.name);
+
+    if (existingItemIndex != -1) {
+      int currentQuantity =
+          int.tryParse(_cartItems[existingItemIndex].quantity) ?? 1;
+
+      if (currentQuantity > 1) {
+        // ✅ Reduce quantity instead of removing immediately
+        _cartItems[existingItemIndex].quantity =
+            (currentQuantity - 1).toString();
+      } else {
+        // ✅ Remove item if quantity is 1
+        _cartItems.removeAt(existingItemIndex);
+      }
+    }
     notifyListeners();
   }
 
+  // ✅ Calculate total price dynamically
   double totalPrice() {
     return _cartItems.fold(0.0, (sum, item) {
       return sum + (item.price * (int.tryParse(item.quantity) ?? 1));
