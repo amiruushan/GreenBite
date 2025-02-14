@@ -1,6 +1,8 @@
 package com.greenbite.backend.controller;
 import com.greenbite.backend.dto.FoodItemDTO;
+import com.greenbite.backend.dto.FoodShopDTO;
 import com.greenbite.backend.service.FoodItemService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -27,6 +29,8 @@ public class FoodItemController {
     public List<FoodItemDTO> getFoodItemsByShop(@PathVariable Long shopId) {
         return foodItemService.getFoodItemsByShop(shopId);
     }
+
+
 
 //    @GetMapping("/tags/{tags}")
 //    public List<FoodItemDTO> getFoodItemsByTags(@PathVariable String tags) {

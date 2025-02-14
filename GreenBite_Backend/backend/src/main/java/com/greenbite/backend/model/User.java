@@ -19,6 +19,15 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(nullable = false)
+    private String firstName; // ✅ New Field
+
+    @Column(nullable = false)
+    private String surname; // ✅ New Field
+
+    @Column(nullable = false)
+    private String district; // ✅ New Field
+
     @Column(unique = true, nullable = false)
     private String username;
 
@@ -29,13 +38,16 @@ public class User implements UserDetails {
     private String password;
 
     @Column(name = "profile_picture_url")
-    private String profilePictureUrl; // ✅ New field
+    private String profilePictureUrl;
+
+    @Column(nullable = false)
+    private String role;
 
     @Column(name = "phone_number")
-    private String phoneNumber; // ✅ New field
+    private String phoneNumber;
 
     @Column(name = "address")
-    private String address; // ✅ New field
+    private String address;
 
     @Column(name = "verification_code")
     private String verificationCode;
@@ -45,11 +57,16 @@ public class User implements UserDetails {
 
     private boolean enabled;
 
-    // Constructor for creating an unverified user
-    public User(String username, String email, String password) {
+    // Constructor for new user with required fields
+    public User(String username, String email, String password, String firstName, String surname, String district, String address, String role) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.firstName = firstName;
+        this.surname = surname;
+        this.district = district;
+        this.address=address;
+        this.role=role;
     }
 
     // Default constructor
