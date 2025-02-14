@@ -71,7 +71,7 @@ class _VendorHomeState extends State<VendorHome> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Green Bite"),
+        title: const Text("Dashboard"),
         titleTextStyle: const TextStyle(
           color: Colors.white,
           fontSize: 30,
