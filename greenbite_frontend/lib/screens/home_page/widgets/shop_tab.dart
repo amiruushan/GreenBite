@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/home_page/models/shop_item.dart';
 import 'dart:convert'; // For JSON parsing
-import 'package:http/http.dart' as http; // Import ShopItem class
+import 'package:http/http.dart' as http;
 
 class ShopsTab extends StatefulWidget {
   const ShopsTab({super.key});
@@ -25,7 +25,7 @@ class _ShopsTabState extends State<ShopsTab> {
     try {
       // Replace this URL with your backend API endpoint
       final response =
-          await http.get(Uri.parse("https://example.com/shops.json"));
+          await http.get(Uri.parse("http://127.0.0.1:8080/api/shop/all"));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -58,15 +58,19 @@ class _ShopsTabState extends State<ShopsTab> {
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
             "Nearby Shops",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 20),
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -74,29 +78,42 @@ class _ShopsTabState extends State<ShopsTab> {
             itemBuilder: (context, index) {
               final shop = shopItems[index];
               return Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Card(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Material(
                   elevation: 4,
-                  child: ListTile(
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        shop.imageUrl, // Shop's image URL
-                        width: 60,
-                        height: 60,
-                        fit: BoxFit.cover,
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(16),
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          shop.imageUrl, // Shop's image URL
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      title: Text(
+                        shop.name, // Shop name
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                      subtitle: Text(
+                        shop.description, // Shop description
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
-                    title: Text(
-                      shop.name, // Shop name
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Text(shop.description), // Shop description
                   ),
                 ),
               );

@@ -33,12 +33,12 @@ class _HomePageState extends State<HomePage> {
     final userId = 1; // Replace with the actual user ID
     try {
       // Fetch all food items
-      final foodResponse = await http
-          .get(Uri.parse('http://192.168.1.6:8080/api/food-items/get'));
+      final foodResponse =
+          await http.get(Uri.parse('http://127.0.0.1:8080/api/food-items/get'));
 
       // Fetch favorite items
       final favoriteResponse = await http
-          .get(Uri.parse('http://192.168.1.6:8080/api/favorites/user/$userId'));
+          .get(Uri.parse('http://127.0.0.1:8080/api/favorites/user/$userId'));
 
       if (foodResponse.statusCode == 200 &&
           favoriteResponse.statusCode == 200) {
@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
         // If already in favorites, remove from backend
         final response = await http.delete(
           Uri.parse(
-              'http://192.168.1.6:8080/api/favorites/remove/$userId/${item.id}'),
+              'http://127.0.0.1:8080/api/favorites/remove/$userId/${item.id}'),
         );
 
         if (response.statusCode == 200) {
@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage> {
         // If not in favorites, add to backend
         final response = await http.post(
           Uri.parse(
-              'http://192.168.1.6:8080/api/favorites/add?userId=$userId&foodItemId=${item.id}'),
+              'http://127.0.0.1:8080/api/favorites/add?userId=$userId&foodItemId=${item.id}'),
         );
 
         if (response.statusCode == 200) {
