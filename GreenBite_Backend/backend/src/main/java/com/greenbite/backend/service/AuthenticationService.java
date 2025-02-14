@@ -35,13 +35,25 @@ public class AuthenticationService {
     }
 
     public User signup(RegisterUserDto input) {
-        User user = new User(input.getUsername(), input.getEmail(), passwordEncoder.encode(input.getPassword()));
+        User user = new User(
+                input.getUsername(),
+                input.getEmail(),
+                passwordEncoder.encode(input.getPassword()),
+                input.getFirstName(), // ✅ New Field
+                input.getSurname(), // ✅ New Field
+                input.getDistrict(), // ✅ New Field
+                input.getAddress(),
+                input.getRole()
+        );
+
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
         user.setEnabled(false);
         sendVerificationEmail(user);
+
         return userRepository.save(user);
     }
+
 
     public User authenticate(LoginUserDto input) {
         User user = userRepository.findByEmail(input.getEmail())
