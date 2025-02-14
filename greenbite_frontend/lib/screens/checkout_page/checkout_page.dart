@@ -22,6 +22,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Checkout"),
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
+        ),
         centerTitle: true,
         backgroundColor: Colors.green,
       ),
@@ -31,6 +36,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 40),
               // 🍽️ Header Image
               Center(
                 child: ClipRRect(

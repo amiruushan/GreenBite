@@ -129,9 +129,9 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                             widget.foodItem, selectedQuantity);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(
-                                "${widget.foodItem.name} x$selectedQuantity added to cart!"),
-                          ),
+                              content: Text(
+                                  "${widget.foodItem.name} x$selectedQuantity added to cart!"),
+                              backgroundColor: Colors.green),
                         );
                         setState(() {});
                       }
