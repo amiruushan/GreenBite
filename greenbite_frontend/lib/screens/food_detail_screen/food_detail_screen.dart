@@ -13,11 +13,30 @@ class FoodDetailScreen extends StatefulWidget {
 }
 
 class _FoodDetailScreenState extends State<FoodDetailScreen> {
-  int selectedQuantity = 1; // ✅ Track selected quantity
+  int selectedQuantity = 1;
 
   @override
   Widget build(BuildContext context) {
+    final cartProvider = Provider.of<CartProvider>(context);
+    final cartItem = cartProvider.cartItems.firstWhere(
+      (item) => item.id == widget.foodItem.id,
+      orElse: () => FoodItem(
+        id: '',
+        name: '',
+        description: '',
+        price: 0,
+        quantity: '0',
+        photo: '',
+        tags: [],
+        restaurant: '',
+        shopId: 0,
+        category: '',
+      ),
+    );
+
+    int cartQuantity = int.tryParse(cartItem.quantity) ?? 0;
     int maxQuantity = int.tryParse(widget.foodItem.quantity) ?? 1;
+    bool canAddMore = (cartQuantity + selectedQuantity) <= maxQuantity;
 
     return Scaffold(
       appBar: AppBar(
@@ -28,7 +47,6 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ✅ Food Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
@@ -39,22 +57,16 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // ✅ Food Name
             Text(
               widget.foodItem.name,
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-
-            // ✅ Restaurant Name
             Text(
               widget.foodItem.restaurant,
               style: const TextStyle(fontSize: 18, color: Colors.grey),
             ),
             const SizedBox(height: 20),
-
-            // ✅ Price
             Text(
               "\$${widget.foodItem.price.toStringAsFixed(2)}",
               style: const TextStyle(
@@ -64,8 +76,6 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // ✅ Description
             const Text(
               "Description",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -76,8 +86,6 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
               style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 20),
-
-            // ✅ Quantity Selector
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -97,8 +105,11 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.add_circle, color: Colors.green),
-                  onPressed: selectedQuantity < maxQuantity
+                  icon: Icon(
+                    Icons.add_circle,
+                    color: canAddMore ? Colors.green : Colors.grey,
+                  ),
+                  onPressed: canAddMore
                       ? () {
                           setState(() {
                             selectedQuantity++;
@@ -109,34 +120,33 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
               ],
             ),
             const SizedBox(height: 20),
-
-            // ✅ Add to Cart Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  final cartProvider =
-                      Provider.of<CartProvider>(context, listen: false);
-
-                  // ✅ Pass the correct selected quantity
-                  cartProvider.addToCart(widget.foodItem, selectedQuantity);
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          "${widget.foodItem.name} x$selectedQuantity added to cart!"),
-                    ),
-                  );
-                },
+                onPressed: canAddMore
+                    ? () {
+                        cartProvider.addToCart(
+                            widget.foodItem, selectedQuantity);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(
+                                  "${widget.foodItem.name} x$selectedQuantity added to cart!"),
+                              backgroundColor: Colors.green),
+                        );
+                        setState(() {});
+                      }
+                    : null, // Disable button if max quantity is reached
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.green,
+                  backgroundColor: canAddMore ? Colors.green : Colors.grey,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 child: Text(
-                  "Add $selectedQuantity to Cart",
+                  canAddMore
+                      ? "Add $selectedQuantity to Cart"
+                      : "Max Quantity Reached",
                   style: const TextStyle(fontSize: 18, color: Colors.white),
                 ),
               ),
