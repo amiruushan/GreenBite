@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/screens/vendor/vendor_profile.dart';
 import '../../widgets/vendor_nav_bar.dart';
+import 'list_food.dart';
+import 'orders.dart';
 
 class VendorHome extends StatefulWidget {
   const VendorHome({super.key});
@@ -16,7 +19,24 @@ class _VendorHomeState extends State<VendorHome> {
     setState(() {
       _selectedIndex = index;
     });
-    // You can add navigation logic here if needed
+
+    // Navigate to the respective screen based on the selected index
+    if (index == 1) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ListFood()),
+      );
+    } else if (index == 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Orders()),
+      );
+    } else if (index == 3) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const VendorProfile()),
+      );
+    }
   }
 
   @override
@@ -142,8 +162,6 @@ class _VendorHomeState extends State<VendorHome> {
           ],
         ),
       ),
-
-      // Botton nav bar
       bottomNavigationBar: VendorNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
