@@ -1,15 +1,23 @@
 import 'dart:convert';
+import 'package:greenbite_frontend/service/auth_service';
 import 'package:http/http.dart' as http;
+// Import AuthService
 import 'user_profile.dart';
 
 class UserProfileService {
-  static const String _baseUrl =
-      'http://127.0.0.1:8080/api/users/2'; // JSON Server URL
-
   // ✅ Fetch User Profile
   static Future<UserProfile> fetchUserProfile() async {
     try {
-      final response = await http.get(Uri.parse(_baseUrl));
+      // Get the user ID from SharedPreferences
+      int? userId = await AuthService.getUserId();
+      if (userId == null) {
+        throw Exception('User ID not found');
+      }
+
+      // Fetch user profile using the user ID
+      final response = await http.get(
+        Uri.parse('http://127.0.0.1:8080/api/users/$userId'),
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
@@ -22,15 +30,13 @@ class UserProfileService {
     }
   }
 
-  // ✅ FIX: Update user profile using PUT request with ID
+  // ✅ Update user profile using PUT request with ID
   static Future<bool> updateUserProfile(UserProfile updatedProfile) async {
     try {
       final response = await http.put(
-        Uri.parse(
-            'http://127.0.0.1:8080/api/users/update'), // ✅ Include ID in URL
+        Uri.parse('http://127.0.0.1:8080/api/users/update'),
         headers: {"Content-Type": "application/json"},
-        body: json.encode(
-            updatedProfile.toJson()), // Ensure `toJson()` exists in UserProfile
+        body: json.encode(updatedProfile.toJson()),
       );
 
       if (response.statusCode == 200) {

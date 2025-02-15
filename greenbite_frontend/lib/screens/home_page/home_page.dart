@@ -20,6 +20,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int? _userId;
   int _selectedIndex = 0;
   List<FoodItem> foodItems = [];
   Set<FoodItem> favoriteItems = {}; // Use a Set to avoid duplicates
@@ -28,11 +29,24 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _loadFoodItems();
+    _fetchUserId(); // Fetch the user ID
+  }
+
+  Future<void> _fetchUserId() async {
+    int? userId = await AuthService.getUserId();
+    setState(() {
+      _userId = userId ?? 1; // Fallback to 1 if null
+    });
   }
 
   Future<void> _loadFoodItems() async {
-    final userId = 1; // Replace with the actual user ID
     try {
+      int? userId = await AuthService.getUserId(); // Retrieve user ID
+      if (userId == null) {
+        print("No user ID found");
+        return;
+      }
+
       String? token = await AuthService.getToken(); // Retrieve token
       if (token == null) {
         print("No token found");
@@ -42,13 +56,13 @@ class _HomePageState extends State<HomePage> {
       // Fetch all food items
       final foodResponse = await http.get(
         Uri.parse('http://127.0.0.1:8080/wada/food-items/get'),
-        headers: {"Authorization": "Bearer $token"}, // Pass token in headers
+        headers: {"Authorization": "Bearer $token"},
       );
 
       // Fetch favorite items
       final favoriteResponse = await http.get(
         Uri.parse('http://127.0.0.1:8080/api/favorites/user/$userId'),
-        // Pass token in headers
+        headers: {"Authorization": "Bearer $token"},
       );
 
       if (foodResponse.statusCode == 200 &&
@@ -77,9 +91,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _toggleFavorite(FoodItem item) async {
-    final userId = 1; // Replace with actual user ID if available
+    //final userId = 1; // Replace with actual user ID if available
 
     try {
+      int? userId = await AuthService.getUserId(); // Retrieve user ID
+      if (userId == null) {
+        print("No user ID found");
+        return;
+      }
       if (favoriteItems.contains(item)) {
         // If already in favorites, remove from backend
         final response = await http.delete(
@@ -129,7 +148,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final int userId = 1;
+    if (_userId == null) {
+      // Show a loading indicator while waiting for the user ID
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
     final List<Widget> screens = [
       HomePageContent(
         foodItems: foodItems,
@@ -138,7 +162,7 @@ class _HomePageState extends State<HomePage> {
       ),
       SearchScreen(foodItems: foodItems),
       FavoritesScreen(
-        userId: userId,
+        userId: _userId!,
         onRemoveFavorite: _removeFavorite,
       ),
       UserProfileScreen(),
