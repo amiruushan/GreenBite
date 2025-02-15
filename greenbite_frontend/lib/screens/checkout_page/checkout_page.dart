@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
-import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
+import 'package:greenbite_frontend/screens/home_page/home_page.dart';
+import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:greenbite_frontend/screens/home_page/home_page.dart'; // Import the HomePage
 
 class CheckoutPage extends StatefulWidget {
-  const CheckoutPage({super.key});
+  const CheckoutPage({Key? key}) : super(key: key);
 
   @override
-  State<CheckoutPage> createState() => _CheckoutPageState();
+  _CheckoutPageState createState() => _CheckoutPageState();
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
@@ -24,63 +23,61 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Future<void> _confirmOrder(BuildContext context) async {
-    final cartProvider = Provider.of<CartProvider>(context, listen: false);
-    final cartItems = cartProvider.cartItems;
+    if (selectedOption == "Stripe Payment") {
+      await _handleStripePayment(context);
+    } else {
+      // Handle other payment methods
+    }
+  }
 
-    // Prepare the order data to send to the backend
-    final orderData = {
-      "paymentMethod": selectedOption,
-      "items": cartItems
-          .map((item) => {
-                "id": item.id,
-                "quantity": item.quantity,
-              })
-          .toList(),
-    };
-
+  Future<void> _handleStripePayment(BuildContext context) async {
     try {
-      // Send the order to the backend
+      // Call your backend to create a PaymentIntent
       final response = await http.post(
-        Uri.parse("http://127.0.0.1:8080/api/orders/confirm"),
-        headers: {"Content-Type": "application/json"},
-        body: json.encode(orderData),
+        Uri.parse('http://127.0.0.1:8080/api/payments/create'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'amount': Provider.of<CartProvider>(context, listen: false)
+                  .totalPrice()
+                  .toInt() *
+              100, // Convert to cents
+          'currency': 'usd',
+        }),
       );
 
-      if (response.statusCode == 200) {
-        // Order confirmed successfully
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Order confirmed! Your items are ready for pickup."),
-            backgroundColor: Colors.green,
-          ),
-        );
+      final responseData = json.decode(response.body);
+      final clientSecret = responseData['clientSecret']; // Extract clientSecret
 
-        // Clear the cart after successful order
-        cartProvider.clearCart();
+      // Initialize the PaymentSheet
+      await Stripe.instance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: clientSecret,
+          merchantDisplayName: 'GreenBite',
+        ),
+      );
 
-        // Navigate to the HomePage
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-              builder: (context) => HomePage()), // Navigate to HomePage
-          (route) => false, // Remove all routes from the stack
-        );
-      } else {
-        // Handle error
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Failed to confirm order. Please try again."),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      // Present the PaymentSheet
+      await Stripe.instance.presentPaymentSheet();
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Payment successful!"),
+            backgroundColor: Colors.green),
+      );
+
+      // Clear the cart and navigate to the home page
+      Provider.of<CartProvider>(context, listen: false).clearCart();
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+        (route) => false,
+      );
     } catch (e) {
-      // Handle network or other errors
+      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("An error occurred: $e"),
-          backgroundColor: Colors.red,
-        ),
+            content: Text("Payment failed: $e"), backgroundColor: Colors.red),
       );
     }
   }
@@ -134,9 +131,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
               // Card Payment Option
               _buildOptionTile(
                 title: "Card Payment",
-                icon: LucideIcons.creditCard,
+                icon: Icons.credit_card,
                 isSelected: selectedOption == "Card Payment",
                 onTap: () => _selectOption("Card Payment"),
+              ),
+
+              const SizedBox(height: 15),
+
+              // Stripe Payment Option
+              _buildOptionTile(
+                title: "Stripe Payment",
+                icon: Icons.payment,
+                isSelected: selectedOption == "Stripe Payment",
+                onTap: () => _selectOption("Stripe Payment"),
               ),
 
               const SizedBox(height: 15),
@@ -144,7 +151,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               // Self Pickup Option
               _buildOptionTile(
                 title: "Self Pick-up",
-                icon: LucideIcons.mapPin,
+                icon: Icons.map,
                 isSelected: selectedOption == "Self Pick-up",
                 onTap: () => _selectOption("Self Pick-up"),
               ),
@@ -156,16 +163,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    if (selectedOption == "Self Pick-up") {
-                      _confirmOrder(context); // Confirm order for self-pickup
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Selected: $selectedOption"),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                    }
+                    _confirmOrder(context);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
