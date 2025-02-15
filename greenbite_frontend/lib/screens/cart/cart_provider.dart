@@ -6,6 +6,11 @@ class CartProvider extends ChangeNotifier {
 
   List<FoodItem> get cartItems => _cartItems;
 
+  void clearCart() {
+    _cartItems.clear();
+    notifyListeners();
+  }
+
   // ✅ Add to cart (updates quantity if item exists)
   void addToCart(FoodItem item, int selectedQuantity) {
     final existingItemIndex =
