@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/screens/home_page/home_page.dart';
+import 'package:greenbite_frontend/service/auth_service';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -39,6 +40,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
     };
 
     try {
+      String? token = await AuthService.getToken(); // Retrieve token
+      if (token == null) {
+        print("No token found");
+        return;
+      }
       if (selectedOption == "Stripe Payment") {
         await _handleStripePayment(context);
       }
@@ -46,7 +52,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
       // Confirm order in backend
       final orderResponse = await http.post(
         Uri.parse("http://127.0.0.1:8080/api/orders/confirm"),
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token"
+        },
         body: jsonEncode(orderData),
       );
 
@@ -80,6 +89,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Future<void> _handleStripePayment(BuildContext context) async {
     try {
+      String? token = await AuthService.getToken();
+      if (token == null) {
+        print("No token found");
+        return;
+      }
       final cartProvider = Provider.of<CartProvider>(context, listen: false);
       final double totalAmount =
           cartProvider.totalPrice() + 2.50; // Include delivery fee
@@ -89,7 +103,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
       // Call backend with dynamic amount
       final response = await http.post(
         Uri.parse(
-            'http://localhost:8080/api/payments/create?amount=$amountInCents&currency=usd'),
+            'http://127.0.0.1:8080/api/payments/create?amount=$amountInCents&currency=usd'),
+        headers: {"Authorization": "Bearer $token"},
       );
 
       final responseData = json.decode(response.body);

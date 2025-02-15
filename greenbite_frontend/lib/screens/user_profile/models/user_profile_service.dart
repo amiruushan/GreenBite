@@ -8,6 +8,10 @@ class UserProfileService {
   // ✅ Fetch User Profile
   static Future<UserProfile> fetchUserProfile() async {
     try {
+      String? token = await AuthService.getToken(); // Retrieve token
+      if (token == null) {
+        print("No token found");
+      }
       // Get the user ID from SharedPreferences
       int? userId = await AuthService.getUserId();
       if (userId == null) {
@@ -17,6 +21,7 @@ class UserProfileService {
       // Fetch user profile using the user ID
       final response = await http.get(
         Uri.parse('http://127.0.0.1:8080/api/users/$userId'),
+        headers: {"Authorization": "Bearer $token"},
       );
 
       if (response.statusCode == 200) {
@@ -33,9 +38,14 @@ class UserProfileService {
   // ✅ Update user profile using PUT request with ID
   static Future<bool> updateUserProfile(UserProfile updatedProfile) async {
     try {
+      String? token = await AuthService.getToken(); // Retrieve token
+      if (token == null) {
+        print("No token found");
+      }
       final response = await http.put(
         Uri.parse('http://127.0.0.1:8080/api/users/update'),
-        headers: {"Content-Type": "application/json"},
+        //headers: {"Content-Type": "application/json"},
+        headers: {"Authorization": "Bearer $token"},
         body: json.encode(updatedProfile.toJson()),
       );
 

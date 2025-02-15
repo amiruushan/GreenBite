@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
 
       // Fetch all food items
       final foodResponse = await http.get(
-        Uri.parse('http://127.0.0.1:8080/wada/food-items/get'),
+        Uri.parse('http://127.0.0.1:8080/api/food-items/get'),
         headers: {"Authorization": "Bearer $token"},
       );
 
@@ -99,11 +99,17 @@ class _HomePageState extends State<HomePage> {
         print("No user ID found");
         return;
       }
+      String? token = await AuthService.getToken(); // Retrieve token
+      if (token == null) {
+        print("No token found");
+        return;
+      }
       if (favoriteItems.contains(item)) {
         // If already in favorites, remove from backend
         final response = await http.delete(
           Uri.parse(
               'http://127.0.0.1:8080/api/favorites/remove/$userId/${item.id}'),
+          headers: {"Authorization": "Bearer $token"},
         );
 
         if (response.statusCode == 200) {
@@ -118,6 +124,7 @@ class _HomePageState extends State<HomePage> {
         final response = await http.post(
           Uri.parse(
               'http://127.0.0.1:8080/api/favorites/add?userId=$userId&foodItemId=${item.id}'),
+          headers: {"Authorization": "Bearer $token"},
         );
 
         if (response.statusCode == 200) {

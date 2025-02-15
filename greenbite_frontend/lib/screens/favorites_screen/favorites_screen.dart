@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/service/auth_service';
 import 'package:http/http.dart' as http;
 import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
@@ -31,8 +32,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   Future<void> _fetchFavorites() async {
     try {
+      String? token = await AuthService.getToken(); // Retrieve token
+      if (token == null) {
+        print("No token found");
+        return;
+      }
       final response = await http.get(
         Uri.parse('http://127.0.0.1:8080/api/favorites/user/${widget.userId}'),
+        headers: {"Authorization": "Bearer $token"},
       );
 
       if (response.statusCode == 200) {
@@ -59,10 +66,16 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     final userId = widget.userId;
 
     try {
+      String? token = await AuthService.getToken(); // Retrieve token
+      if (token == null) {
+        print("No token found");
+        return;
+      }
       final response = await http.delete(
         Uri.parse(
           'http://127.0.0.1:8080/api/favorites/remove/$userId/${item.id}',
         ),
+        headers: {"Authorization": "Bearer $token"},
       );
 
       if (response.statusCode == 200) {
