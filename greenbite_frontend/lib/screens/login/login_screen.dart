@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:greenbite_frontend/screens/home_page/home_page.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'email_verification_screen.dart';
 import 'user_type_validation_screen.dart';
-
+import 'package:greenbite_frontend/service/auth_service';
 import '/../widgets/custom_textfield_widget.dart';
 import '/../widgets/custom_button_widget.dart';
 
@@ -19,7 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
 
   Future<void> login() async {
-    final String url = "http://localhost:8080/auth/login";
+    final String url = "http://127.0.0.1:8080/auth/login";
 
     final response = await http.post(
       Uri.parse(url),
@@ -31,6 +32,12 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      String token = responseData['token']; // Assuming token is in response
+      AuthService.saveToken(token);
+      // Save token in SharedPreferences
+
+      print("Login Successful: $token");
       print("Login Successful: ${response.body}");
       Navigator.push(
         context,

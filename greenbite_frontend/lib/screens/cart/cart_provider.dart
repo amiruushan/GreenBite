@@ -11,13 +11,13 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ✅ Add to cart (updates quantity if item exists)
+  // ✅ Add to cart (uses ID instead of name to distinguish items)
   void addToCart(FoodItem item, int selectedQuantity) {
     final existingItemIndex =
-        _cartItems.indexWhere((cartItem) => cartItem.name == item.name);
+        _cartItems.indexWhere((cartItem) => cartItem.id == item.id);
 
     if (existingItemIndex != -1) {
-      // ✅ Convert quantity to int and increase it
+      // ✅ Increase quantity if item exists
       int updatedQuantity =
           (int.tryParse(_cartItems[existingItemIndex].quantity) ?? 1) +
               selectedQuantity;
@@ -40,17 +40,17 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ✅ Fixed: Renamed to `removeItem` (match call in CartScreen)
+  // ✅ Remove item (uses ID instead of name)
   void removeItem(FoodItem item) {
     final existingItemIndex =
-        _cartItems.indexWhere((cartItem) => cartItem.name == item.name);
+        _cartItems.indexWhere((cartItem) => cartItem.id == item.id);
 
     if (existingItemIndex != -1) {
       int currentQuantity =
           int.tryParse(_cartItems[existingItemIndex].quantity) ?? 1;
 
       if (currentQuantity > 1) {
-        // ✅ Reduce quantity instead of removing immediately
+        // ✅ Reduce quantity if more than 1
         _cartItems[existingItemIndex].quantity =
             (currentQuantity - 1).toString();
       } else {
@@ -61,7 +61,7 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ✅ Calculate total price dynamically
+  // ✅ Calculate total price
   double totalPrice() {
     return _cartItems.fold(0.0, (sum, item) {
       return sum + (item.price * (int.tryParse(item.quantity) ?? 1));

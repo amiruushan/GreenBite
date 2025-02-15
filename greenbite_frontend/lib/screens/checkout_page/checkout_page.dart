@@ -23,10 +23,58 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Future<void> _confirmOrder(BuildContext context) async {
-    if (selectedOption == "Stripe Payment") {
-      await _handleStripePayment(context);
-    } else {
-      // Handle other payment methods
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+
+    // Format order data
+    final orderData = {
+      "customerId": 1, // Update this dynamically if needed
+      "paymentMethod":
+          selectedOption == "Stripe Payment" ? "Credit Card" : "Self Checkout",
+      "items": cartProvider.cartItems
+          .map((item) => {
+                "id": item.id, // Ensure your CartItem model has an `id`
+                "quantity": item.quantity,
+              })
+          .toList(),
+    };
+
+    try {
+      if (selectedOption == "Stripe Payment") {
+        await _handleStripePayment(context);
+      }
+
+      // Confirm order in backend
+      final orderResponse = await http.post(
+        Uri.parse("http://127.0.0.1:8080/api/orders/confirm"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(orderData),
+      );
+
+      if (orderResponse.statusCode == 200) {
+        // Clear the cart
+        cartProvider.clearCart();
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text("Order Confirmed!"), backgroundColor: Colors.green),
+        );
+
+        // Reload the app (navigate to home)
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+          (route) => false,
+        );
+      } else {
+        throw Exception("Failed to confirm order.");
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text("Order confirmation failed"),
+            backgroundColor: Colors.red),
+      );
     }
   }
 

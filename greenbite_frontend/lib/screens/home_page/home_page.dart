@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/shop_tab.dart';
+import 'package:greenbite_frontend/service/auth_service';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/favorites_screen/favorites_screen.dart';
@@ -32,13 +33,23 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadFoodItems() async {
     final userId = 1; // Replace with the actual user ID
     try {
+      String? token = await AuthService.getToken(); // Retrieve token
+      if (token == null) {
+        print("No token found");
+        return;
+      }
+
       // Fetch all food items
-      final foodResponse =
-          await http.get(Uri.parse('http://127.0.0.1:8080/api/food-items/get'));
+      final foodResponse = await http.get(
+        Uri.parse('http://127.0.0.1:8080/wada/food-items/get'),
+        headers: {"Authorization": "Bearer $token"}, // Pass token in headers
+      );
 
       // Fetch favorite items
-      final favoriteResponse = await http
-          .get(Uri.parse('http://127.0.0.1:8080/api/favorites/user/$userId'));
+      final favoriteResponse = await http.get(
+        Uri.parse('http://127.0.0.1:8080/api/favorites/user/$userId'),
+        // Pass token in headers
+      );
 
       if (foodResponse.statusCode == 200 &&
           favoriteResponse.statusCode == 200) {
@@ -55,7 +66,7 @@ class _HomePageState extends State<HomePage> {
 
         setState(() {
           foodItems = allFoodItems;
-          favoriteItems = favorites; // ✅ Ensure the favorite icon is updated
+          favoriteItems = favorites;
         });
       } else {
         print("Failed to load food or favorite items");
