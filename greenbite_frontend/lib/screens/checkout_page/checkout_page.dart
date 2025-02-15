@@ -32,17 +32,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Future<void> _handleStripePayment(BuildContext context) async {
     try {
-      // Call your backend to create a PaymentIntent
+      final cartProvider = Provider.of<CartProvider>(context, listen: false);
+      final double totalAmount =
+          cartProvider.totalPrice() + 2.50; // Include delivery fee
+      final int amountInCents =
+          (totalAmount * 100).toInt(); // Stripe requires amount in cents
+
+      // Call backend with dynamic amount
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8080/api/payments/create'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'amount': Provider.of<CartProvider>(context, listen: false)
-                  .totalPrice()
-                  .toInt() *
-              100, // Convert to cents
-          'currency': 'usd',
-        }),
+        Uri.parse(
+            'http://localhost:8080/api/payments/create?amount=$amountInCents&currency=usd'),
       );
 
       final responseData = json.decode(response.body);
@@ -67,7 +66,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       );
 
       // Clear the cart and navigate to the home page
-      Provider.of<CartProvider>(context, listen: false).clearCart();
+      cartProvider.clearCart();
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
@@ -76,8 +75,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     } catch (e) {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text("Payment failed: $e"), backgroundColor: Colors.red),
+        SnackBar(content: Text("Payment failed"), backgroundColor: Colors.red),
       );
     }
   }
@@ -129,18 +127,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
               const SizedBox(height: 15),
 
               // Card Payment Option
-              _buildOptionTile(
-                title: "Card Payment",
-                icon: Icons.credit_card,
-                isSelected: selectedOption == "Card Payment",
-                onTap: () => _selectOption("Card Payment"),
-              ),
 
               const SizedBox(height: 15),
 
               // Stripe Payment Option
               _buildOptionTile(
-                title: "Stripe Payment",
+                title: "Card Payment",
                 icon: Icons.payment,
                 isSelected: selectedOption == "Stripe Payment",
                 onTap: () => _selectOption("Stripe Payment"),
