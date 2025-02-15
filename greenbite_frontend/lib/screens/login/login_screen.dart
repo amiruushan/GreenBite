@@ -1,9 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:greenbite_frontend/widgets/custom_button_widget.dart';
-import 'package:greenbite_frontend/widgets/custom_textfield_widget.dart';
+import 'package:flutter/rendering.dart';
+import 'package:greenbite_frontend/screens/home_page/home_page.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'email_verification_screen.dart';
 import 'user_type_validation_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+import '/../widgets/custom_textfield_widget.dart';
+import '/../widgets/custom_button_widget.dart';
+
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  Future<void> login() async {
+    final String url = "http://localhost:8080/auth/login";
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "email": emailController.text,
+        "password": passwordController.text,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print("Login Successful: ${response.body}");
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    } else {
+      print("Login Failed: ${response.body}");
+      // Handle login failure
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,13 +62,16 @@ class LoginScreen extends StatelessWidget {
             Text("Log into your Registered Account.",
                 style: TextStyle(color: Colors.black54)),
             SizedBox(height: 20),
-            CustomTextField(label: "Email"),
+            CustomTextField(controller: emailController, label: "Email"),
             SizedBox(height: 15),
-            CustomTextField(label: "Password", isPassword: true),
+            CustomTextField(
+                controller: passwordController,
+                label: "Password",
+                isPassword: true),
             SizedBox(height: 25),
             CustomButton(
               text: "Continue",
-              onPressed: () {},
+              onPressed: login, // Call login function
               backgroundColor: Colors.green,
               textColor: Colors.white,
             ),
@@ -41,8 +82,7 @@ class LoginScreen extends StatelessWidget {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              UserTypeValidationScreen())); // Navigate to Sign Up
+                          builder: (context) => UserTypeValidationScreen()));
                 },
                 child: Text("New member? Register",
                     style: TextStyle(color: Colors.green)),

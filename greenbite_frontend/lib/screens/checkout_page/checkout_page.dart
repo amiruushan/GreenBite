@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
+import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:greenbite_frontend/screens/home_page/home_page.dart'; // Import the HomePage
 
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key});
@@ -15,6 +21,68 @@ class _CheckoutPageState extends State<CheckoutPage> {
     setState(() {
       selectedOption = option;
     });
+  }
+
+  Future<void> _confirmOrder(BuildContext context) async {
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    final cartItems = cartProvider.cartItems;
+
+    // Prepare the order data to send to the backend
+    final orderData = {
+      "paymentMethod": selectedOption,
+      "items": cartItems
+          .map((item) => {
+                "id": item.id,
+                "quantity": item.quantity,
+              })
+          .toList(),
+    };
+
+    try {
+      // Send the order to the backend
+      final response = await http.post(
+        Uri.parse("http://127.0.0.1:8080/api/orders/confirm"),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode(orderData),
+      );
+
+      if (response.statusCode == 200) {
+        // Order confirmed successfully
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Order confirmed! Your items are ready for pickup."),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Clear the cart after successful order
+        cartProvider.clearCart();
+
+        // Navigate to the HomePage
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+              builder: (context) => HomePage()), // Navigate to HomePage
+          (route) => false, // Remove all routes from the stack
+        );
+      } else {
+        // Handle error
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Failed to confirm order. Please try again."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      // Handle network or other errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("An error occurred: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -37,7 +105,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
-              // 🍽️ Header Image
+              // 🍽 Header Image
               Center(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
@@ -88,12 +156,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Selected: $selectedOption"),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
+                    if (selectedOption == "Self Pick-up") {
+                      _confirmOrder(context); // Confirm order for self-pickup
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Selected: $selectedOption"),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
@@ -115,8 +187,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-  // 🛍️ Order Summary Widget
+  // 🛍 Order Summary Widget
   Widget _buildOrderSummary() {
+    final cartProvider = Provider.of<CartProvider>(context);
+    final cartItems = cartProvider.cartItems;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -139,9 +214,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
-          _buildSummaryRow("Subtotal", "\$25.00"),
+          _buildSummaryRow(
+              "Subtotal", "\$${cartProvider.totalPrice().toStringAsFixed(2)}"),
           _buildSummaryRow("Delivery Fee", "\$2.50"),
-          _buildSummaryRow("Total", "\$27.50", isTotal: true),
+          _buildSummaryRow("Total",
+              "\$${(cartProvider.totalPrice() + 2.50).toStringAsFixed(2)}",
+              isTotal: true),
         ],
       ),
     );
