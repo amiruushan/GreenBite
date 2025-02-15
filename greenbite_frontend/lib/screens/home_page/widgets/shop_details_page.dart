@@ -21,7 +21,7 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
   @override
   void initState() {
     super.initState();
-    fetchShopDetails(widget.shopId);
+    fetchShopDetails(widget.shopId); // Fetch shop details using the shopId
   }
 
   Future<void> fetchShopDetails(String shopId) async {
@@ -33,11 +33,14 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
         final dynamic data = json.decode(response.body);
 
         if (data is Map<String, dynamic>) {
-          // ✅ Expecting a single shop object
+          // Fetch shop details
           setState(() {
             shopItem = ShopItem.fromJson(data);
             isLoading = false;
           });
+
+          // Fetch food items for the shop
+          fetchFoodItems(shopId);
         } else {
           setState(() {
             errorMessage = "Invalid data received from API";
@@ -61,7 +64,7 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
   Future<void> fetchFoodItems(String shopId) async {
     try {
       final response = await http
-          .get(Uri.parse("https://127.0.0.1:8080/api/food-items/shop/$shopId"));
+          .get(Uri.parse("http://127.0.0.1:8080/api/food-items/shop/$shopId"));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -70,8 +73,8 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
 
         setState(() {
           if (shopItem != null) {
-            shopItem =
-                shopItem!.copyWith(foodItems: newFoodItems); // ✅ Safe update
+            shopItem = shopItem!
+                .copyWith(foodItems: newFoodItems); // Update food items
           }
         });
       } else {

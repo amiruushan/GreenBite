@@ -95,7 +95,7 @@ class _ShopsTabState extends State<ShopsTab> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => ShopDetailsPage(
-                                shopId: "1"), // ✅ Pass shopId correctly
+                                shopId: shop.shopId), // Pass the correct shopId
                           ),
                         );
                       },
