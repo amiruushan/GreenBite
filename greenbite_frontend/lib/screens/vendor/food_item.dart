@@ -175,7 +175,7 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
                 border: OutlineInputBorder(),
               ),
               items: const [
-                "Pizza",
+                "pizza",
                 "Burger",
                 "Cake",
                 "Salad",
