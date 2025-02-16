@@ -3,6 +3,7 @@ import 'package:greenbite_frontend/screens/vendor/vendor_profile.dart';
 import '../../widgets/vendor_nav_bar.dart';
 import 'list_food.dart';
 import 'orders.dart';
+import 'food_item.dart'; // Import the new FoodItemScreen
 
 class VendorHome extends StatefulWidget {
   const VendorHome({super.key});
@@ -50,22 +51,37 @@ class _VendorHomeState extends State<VendorHome> {
     // Dummy food items
     final List<Map<String, dynamic>> foodItems = [
       {
+        "id": 1,
         "name": "Fresh Apples",
         "photo": "https://lh3.googleusercontent.com/p/AF1QipMKrqUJrVzlF0WdfP5x5u_aHCVBY0epxPFMDpu4=s680-w680-h510",
         "description": "Crispy and delicious apples.",
         "price": 3.99,
+        "quantity": 10,
+        "shopId": 1,
+        "tags": ["fruit", "organic"],
+        "category": "Fruit",
       },
       {
+        "id": 2,
         "name": "Organic Bananas",
         "photo": "https://lh3.googleusercontent.com/p/AF1QipMKrqUJrVzlF0WdfP5x5u_aHCVBY0epxPFMDpu4=s680-w680-h510",
         "description": "Rich in potassium and flavor.",
         "price": 2.49,
+        "quantity": 15,
+        "shopId": 1,
+        "tags": ["fruit", "organic"],
+        "category": "Fruit",
       },
       {
+        "id": 3,
         "name": "Juicy Oranges",
         "photo": "https://lh3.googleusercontent.com/p/AF1QipMKrqUJrVzlF0WdfP5x5u_aHCVBY0epxPFMDpu4=s680-w680-h510",
         "description": "Freshly picked oranges.",
         "price": 4.29,
+        "quantity": 20,
+        "shopId": 1,
+        "tags": ["fruit", "organic"],
+        "category": "Fruit",
       },
     ];
 
@@ -155,6 +171,15 @@ class _VendorHomeState extends State<VendorHome> {
                           fontWeight: FontWeight.bold,
                           color: Colors.green),
                     ),
+                    onTap: () {
+                      // Navigate to the FoodItemScreen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FoodItemScreen(foodItem: food),
+                        ),
+                      );
+                    },
                   ),
                 );
               },
