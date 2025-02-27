@@ -3,6 +3,7 @@ import '../../widgets/vendor_nav_bar.dart';
 import 'vendor_home.dart';
 import 'list_food.dart';
 import 'orders.dart';
+import 'edit_profile.dart'; // Import the EditProfile screen
 
 class VendorProfile extends StatefulWidget {
   const VendorProfile({super.key});
@@ -46,9 +47,27 @@ class _VendorProfileState extends State<VendorProfile> {
     }
   }
 
-  // ✅ Navigate to Edit Screen (Placeholder)
+  // ✅ Navigate to Edit Profile Screen
   Future<void> _editProfile() async {
-    print("Edit profile clicked"); // TODO: Implement edit profile logic
+    // Navigate to the EditProfile screen and pass the current profile data
+    final updatedProfile = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProfile(vendorProfile: _vendorProfile),
+      ),
+    );
+
+    // If the user saved changes, update the UI with the new profile data
+    if (updatedProfile != null && updatedProfile is Map<String, dynamic>) {
+      setState(() {
+        _vendorProfile["username"] = updatedProfile["username"];
+        _vendorProfile["email"] = updatedProfile["email"];
+        _vendorProfile["phoneNumber"] = updatedProfile["phoneNumber"];
+        _vendorProfile["address"] = updatedProfile["address"];
+        _vendorProfile["businessName"] = updatedProfile["businessName"];
+        _vendorProfile["businessDescription"] = updatedProfile["businessDescription"];
+      });
+    }
   }
 
   // ✅ Sign Out (Placeholder)

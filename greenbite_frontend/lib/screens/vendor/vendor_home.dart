@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:greenbite_frontend/screens/vendor/vendor_profile.dart';
 import '../../widgets/vendor_nav_bar.dart';
 import 'list_food.dart';
 import 'orders.dart';
+import 'food_item.dart';
 
 class VendorHome extends StatefulWidget {
   const VendorHome({super.key});
@@ -12,15 +15,46 @@ class VendorHome extends StatefulWidget {
 }
 
 class _VendorHomeState extends State<VendorHome> {
-  int _selectedIndex = 0; // State to manage the selected index
+  int _selectedIndex = 0;
+  List<Map<String, dynamic>> foodItems = [];
+  bool isLoading = true;
+  final int vendorId = 1; // Replace with dynamic vendor ID if needed
 
-  // Function to handle tab selection
+  // Fetch food items from backend
+  Future<void> fetchFoodItems() async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://192.168.1.3:8080/api/food-items/shop/1'),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          foodItems = List<Map<String, dynamic>>.from(data);
+          isLoading = false;
+        });
+      } else {
+        throw Exception("Failed to load food items");
+      }
+    } catch (e) {
+      print("Error fetching food items: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchFoodItems(); // Fetch data when screen loads
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
 
-    // Navigate to the respective screen based on the selected index
     if (index == 1) {
       Navigator.pushReplacement(
         context,
@@ -41,33 +75,10 @@ class _VendorHomeState extends State<VendorHome> {
 
   @override
   Widget build(BuildContext context) {
-    // Dummy data for the vendor
-    final String vendorName = "Street Za";
-    final String vendorDescription = "Best organic and fresh produce in town.";
-    final String vendorImageUrl =
+    const String vendorName = "Street Za";
+    const String vendorDescription = "Best organic and fresh produce in town.";
+    const String vendorImageUrl =
         "https://lh3.googleusercontent.com/p/AF1QipOv6Va9c7dh1Tml4WiUHs2o5PO0jKF6vZlvLk_U=s680-w680-h510";
-
-    // Dummy food items
-    final List<Map<String, dynamic>> foodItems = [
-      {
-        "name": "Fresh Apples",
-        "photo": "https://lh3.googleusercontent.com/p/AF1QipMKrqUJrVzlF0WdfP5x5u_aHCVBY0epxPFMDpu4=s680-w680-h510",
-        "description": "Crispy and delicious apples.",
-        "price": 3.99,
-      },
-      {
-        "name": "Organic Bananas",
-        "photo": "https://lh3.googleusercontent.com/p/AF1QipMKrqUJrVzlF0WdfP5x5u_aHCVBY0epxPFMDpu4=s680-w680-h510",
-        "description": "Rich in potassium and flavor.",
-        "price": 2.49,
-      },
-      {
-        "name": "Juicy Oranges",
-        "photo": "https://lh3.googleusercontent.com/p/AF1QipMKrqUJrVzlF0WdfP5x5u_aHCVBY0epxPFMDpu4=s680-w680-h510",
-        "description": "Freshly picked oranges.",
-        "price": 4.29,
-      },
-    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -80,12 +91,15 @@ class _VendorHomeState extends State<VendorHome> {
         centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 117, 237, 123),
       ),
-      body: SingleChildScrollView(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator()) // Show loader
+          : foodItems.isEmpty
+          ? const Center(child: Text("No food items available"))
+          : SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Vendor Image
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Image.network(
@@ -96,11 +110,10 @@ class _VendorHomeState extends State<VendorHome> {
               ),
             ),
             const SizedBox(height: 16),
-
-            // Vendor Name & Description
             Text(
               vendorName,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
@@ -108,20 +121,13 @@ class _VendorHomeState extends State<VendorHome> {
               style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 16),
-
-            // Food Items Section
             const Text(
               "Available Food Items",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-
-            foodItems.isEmpty
-                ? const Text(
-              "No food items available",
-              style: TextStyle(color: Colors.grey),
-            )
-                : ListView.builder(
+            ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: foodItems.length,
@@ -155,6 +161,15 @@ class _VendorHomeState extends State<VendorHome> {
                           fontWeight: FontWeight.bold,
                           color: Colors.green),
                     ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              FoodItemScreen(foodItem: food),
+                        ),
+                      );
+                    },
                   ),
                 );
               },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/home_page/models/shop_item.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/shop_details_page.dart';
+import 'package:greenbite_frontend/service/auth_service';
 import 'dart:convert'; // For JSON parsing
 import 'package:http/http.dart' as http;
 // Import the ShopDetailsPage
@@ -25,9 +26,15 @@ class _ShopsTabState extends State<ShopsTab> {
 
   Future<void> fetchShopData() async {
     try {
-      // Replace this URL with your backend API endpoint
-      final response =
-          await http.get(Uri.parse("http://127.0.0.1:8080/api/shop/all"));
+      String? token = await AuthService.getToken(); // Retrieve token
+      if (token == null) {
+        print("No token found");
+        return;
+      }
+      final response = await http.get(
+        Uri.parse("http://127.0.0.1:8080/api/shop/all"),
+        headers: {"Authorization": "Bearer $token"},
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);

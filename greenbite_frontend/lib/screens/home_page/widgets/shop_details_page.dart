@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/home_page/models/shop_item.dart';
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
+import 'package:greenbite_frontend/service/auth_service';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -26,8 +27,15 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
 
   Future<void> fetchShopDetails(String shopId) async {
     try {
-      final response =
-          await http.get(Uri.parse("http://127.0.0.1:8080/api/shop/$shopId"));
+      String? token = await AuthService.getToken(); // Retrieve token
+      if (token == null) {
+        print("No token found");
+        return;
+      }
+      final response = await http.get(
+        Uri.parse("http://127.0.0.1:8080/api/shop/$shopId"),
+        headers: {"Authorization": "Bearer $token"},
+      );
 
       if (response.statusCode == 200) {
         final dynamic data = json.decode(response.body);
@@ -63,8 +71,15 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
 
   Future<void> fetchFoodItems(String shopId) async {
     try {
-      final response = await http
-          .get(Uri.parse("http://127.0.0.1:8080/api/food-items/shop/$shopId"));
+      String? token = await AuthService.getToken(); // Retrieve token
+      if (token == null) {
+        print("No token found");
+        return;
+      }
+      final response = await http.get(
+        Uri.parse("http://127.0.0.1:8080/api/food-items/shop/$shopId"),
+        headers: {"Authorization": "Bearer $token"},
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
