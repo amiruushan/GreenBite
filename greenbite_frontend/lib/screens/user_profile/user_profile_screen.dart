@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile.dart';
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile_service.dart';
 import 'package:greenbite_frontend/screens/user_profile/edit_profile_screen.dart';
+import 'package:greenbite_frontend/screens/vendor/vendor_home.dart'; // Import the VendorHome screen
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -61,6 +62,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
+  // ✅ Switch to Vendor View
+  void _switchToVendor() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const VendorHome()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,7 +77,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         title: const Text('Profile',
             style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.green.withOpacity(0.7), Colors.green.shade700],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -79,60 +98,70 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               : Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Profile Picture
-                      CircleAvatar(
-                        radius: 60,
-                        backgroundImage:
-                            NetworkImage(_userProfile!.profilePictureUrl),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // User Name
-                      Text(
-                        _userProfile!.username,
-                        style: const TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-
-                      // Email
-                      Text(
-                        _userProfile!.email,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Info Cards
-                      _buildInfoCard(
-                          Icons.phone, "Phone", _userProfile!.phoneNumber),
-                      _buildInfoCard(
-                          Icons.location_on, "Address", _userProfile!.address),
-
+                      // Profile Picture and Name Section
+                      _buildProfileHeader(),
                       const SizedBox(height: 20),
 
-                      // Edit Profile Button
-                      _buildActionButton(
-                        icon: Icons.edit,
-                        text: "Edit Profile",
-                        color: Colors.blue,
-                        onPressed: _editProfile,
+                      // Main Container with Grey Background and Rounded Corners
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100, // Light grey background
+                          borderRadius:
+                              BorderRadius.circular(12), // Rounded corners
+                        ),
+                        child: Column(
+                          children: [
+                            // Edit Profile Section
+                            _buildSectionItem(
+                              icon: Icons.edit,
+                              text: "Edit Profile",
+                              onPressed: _editProfile,
+                            ),
+                            const Divider(height: 1, indent: 16, endIndent: 16),
+
+                            // Switch to Vendor Section
+                            _buildSectionItem(
+                              icon: Icons.store,
+                              text: "Switch to Vendor",
+                              onPressed: _switchToVendor,
+                            ),
+                            const Divider(height: 1, indent: 16, endIndent: 16),
+
+                            // Sign Out Section
+                            _buildSectionItem(
+                              icon: Icons.logout,
+                              text: "Sign Out",
+                              onPressed: _signOut,
+                            ),
+                          ],
+                        ),
                       ),
+                      const SizedBox(height: 20),
 
-                      SizedBox(height: 20),
+                      // Additional Options Container
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100, // Light grey background
+                          borderRadius:
+                              BorderRadius.circular(12), // Rounded corners
+                        ),
+                        child: Column(
+                          children: [
+                            // Calorie Tracker Section
+                            _buildSectionItem(
+                              icon: Icons.directions_run,
+                              text: "Calorie Tracker",
+                            ),
+                            const Divider(height: 1, indent: 16, endIndent: 16),
 
-                      // Sign Out Button
-                      _buildActionButton(
-                        icon: Icons.logout,
-                        text: "Sign Out",
-                        color: Colors.red,
-                        onPressed: _signOut,
+                            // About Us Section
+                            _buildSectionItem(
+                              icon: Icons.info,
+                              text: "About Us",
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -140,44 +169,68 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  // Widget to display user info
-  Widget _buildInfoCard(IconData icon, String title, String value) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        leading: Icon(icon, color: Colors.green),
-        title: Text(
-          title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text(value, style: const TextStyle(fontSize: 14)),
+  // Profile Header with Profile Picture and Name
+  Widget _buildProfileHeader() {
+    return Container(
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Row(
+        children: [
+          // Profile Picture
+          CircleAvatar(
+            radius: 50,
+            backgroundImage: NetworkImage(
+              _userProfile?.profilePictureUrl ??
+                  UserProfile
+                      .placeholderProfilePictureUrl, // Fallback to placeholder
+            ),
+          ),
+          const SizedBox(width: 16), // Spacing between image and text
+
+          // User Info
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Username
+              Text(
+                _userProfile!.username,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 4),
+
+              // Email
+              Text(
+                _userProfile!.email,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black54,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  // Widget to display buttons
-  Widget _buildActionButton({
+  // Section Item with Icon, Text and Divider
+  Widget _buildSectionItem({
     required IconData icon,
     required String text,
-    required Color color,
-    required VoidCallback onPressed,
+    VoidCallback? onPressed,
   }) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, color: Colors.white),
-        label: Text(text,
-            style: const TextStyle(fontSize: 18, color: Colors.white)),
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          backgroundColor: color,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+    return ListTile(
+      onTap: onPressed,
+      leading: Icon(icon, color: Colors.green),
+      title: Text(
+        text,
+        style: const TextStyle(fontSize: 16, color: Colors.black87),
       ),
+      trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
     );
   }
 }

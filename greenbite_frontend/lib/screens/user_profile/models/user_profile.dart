@@ -2,15 +2,19 @@ class UserProfile {
   final int id;
   final String username;
   final String email;
-  final String profilePictureUrl;
+  final String? profilePictureUrl; // Make it nullable
   final String phoneNumber;
   final String address;
+
+  // Default placeholder URL
+  static const String placeholderProfilePictureUrl =
+      'https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg';
 
   UserProfile({
     required this.id,
     required this.username,
     required this.email,
-    required this.profilePictureUrl,
+    this.profilePictureUrl, // Accept null
     required this.phoneNumber,
     required this.address,
   });
@@ -21,7 +25,8 @@ class UserProfile {
       id: json['id'],
       username: json['username'],
       email: json['email'],
-      profilePictureUrl: json['profilePictureUrl'],
+      profilePictureUrl: json['profilePictureUrl'] ??
+          placeholderProfilePictureUrl, // Use placeholder if null
       phoneNumber: json['phoneNumber'],
       address: json['address'],
     );
@@ -33,7 +38,8 @@ class UserProfile {
       "id": id,
       "username": username,
       "email": email,
-      "profilePictureUrl": profilePictureUrl,
+      "profilePictureUrl": profilePictureUrl ??
+          placeholderProfilePictureUrl, // Use placeholder if null
       "phoneNumber": phoneNumber,
       "address": address,
     };
