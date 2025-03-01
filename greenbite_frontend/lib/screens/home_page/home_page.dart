@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
+import 'package:greenbite_frontend/screens/food_detail_screen/food_detail_screen.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/shop_tab.dart';
+import 'package:greenbite_frontend/screens/vendor/food_item.dart';
 import 'package:greenbite_frontend/service/auth_service';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -203,6 +206,40 @@ class HomePageContent extends StatefulWidget {
 
 class _HomePageContentState extends State<HomePageContent> {
   List<String> _selectedTags = []; // Track multiple selected tags
+  final PageController _featuredController =
+      PageController(); // Controller for featured items
+  int _currentFeaturedIndex = 0; // Track the current featured item index
+  Timer? _featuredTimer; // Timer for auto-switching featured items
+
+  @override
+  void initState() {
+    super.initState();
+    // Start auto-switching featured items every 5 seconds
+    _startFeaturedTimer();
+  }
+
+  @override
+  void dispose() {
+    _featuredController.dispose(); // Dispose the PageController
+    _featuredTimer?.cancel(); // Cancel the timer
+    super.dispose();
+  }
+
+  // Start the timer for auto-switching featured items
+  void _startFeaturedTimer() {
+    _featuredTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (_currentFeaturedIndex < widget.foodItems.length - 1) {
+        _currentFeaturedIndex++;
+      } else {
+        _currentFeaturedIndex = 0; // Loop back to the first item
+      }
+      _featuredController.animateToPage(
+        _currentFeaturedIndex,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
 
   // Extract unique tags from all food items
   List<String> getUniqueTags() {
@@ -298,25 +335,145 @@ class _HomePageContentState extends State<HomePageContent> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 10),
 
-                        // 📌 Categories Section
+                        // 🍽 Featured Items Section
                         const Text(
-                          "Categories",
+                          "Recommended For You",
                           style: TextStyle(
                               fontSize: 22, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 10),
                         SizedBox(
-                          height: 100,
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            children: foodCategories.map((category) {
-                              return CategoryCard(
-                                icon: category["icon"],
-                                label: category["label"],
-                              );
-                            }).toList(),
+                          height: 170, // Adjust height as needed
+                          child: Stack(
+                            children: [
+                              // PageView for Featured Items
+                              PageView.builder(
+                                controller: _featuredController,
+                                itemCount: widget.foodItems.length,
+                                onPageChanged: (index) {
+                                  setState(() {
+                                    _currentFeaturedIndex = index;
+                                  });
+                                },
+                                itemBuilder: (context, index) {
+                                  final item = widget.foodItems[index];
+                                  return GestureDetector(
+                                    onTap: () {
+                                      // Navigate to the food details page
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              FoodDetailScreen(foodItem: item),
+                                        ),
+                                      );
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Stack(
+                                          children: [
+                                            Image.network(
+                                              item.photo,
+                                              fit: BoxFit.cover,
+                                              width: double.infinity,
+                                            ),
+                                            // Overlay for item name and price
+                                            Positioned(
+                                              bottom: 0,
+                                              left: 0,
+                                              right: 0,
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black
+                                                      .withOpacity(0.5),
+                                                  borderRadius:
+                                                      const BorderRadius.only(
+                                                    bottomLeft:
+                                                        Radius.circular(12),
+                                                    bottomRight:
+                                                        Radius.circular(12),
+                                                  ),
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      item.name,
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "\$${item.price.toStringAsFixed(2)}",
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+
+                              // Previous Button (<)
+                              Positioned(
+                                left: 8,
+                                top: 0,
+                                bottom: 0,
+                                child: IconButton(
+                                  icon: const Icon(Icons.arrow_back_ios,
+                                      color: Colors.white),
+                                  onPressed: () {
+                                    if (_currentFeaturedIndex > 0) {
+                                      _featuredController.previousPage(
+                                        duration:
+                                            const Duration(milliseconds: 500),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+
+                              // Next Button (>)
+                              Positioned(
+                                right: 8,
+                                top: 0,
+                                bottom: 0,
+                                child: IconButton(
+                                  icon: const Icon(Icons.arrow_forward_ios,
+                                      color: Colors.white),
+                                  onPressed: () {
+                                    if (_currentFeaturedIndex <
+                                        widget.foodItems.length - 1) {
+                                      _featuredController.nextPage(
+                                        duration:
+                                            const Duration(milliseconds: 500),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                         ),
 
@@ -324,43 +481,55 @@ class _HomePageContentState extends State<HomePageContent> {
 
                         // 🍽 Recommended Section
                         const Text(
-                          "Recommended For You",
+                          "Food to Suit Your Diet",
                           style: TextStyle(
                               fontSize: 22, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 10),
 
-                        // 🏷 Clickable Tags for Filtering
-                        Wrap(
-                          spacing: 8,
-                          children: getUniqueTags().map((tag) {
-                            bool isSelected = _selectedTags.contains(tag);
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  if (isSelected) {
-                                    _selectedTags
-                                        .remove(tag); // Deselect the tag
-                                  } else {
-                                    _selectedTags.add(tag); // Select the tag
-                                  }
-                                });
-                              },
-                              child: Chip(
-                                label: Text(tag),
-                                backgroundColor: isSelected
-                                    ? Colors.green
-                                    : Colors.grey[300],
-                                labelStyle: TextStyle(
-                                  color:
-                                      isSelected ? Colors.white : Colors.black,
-                                  fontWeight: FontWeight.bold,
+                        // 🏷 Clickable Tags for Filtering (Horizontal List)
+                        SizedBox(
+                          height:
+                              50, // Set a fixed height for the horizontal tags
+                          child: ListView.separated(
+                            scrollDirection:
+                                Axis.horizontal, // Make the list horizontal
+                            itemCount: getUniqueTags().length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(
+                                    width: 8), // Add spacing between tags
+                            itemBuilder: (context, index) {
+                              final tag =
+                                  getUniqueTags()[index]; // Get the current tag
+                              bool isSelected = _selectedTags.contains(
+                                  tag); // Check if the tag is selected
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    if (isSelected) {
+                                      _selectedTags
+                                          .remove(tag); // Deselect the tag
+                                    } else {
+                                      _selectedTags.add(tag); // Select the tag
+                                    }
+                                  });
+                                },
+                                child: Chip(
+                                  label: Text(tag),
+                                  backgroundColor: isSelected
+                                      ? Colors.green
+                                      : Colors.grey[300],
+                                  labelStyle: TextStyle(
+                                    color: isSelected
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                            );
-                          }).toList(),
+                              );
+                            },
+                          ),
                         ),
-
                         const SizedBox(height: 10),
 
                         // 🍽 Recommended Items ListView
