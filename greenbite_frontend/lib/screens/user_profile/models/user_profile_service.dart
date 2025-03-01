@@ -20,7 +20,7 @@ class UserProfileService {
 
       // Fetch user profile using the user ID
       final response = await http.get(
-        Uri.parse('http://127.0.0.1:8080/api/users/$userId'),
+        Uri.parse('http://192.168.1.5:8080/api/users/$userId'),
         headers: {"Authorization": "Bearer $token"},
       );
 
@@ -43,7 +43,7 @@ class UserProfileService {
         print("No token found");
       }
       final response = await http.put(
-        Uri.parse('http://127.0.0.1:8080/api/users/update'),
+        Uri.parse('http://192.168.1.5:8080/api/users/update'),
         //headers: {"Content-Type": "application/json"},
         headers: {"Authorization": "Bearer $token"},
         body: json.encode(updatedProfile.toJson()),

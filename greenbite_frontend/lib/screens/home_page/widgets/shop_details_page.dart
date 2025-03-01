@@ -33,7 +33,7 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
         return;
       }
       final response = await http.get(
-        Uri.parse("http://127.0.0.1:8080/api/shop/$shopId"),
+        Uri.parse("http://192.168.1.5:8080/api/shop/$shopId"),
         headers: {"Authorization": "Bearer $token"},
       );
 
@@ -77,7 +77,7 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
         return;
       }
       final response = await http.get(
-        Uri.parse("http://127.0.0.1:8080/api/food-items/shop/$shopId"),
+        Uri.parse("http://192.168.1.5:8080/api/food-items/shop/$shopId"),
         headers: {"Authorization": "Bearer $token"},
       );
 

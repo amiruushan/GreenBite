@@ -32,7 +32,7 @@ class _ShopsTabState extends State<ShopsTab> {
         return;
       }
       final response = await http.get(
-        Uri.parse("http://127.0.0.1:8080/api/shop/all"),
+        Uri.parse("http://192.168.1.5:8080/api/shop/all"),
         headers: {"Authorization": "Bearer $token"},
       );
 

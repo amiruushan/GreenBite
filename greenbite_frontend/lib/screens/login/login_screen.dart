@@ -19,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
 
   Future<void> login() async {
-    final String url = "http://127.0.0.1:8080/auth/login";
+    final String url = "http://192.168.1.5:8080/auth/login";
 
     final response = await http.post(
       Uri.parse(url),
@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _fetchAndSaveUserId(String email) async {
     try {
       final response = await http.get(
-        Uri.parse('http://127.0.0.1:8080/auth/getUserID?email=$email'),
+        Uri.parse('http://192.168.1.5:8080/auth/getUserID?email=$email'),
       );
 
       if (response.statusCode == 200) {

@@ -55,13 +55,13 @@ class _HomePageState extends State<HomePage> {
 
       // Fetch all food items
       final foodResponse = await http.get(
-        Uri.parse('http://127.0.0.1:8080/api/food-items/get'),
+        Uri.parse('http://192.168.1.5:8080/api/food-items/get'),
         headers: {"Authorization": "Bearer $token"},
       );
 
       // Fetch favorite items
       final favoriteResponse = await http.get(
-        Uri.parse('http://127.0.0.1:8080/api/favorites/user/$userId'),
+        Uri.parse('http://192.168.1.5:8080/api/favorites/user/$userId'),
         headers: {"Authorization": "Bearer $token"},
       );
 
@@ -108,7 +108,7 @@ class _HomePageState extends State<HomePage> {
         // If already in favorites, remove from backend
         final response = await http.delete(
           Uri.parse(
-              'http://127.0.0.1:8080/api/favorites/remove/$userId/${item.id}'),
+              'http://192.168.1.5:8080/api/favorites/remove/$userId/${item.id}'),
           headers: {"Authorization": "Bearer $token"},
         );
 
@@ -123,7 +123,7 @@ class _HomePageState extends State<HomePage> {
         // If not in favorites, add to backend
         final response = await http.post(
           Uri.parse(
-              'http://127.0.0.1:8080/api/favorites/add?userId=$userId&foodItemId=${item.id}'),
+              'http://192.168.1.5:8080/api/favorites/add?userId=$userId&foodItemId=${item.id}'),
           headers: {"Authorization": "Bearer $token"},
         );
 
@@ -185,7 +185,7 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class HomePageContent extends StatelessWidget {
+class HomePageContent extends StatefulWidget {
   final List<FoodItem> foodItems;
   final Set<FoodItem> favoriteItems;
   final Function(FoodItem) onToggleFavorite;
@@ -198,9 +198,33 @@ class HomePageContent extends StatelessWidget {
   });
 
   @override
+  State<HomePageContent> createState() => _HomePageContentState();
+}
+
+class _HomePageContentState extends State<HomePageContent> {
+  List<String> _selectedTags = []; // Track multiple selected tags
+
+  // Extract unique tags from all food items
+  List<String> getUniqueTags() {
+    final Set<String> uniqueTags = {};
+    for (var item in widget.foodItems) {
+      uniqueTags.addAll(item.tags);
+    }
+    return uniqueTags.toList();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Filter recommended items based on the selected tags
+    List<FoodItem> recommendedItems = widget.foodItems
+        .where((item) =>
+            _selectedTags.isEmpty || // Show all items if no tags are selected
+            _selectedTags.every(
+                (tag) => item.tags.contains(tag))) // Match ALL selected tags
+        .toList();
+
     return DefaultTabController(
-      length: 2, // ✅ Two tabs
+      length: 2, // Two tabs (Food Items & Shops)
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Green Bite"),
@@ -233,15 +257,15 @@ class HomePageContent extends StatelessWidget {
             labelColor: Colors.green,
             unselectedLabelColor: Colors.grey,
             tabs: [
-              Tab(text: "Food Items"), // 🍽 Food Tab
-              Tab(text: "Shops"), // 🏪 Shops Tab
+              Tab(text: "Food Items"),
+              Tab(text: "Shops"),
             ],
           ),
         ),
         body: TabBarView(
           children: [
-            // 🍽 Food Items Page
-            foodItems.isEmpty
+            // 🍽 Food Items Tab
+            widget.foodItems.isEmpty
                 ? const Center(child: CircularProgressIndicator())
                 : SingleChildScrollView(
                     padding: const EdgeInsets.all(16),
@@ -259,7 +283,7 @@ class HomePageContent extends StatelessWidget {
                                 blurRadius: 8,
                                 spreadRadius: 2,
                                 offset: const Offset(0, 2),
-                              ),
+                              )
                             ],
                           ),
                           child: TextField(
@@ -305,30 +329,75 @@ class HomePageContent extends StatelessWidget {
                               fontSize: 22, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 10),
+
+                        // 🏷 Clickable Tags for Filtering
+                        Wrap(
+                          spacing: 8,
+                          children: getUniqueTags().map((tag) {
+                            bool isSelected = _selectedTags.contains(tag);
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (isSelected) {
+                                    _selectedTags
+                                        .remove(tag); // Deselect the tag
+                                  } else {
+                                    _selectedTags.add(tag); // Select the tag
+                                  }
+                                });
+                              },
+                              child: Chip(
+                                label: Text(tag),
+                                backgroundColor: isSelected
+                                    ? Colors.green
+                                    : Colors.grey[300],
+                                labelStyle: TextStyle(
+                                  color:
+                                      isSelected ? Colors.white : Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        // 🍽 Recommended Items ListView
                         SizedBox(
                           height: 250,
-                          child: ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: foodItems.length,
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(width: 10),
-                            itemBuilder: (context, index) {
-                              final item = foodItems[index];
-                              return SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.4,
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4),
-                                  child: FoodCard(
-                                    foodItem: item,
-                                    isFavorite: favoriteItems.contains(item),
-                                    onFavoritePressed: () =>
-                                        onToggleFavorite(item),
+                          child: recommendedItems.isEmpty
+                              ? const Center(
+                                  child: Text(
+                                    "No items match this filter!",
+                                    style: TextStyle(
+                                        fontSize: 18, color: Colors.grey),
                                   ),
+                                )
+                              : ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: recommendedItems.length,
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(width: 10),
+                                  itemBuilder: (context, index) {
+                                    final item = recommendedItems[index];
+                                    return SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.4,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 4),
+                                        child: FoodCard(
+                                          foodItem: item,
+                                          isFavorite: widget.favoriteItems
+                                              .contains(item),
+                                          onFavoritePressed: () =>
+                                              widget.onToggleFavorite(item),
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
-                          ),
                         ),
 
                         const SizedBox(height: 20),
@@ -343,15 +412,16 @@ class HomePageContent extends StatelessWidget {
                         ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: foodItems.length,
+                          itemCount: widget.foodItems.length,
                           itemBuilder: (context, index) {
-                            final item = foodItems[index];
+                            final item = widget.foodItems[index];
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 10),
                               child: FoodCard(
                                 foodItem: item,
-                                isFavorite: favoriteItems.contains(item),
-                                onFavoritePressed: () => onToggleFavorite(item),
+                                isFavorite: widget.favoriteItems.contains(item),
+                                onFavoritePressed: () =>
+                                    widget.onToggleFavorite(item),
                               ),
                             );
                           },

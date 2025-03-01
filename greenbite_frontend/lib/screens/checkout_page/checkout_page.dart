@@ -51,7 +51,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
       // Confirm order in backend
       final orderResponse = await http.post(
-        Uri.parse("http://127.0.0.1:8080/api/orders/confirm"),
+        Uri.parse("http://192.168.1.5:8080/api/orders/confirm"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token"
@@ -103,7 +103,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       // Call backend with dynamic amount
       final response = await http.post(
         Uri.parse(
-            'http://127.0.0.1:8080/api/payments/create?amount=$amountInCents&currency=usd'),
+            'http://192.168.1.5:8080/api/payments/create?amount=$amountInCents&currency=usd'),
         headers: {"Authorization": "Bearer $token"},
       );
 
