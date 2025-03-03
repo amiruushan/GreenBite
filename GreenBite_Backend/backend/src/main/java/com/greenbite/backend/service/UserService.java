@@ -45,4 +45,32 @@ public class UserService {
                 user.getAddress()
         );
     }
+    public void addPoints(Long userId, int earnedPoints) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Add normal points
+        user.setNormalPoints(user.getNormalPoints() + earnedPoints);
+
+        // Convert to Green Bite points if threshold is reached (100 normal points = 1 Green Bite point)
+        if (user.getNormalPoints() >= 100) {
+            int convertedPoints = user.getNormalPoints() / 100;  // Number of Green Bite points to add
+            user.setGreenBitePoints(user.getGreenBitePoints() + convertedPoints);
+            user.setNormalPoints(user.getNormalPoints() % 100); // Remaining normal points after conversion
+        }
+
+        userRepository.save(user);
+    }
+
+    public int getNormalPoints(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return user.getNormalPoints();
+    }
+
+    public int getGreenBitePoints(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return user.getGreenBitePoints();
+    }
 }

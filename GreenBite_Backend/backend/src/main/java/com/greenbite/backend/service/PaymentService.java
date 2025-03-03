@@ -17,7 +17,7 @@ public class PaymentService {
         Stripe.apiKey = stripeSecretKey;
 
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                .setAmount(amount * 100) // Convert to cents
+                .setAmount(amount) // Convert to cents
                 .setCurrency(currency)
                 .addPaymentMethodType("card") // ✅ Correct method
                 .build();

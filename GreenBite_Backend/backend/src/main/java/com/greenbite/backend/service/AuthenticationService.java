@@ -137,4 +137,8 @@ public class AuthenticationService {
         int code = random.nextInt(900000) + 100000;
         return String.valueOf(code);
     }
+    public Long getUserIdByEmail(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        return user.map(User::getId).orElse(null); // Return null if user is not found
+    }
 }

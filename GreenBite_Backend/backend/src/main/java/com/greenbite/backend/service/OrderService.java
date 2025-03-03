@@ -1,12 +1,12 @@
 package com.greenbite.backend.service;
 
-import com.greenbite.backend.dto.FoodItemDTO;
 import com.greenbite.backend.dto.OrderDTO;
 import com.greenbite.backend.model.FoodItem;
 import com.greenbite.backend.model.Order;
 import com.greenbite.backend.repository.OrderRepository;
 import com.greenbite.backend.repository.FoodItemRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,10 +22,18 @@ public class OrderService {
         this.foodItemRepository = foodItemRepository;
     }
 
+    @Transactional
     public Order createOrder(OrderDTO orderDTO) {
-        // Convert the FoodItemDTO to FoodItem entities
         List<FoodItem> foodItems = orderDTO.getItems().stream()
-                .map(itemDTO -> foodItemRepository.findById(itemDTO.getId()).orElseThrow(() -> new RuntimeException("Food item not found")))
+                .map(itemDTO -> {
+                    FoodItem foodItem = foodItemRepository.findById(itemDTO.getId())
+                            .orElseThrow(() -> new RuntimeException("Food item not found"));
+                    // Reduce stock
+                    foodItem.setQuantity(foodItem.getQuantity() - itemDTO.getQuantity());
+                    foodItemRepository.save(foodItem);
+
+                    return foodItem;
+                })
                 .collect(Collectors.toList());
 
         // Create and save the order

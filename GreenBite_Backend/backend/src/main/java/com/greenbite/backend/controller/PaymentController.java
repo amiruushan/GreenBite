@@ -1,9 +1,10 @@
 package com.greenbite.backend.controller;
 
-
 import com.greenbite.backend.service.PaymentService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -16,14 +17,24 @@ public class PaymentController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createPayment(@RequestParam Long amount, @RequestParam String currency) {
-        System.out.println("Payment api");
+    public ResponseEntity<Map<String, String>> createPayment(@RequestParam Long amount, @RequestParam String currency) {
+        System.out.println("Payment API Called");
         try {
             String clientSecret = paymentService.createPaymentIntent(amount, currency);
-            return ResponseEntity.ok(clientSecret);
+
+            // Wrap response in a JSON object
+            Map<String, String> response = new HashMap<>();
+            response.put("clientSecret", clientSecret);
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+            // Wrap error message in a JSON object
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+
+            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
 }
+
 
