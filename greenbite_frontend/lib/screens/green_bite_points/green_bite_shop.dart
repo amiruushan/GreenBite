@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/service/auth_service';
-
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -12,11 +11,13 @@ class GreenBiteShopScreen extends StatefulWidget {
 class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
   int greenBitePoints = 0;
   bool isLoading = true;
+  List<Map<String, dynamic>> deals = []; // Store fetched deals
 
   @override
   void initState() {
     super.initState();
     _fetchPoints();
+    _fetchDeals(); // Fetch deals when the screen loads
   }
 
   Future<void> _fetchPoints() async {
@@ -52,6 +53,29 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> _fetchDeals() async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://192.168.1.2:8080/api/deals'),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          deals = List<Map<String, dynamic>>.from(data);
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to fetch deals: ${response.body}")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error fetching deals: $e")),
+      );
     }
   }
 
@@ -120,16 +144,14 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
                 crossAxisCount: 2,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                children: [
-                  _buildDealItem("5 GBP - \$5 Discount Code", Icons.local_offer,
-                      Colors.blue, 5),
-                  _buildDealItem("10 GBP - \$10 Keells Gift Card",
-                      Icons.card_giftcard, Colors.orange, 10),
-                  _buildDealItem("15 GBP - Amazon Gift Card",
-                      Icons.shopping_bag, Colors.purple, 15),
-                  _buildDealItem("20 GBP - Free Meal Voucher", Icons.fastfood,
-                      Colors.red, 20),
-                ],
+                children: deals.map((deal) {
+                  return _buildDealItem(
+                    deal["title"],
+                    _getIcon(deal["icon"]),
+                    _getColor(deal["color"]),
+                    deal["cost"],
+                  );
+                }).toList(),
               ),
             ),
     );
@@ -157,5 +179,35 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
         ),
       ),
     );
+  }
+
+  IconData _getIcon(String iconName) {
+    switch (iconName) {
+      case "local_offer":
+        return Icons.local_offer;
+      case "card_giftcard":
+        return Icons.card_giftcard;
+      case "shopping_bag":
+        return Icons.shopping_bag;
+      case "fastfood":
+        return Icons.fastfood;
+      default:
+        return Icons.local_offer;
+    }
+  }
+
+  Color _getColor(String colorName) {
+    switch (colorName) {
+      case "blue":
+        return Colors.blue;
+      case "orange":
+        return Colors.orange;
+      case "purple":
+        return Colors.purple;
+      case "red":
+        return Colors.red;
+      default:
+        return Colors.green;
+    }
   }
 }
