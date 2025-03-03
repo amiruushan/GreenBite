@@ -1,16 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/screens/checkout_page/checkout_page.dart';
-import 'package:provider/provider.dart';
-import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
+import 'package:greenbite_frontend/screens/green_bite_points/inventory_screen.dart';
+import 'package:greenbite_frontend/service/auth_service';
 
-class CartScreen extends StatelessWidget {
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:provider/provider.dart';
+
+class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
+
+  @override
+  _CartScreenState createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  String? selectedCoupon;
+  double discountAmount = 0.0;
+  List<dynamic> inventoryCoupons = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchInventoryCoupons();
+  }
+
+  Future<void> _fetchInventoryCoupons() async {
+    try {
+      int? userId = await AuthService.getUserId();
+      if (userId == null) throw Exception('User ID not found');
+
+      final response = await http.get(
+        Uri.parse('http://192.168.1.2:8080/api/user/inventory?userId=$userId'),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          inventoryCoupons = jsonDecode(response.body);
+        });
+      } else {
+        print("Failed to fetch inventory: ${response.body}");
+      }
+    } catch (e) {
+      print("Error fetching inventory: $e");
+    }
+  }
+
+  void _applyDiscount(String couponCode, double discount) {
+    setState(() {
+      discountAmount = discount;
+      selectedCoupon = couponCode;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Applied Coupon: $couponCode!")),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
     final cartItems = cartProvider.cartItems;
+
+    double totalPrice = cartProvider.totalPrice();
+    double finalPrice = (totalPrice - discountAmount).clamp(0, double.infinity);
 
     return Scaffold(
       appBar: AppBar(
@@ -128,6 +182,30 @@ class CartScreen extends StatelessWidget {
                   ),
                 ),
 
+                // Coupon Redemption Section
+                if (inventoryCoupons.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: DropdownButton<String>(
+                      hint: const Text("Select Coupon"),
+                      value: selectedCoupon,
+                      items: inventoryCoupons
+                          .map<DropdownMenuItem<String>>((coupon) {
+                        return DropdownMenuItem<String>(
+                          value: coupon['coupon_code'],
+                          child: Text(
+                              "${coupon['deal_name']} - \$${coupon['discount']}"),
+                        );
+                      }).toList(),
+                      onChanged: (couponCode) {
+                        var selectedItem = inventoryCoupons.firstWhere(
+                            (item) => item['coupon_code'] == couponCode);
+                        _applyDiscount(selectedItem['coupon_code'],
+                            selectedItem['discount']);
+                      },
+                    ),
+                  ),
+
                 // Checkout Section (Sticky Bottom Bar)
                 Container(
                   padding:
@@ -156,9 +234,57 @@ class CartScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            "\$${cartProvider.totalPrice().toStringAsFixed(2)}",
+                            "\$${totalPrice.toStringAsFixed(2)}",
                             style: const TextStyle(
                               fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // Discount Applied
+                      if (selectedCoupon != null)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Discount ($selectedCoupon):",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                              ),
+                            ),
+                            Text(
+                              "-\$${discountAmount.toStringAsFixed(2)}",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                      const SizedBox(height: 8),
+
+                      // Final Price
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Final Total:",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            "\$${finalPrice.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                              fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: Colors.green,
                             ),

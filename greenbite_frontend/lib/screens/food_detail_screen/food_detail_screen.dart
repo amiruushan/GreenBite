@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
-import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
+import 'package:greenbite_frontend/service/auth_service';
+
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:provider/provider.dart';
+import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
 
 class FoodDetailScreen extends StatefulWidget {
   final FoodItem foodItem;
@@ -14,6 +18,48 @@ class FoodDetailScreen extends StatefulWidget {
 
 class _FoodDetailScreenState extends State<FoodDetailScreen> {
   int selectedQuantity = 1;
+
+  void _addToCart() async {
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    cartProvider.addToCart(widget.foodItem, selectedQuantity);
+
+    int earnedPoints = widget.foodItem.tags.contains("vegan") ||
+            widget.foodItem.tags.contains("low-fat") ||
+            widget.foodItem.tags.contains("sugar-free")
+        ? 20
+        : 10;
+
+    // ✅ Send API request to add normal points on successful purchase
+    try {
+      int? userId = await AuthService.getUserId();
+      if (userId == null) throw Exception("User ID not found");
+
+      final response = await http.post(
+        Uri.parse("http://192.168.1.2:8080/api/user/add-points"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"userId": userId, "normalPoints": earnedPoints}),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text("+$earnedPoints NP added!",
+                  style: TextStyle(color: Colors.green))),
+        );
+      } else {
+        print("Failed to add points: ${response.body}");
+      }
+    } catch (e) {
+      print("Error adding points: $e");
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          content: Text(
+              "${widget.foodItem.name} x$selectedQuantity added to cart!")),
+    );
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +131,17 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
               widget.foodItem.description,
               style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
+            Text(
+              widget.foodItem.tags.contains("vegan") ||
+                      widget.foodItem.tags.contains("low-fat") ||
+                      widget.foodItem.tags.contains("sugar-free")
+                  ? "+20 NP on purchase"
+                  : "+10 NP on purchase",
+              style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.green,
+                  fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -123,19 +180,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: canAddMore
-                    ? () {
-                        cartProvider.addToCart(
-                            widget.foodItem, selectedQuantity);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text(
-                                  "${widget.foodItem.name} x$selectedQuantity added to cart!"),
-                              backgroundColor: Colors.green),
-                        );
-                        setState(() {});
-                      }
-                    : null, // Disable button if max quantity is reached
+                onPressed: canAddMore ? _addToCart : null,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: canAddMore ? Colors.green : Colors.grey,
