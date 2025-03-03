@@ -68,7 +68,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 // Send the data to the backend
                 try {
                   final response = await http.post(
-                    Uri.parse('http://127.0.0.1:8080/auth/verify'),
+                    Uri.parse('http://192.168.1.1:8080/auth/verify'),
                     headers: {'Content-Type': 'application/json'},
                     body: json.encode(data),
                   );

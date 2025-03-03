@@ -39,7 +39,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       }
       final response = await http.get(
         Uri.parse(
-            'http://192.168.1.5:8080/api/favorites/user/${widget.userId}'),
+            'http://192.168.1.2:8080/api/favorites/user/${widget.userId}'),
         headers: {"Authorization": "Bearer $token"},
       );
 
@@ -74,7 +74,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       }
       final response = await http.delete(
         Uri.parse(
-          'http://192.168.1.5:8080/api/favorites/remove/$userId/${item.id}',
+          'http://192.168.1.2:8080/api/favorites/remove/$userId/${item.id}',
         ),
         headers: {"Authorization": "Bearer $token"},
       );

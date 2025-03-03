@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/screens/green_bite_points/green_bite_shop.dart';
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile.dart';
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile_service.dart';
 import 'package:greenbite_frontend/screens/user_profile/edit_profile_screen.dart';
 import 'package:greenbite_frontend/screens/vendor/vendor_home.dart'; // Import the VendorHome screen
+import 'package:greenbite_frontend/screens/green_bite_points/green_bite_points_screen.dart'; // Import Green Bite Points screen
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -67,6 +69,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const VendorHome()),
+    );
+  }
+
+  // ✅ Navigate to Green Bite Points Page
+  void _goToGreenBitePoints() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => GreenBitePointsScreen()),
     );
   }
 
@@ -148,12 +158,25 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         ),
                         child: Column(
                           children: [
-                            // Calorie Tracker Section
+                            // Green Bite Points Section
                             _buildSectionItem(
-                              icon: Icons.directions_run,
-                              text: "Calorie Tracker",
+                              icon: Icons.emoji_events,
+                              text: "Green Bite Points",
+                              onPressed: _goToGreenBitePoints,
                             ),
                             const Divider(height: 1, indent: 16, endIndent: 16),
+
+                            _buildSectionItem(
+                              icon: Icons.store,
+                              text: "Green Bite Shop",
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            GreenBiteShopScreen()));
+                              },
+                            ),
 
                             // About Us Section
                             _buildSectionItem(

@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/login/email_verification_screen.dart';
-import 'package:greenbite_frontend/screens/login/login_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart'; // ✅ Animation support
 import 'dart:convert';
 
 class SignupScreen extends StatefulWidget {
-  final String? userType;
-
-  SignupScreen({this.userType});
-
   @override
   _SignupScreenState createState() => _SignupScreenState();
 }
@@ -75,12 +70,11 @@ class _SignupScreenState extends State<SignupScreen> {
       "password": _passwordController.text,
       "streetAddress": _streetAddressController.text,
       "district": _selectedDistrict,
-      "role": widget.userType,
     };
 
     try {
       var response = await http.post(
-        Uri.parse("http://192.168.1.5:8080/auth/signup"),
+        Uri.parse("http://192.168.1.1:8080/auth/signup"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(signupData),
       );
