@@ -47,4 +47,9 @@ public class FoodItemController {
     public FoodItemDTO addFoodItem(@RequestBody FoodItemDTO foodItemDTO) {
         return foodItemService.addFoodItem(foodItemDTO);
     }
+
+    @DeleteMapping("/delete")
+    public void deleteFoodItem(@RequestBody FoodItemDTO foodItemDTO){
+        foodItemService.deleteFoodItem(foodItemDTO);
+    }
 }
