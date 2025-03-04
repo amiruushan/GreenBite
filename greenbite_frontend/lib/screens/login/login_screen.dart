@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/home_page/home_page.dart';
 import 'package:greenbite_frontend/screens/login/signup_screen.dart';
 import 'package:greenbite_frontend/service/auth_service';
@@ -21,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true; // Show loading spinner
     });
 
-    final String url = "http://192.168.1.3:8080/auth/login";
+    final String url = "${Config.apiBaseUrl}/auth/login";
 
     final response = await http.post(
       Uri.parse(url),
@@ -66,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _fetchAndSaveUserId(String email) async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.1.3:8080/auth/getUserID?email=$email'),
+        Uri.parse('${Config.apiBaseUrl}/auth/getUserID?email=$email'),
       );
 
       if (response.statusCode == 200) {

@@ -33,7 +33,7 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/api/**").permitAll() // Allow access to /shop/** without authentication
+                        .requestMatchers("/lll/**").permitAll() // Allow access to /shop/** without authentication
                         .anyRequest().authenticated()
                 )
 

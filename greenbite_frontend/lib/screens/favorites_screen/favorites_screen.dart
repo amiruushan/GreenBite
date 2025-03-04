@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/service/auth_service';
 import 'package:http/http.dart' as http;
 import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
@@ -38,8 +39,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse(
-            'http://192.168.1.2:8080/api/favorites/user/${widget.userId}'),
+        Uri.parse('${Config.apiBaseUrl}/api/favorites/user/${widget.userId}'),
         headers: {"Authorization": "Bearer $token"},
       );
 
@@ -74,7 +74,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       }
       final response = await http.delete(
         Uri.parse(
-          'http://192.168.1.2:8080/api/favorites/remove/$userId/${item.id}',
+          '${Config.apiBaseUrl}/api/favorites/remove/$userId/${item.id}',
         ),
         headers: {"Authorization": "Bearer $token"},
       );

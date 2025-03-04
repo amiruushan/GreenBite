@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
 import 'package:greenbite_frontend/screens/food_detail_screen/food_detail_screen.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/shop_tab.dart';
@@ -58,13 +59,13 @@ class _HomePageState extends State<HomePage> {
 
       // Fetch all food items
       final foodResponse = await http.get(
-        Uri.parse('http://192.168.1.3:8080/api/food-items/get'),
+        Uri.parse('${Config.apiBaseUrl}/api/food-items/get'),
         headers: {"Authorization": "Bearer $token"},
       );
 
       // Fetch favorite items
       final favoriteResponse = await http.get(
-        Uri.parse('http://192.168.1.3:8080/api/favorites/user/$userId'),
+        Uri.parse('${Config.apiBaseUrl}/api/favorites/user/$userId'),
         headers: {"Authorization": "Bearer $token"},
       );
 
@@ -111,7 +112,7 @@ class _HomePageState extends State<HomePage> {
         // If already in favorites, remove from backend
         final response = await http.delete(
           Uri.parse(
-              'http://192.168.1.3:8080/api/favorites/remove/$userId/${item.id}'),
+              '${Config.apiBaseUrl}/api/favorites/remove/$userId/${item.id}'),
           headers: {"Authorization": "Bearer $token"},
         );
 
@@ -126,7 +127,7 @@ class _HomePageState extends State<HomePage> {
         // If not in favorites, add to backend
         final response = await http.post(
           Uri.parse(
-              'http://192.168.1.3:8080/api/favorites/add?userId=$userId&foodItemId=${item.id}'),
+              '${Config.apiBaseUrl}/api/favorites/add?userId=$userId&foodItemId=${item.id}'),
           headers: {"Authorization": "Bearer $token"},
         );
 

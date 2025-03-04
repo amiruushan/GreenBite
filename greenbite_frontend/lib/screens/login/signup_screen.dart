@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/login/email_verification_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart'; // ✅ Animation support
@@ -74,7 +75,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
     try {
       var response = await http.post(
-        Uri.parse("http://192.168.1.3:8080/auth/signup"),
+        Uri.parse("${Config.apiBaseUrl}/auth/signup"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(signupData),
       );

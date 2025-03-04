@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/service/auth_service';
 
@@ -19,6 +20,15 @@ class FoodDetailScreen extends StatefulWidget {
 class _FoodDetailScreenState extends State<FoodDetailScreen> {
   int selectedQuantity = 1;
 
+  Future<Map<String, String>> _getHeaders() async {
+    String? token = await AuthService.getToken();
+    if (token == null) throw Exception("No JWT token found.");
+    return {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token", // ✅ Add Authorization header
+    };
+  }
+
   void _addToCart() async {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
     cartProvider.addToCart(widget.foodItem, selectedQuantity);
@@ -35,8 +45,8 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
       if (userId == null) throw Exception("User ID not found");
 
       final response = await http.post(
-        Uri.parse("http://192.168.1.3:8080/api/users/add-points"),
-        headers: {"Content-Type": "application/json"},
+        Uri.parse("${Config.apiBaseUrl}/api/users/add-points"),
+        headers: await _getHeaders(),
         body: jsonEncode({"userId": userId, "normalPoints": earnedPoints}),
       );
 

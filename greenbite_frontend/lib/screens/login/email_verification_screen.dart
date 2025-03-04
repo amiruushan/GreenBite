@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/config.dart';
 import 'login_screen.dart';
 import '/../widgets/custom_button_widget.dart';
 import 'package:http/http.dart' as http;
@@ -68,7 +69,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 // Send the data to the backend
                 try {
                   final response = await http.post(
-                    Uri.parse('http://192.168.1.1:8080/auth/verify'),
+                    Uri.parse('${Config.apiBaseUrl}/auth/verify'),
                     headers: {'Content-Type': 'application/json'},
                     body: json.encode(data),
                   );

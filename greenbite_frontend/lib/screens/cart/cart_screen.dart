@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/screens/checkout_page/checkout_page.dart';
 import 'package:greenbite_frontend/screens/green_bite_points/inventory_screen.dart';
@@ -25,13 +26,23 @@ class _CartScreenState extends State<CartScreen> {
     _fetchInventoryCoupons();
   }
 
+  Future<Map<String, String>> _getHeaders() async {
+    String? token = await AuthService.getToken();
+    if (token == null) throw Exception("No JWT token found.");
+    return {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token", // ✅ Add Authorization header
+    };
+  }
+
   Future<void> _fetchInventoryCoupons() async {
     try {
       int? userId = await AuthService.getUserId();
       if (userId == null) throw Exception('User ID not found');
 
       final response = await http.get(
-        Uri.parse('http://192.168.1.3:8080/api/user/inventory/$userId'),
+        Uri.parse('${Config.apiBaseUrl}/api/user/inventory/$userId'),
+        headers: await _getHeaders(),
       );
 
       if (response.statusCode == 200) {
@@ -77,8 +88,8 @@ class _CartScreenState extends State<CartScreen> {
     // Call backend to redeem coupon first
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.3:8080/api/user/inventory/redeem-coupon'),
-        headers: {"Content-Type": "application/json"},
+        Uri.parse('${Config.apiBaseUrl}/api/user/inventory/redeem-coupon'),
+        headers: await _getHeaders(),
         body: jsonEncode({"couponCode": couponCode}),
       );
 
