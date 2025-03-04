@@ -38,18 +38,20 @@ class _CartScreenState extends State<CartScreen> {
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
 
+        // Filter for unredeemed coupons and remove duplicates based on coupon_code
+        Map<String, dynamic> uniqueCoupons = {};
+        for (var item in data) {
+          if (item["redeemed"] == false) {
+            String code = item["coupon_code"] ?? "UNKNOWN_CODE";
+            uniqueCoupons[code] = {
+              "deal_name": item["deal_name"] ?? "Unknown Deal",
+              "coupon_code": code,
+              "discount": (item["discount"] is num) ? item["discount"] : 0,
+            };
+          }
+        }
         setState(() {
-          inventoryCoupons = data
-              .where((item) =>
-                  item["redeemed"] == false) // ✅ Filter out redeemed coupons
-              .map((item) => {
-                    "deal_name": item["deal_name"] ?? "Unknown Deal",
-                    "coupon_code": item["coupon_code"] ?? "UNKNOWN_CODE",
-                    "discount": (item["discount"] is num)
-                        ? item["discount"]
-                        : 0, // ✅ Ensure it's a number
-                  })
-              .toList();
+          inventoryCoupons = uniqueCoupons.values.toList();
         });
       } else {
         print("Failed to fetch inventory: ${response.body}");
@@ -59,15 +61,35 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
-  void _applyDiscount(String couponCode, double discount) {
+  void _applyDiscount(String couponCode, double discount) async {
     setState(() {
       discountAmount = discount;
       selectedCoupon = couponCode;
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Applied Coupon: $couponCode!")),
-    );
+    // Redeem coupon from backend
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.1.3:8080/api/user/inventory/redeem-coupon'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"couponCode": couponCode}),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Applied & Redeemed Coupon: $couponCode!")),
+        );
+        _fetchInventoryCoupons(); // ✅ Refresh coupon list
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to redeem coupon: ${response.body}")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error redeeming coupon: $e")),
+      );
+    }
   }
 
   @override

@@ -33,13 +33,14 @@ public class InventoryService {
             Map<String, Object> map = new HashMap<>();
             map.put("deal_name", item.getDeal().getTitle());
             map.put("coupon_code", item.getCouponCode());
-            map.put("discount", item.getDiscount()); // ✅ Include discount
+            map.put("discount", item.getDiscount()); // ✅ Ensure discount is included
             map.put("redeemed", !item.isActive()); // ✅ Fix redeemed status
             inventoryData.add(map);
         }
 
         return inventoryData;
     }
+
 
 
 
@@ -57,6 +58,11 @@ public class InventoryService {
         user.setGreenBitePoints(user.getGreenBitePoints() - deal.getCost());
         userRepository.save(user);
 
+        // If couponCode is null or empty, generate a random one
+        if (couponCode == null || couponCode.trim().isEmpty()) {
+            couponCode = "GB-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        }
+
         // Save to inventory with discount
         Inventory inventory = new Inventory(user, deal, couponCode, deal.getDiscount());
         inventoryRepository.save(inventory);
@@ -64,23 +70,19 @@ public class InventoryService {
 
 
 
+
     public void redeemCoupon(String couponCode) {
-        Optional<Inventory> inventoryOptional = inventoryRepository.findByCouponCode(couponCode);
+        Inventory inventory = inventoryRepository.findByCouponCode(couponCode)
+                .orElseThrow(() -> new RuntimeException("Coupon not found!"));
 
-        if (inventoryOptional.isPresent()) {
-            Inventory inventory = inventoryOptional.get();
-
-            if (inventory.isActive()) { // ✅ Check if it's already redeemed
-                inventory.setActive(false); // ✅ Mark as redeemed
-                inventoryRepository.save(inventory); // ✅ Save changes
-                System.out.println("Coupon " + couponCode + " redeemed successfully.");
-            } else {
-                throw new RuntimeException("Coupon already redeemed!");
-            }
-        } else {
-            throw new RuntimeException("Coupon not found!");
+        if (!inventory.isActive()) { // Check if already redeemed
+            throw new RuntimeException("Coupon already redeemed!");
         }
+
+        inventory.setActive(false); // Mark as redeemed
+        inventoryRepository.save(inventory);
     }
+
 
 
 

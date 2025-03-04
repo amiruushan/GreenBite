@@ -103,7 +103,8 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
         body: jsonEncode({
           "userId": userId,
           "dealId": dealId,
-          "couponCode": couponCode,
+          "couponCode":
+              couponCode, // Will be empty, so backend generates a random code.
         }),
       );
 
@@ -111,10 +112,10 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
         setState(() {
           greenBitePoints -= dealCost;
         });
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Deal purchased successfully!")),
         );
+        _fetchDeals(); // Optionally refresh deals if needed.
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Failed to purchase deal: ${response.body}")),
@@ -190,9 +191,11 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
             ElevatedButton(
-              onPressed: () => _purchaseDeal(dealId, "COUPON123"),
+              onPressed: () => _purchaseDeal(
+                  dealId, ""), // ✅ Use `dealId` instead of `deal["id"]`
               style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-              child: Text("Purchase for $cost GBP"),
+              child: Text(
+                  "Purchase for $cost GBP"), // ✅ Use `cost` instead of `deal["cost"]`
             ),
           ],
         ),
