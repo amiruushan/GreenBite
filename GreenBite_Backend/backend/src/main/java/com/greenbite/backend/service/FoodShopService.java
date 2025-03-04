@@ -21,7 +21,7 @@ public class FoodShopService {
     public List<FoodShopDTO> getAllFoodShops() {
         List<FoodShop> foodShops = foodShopRepository.findAll();
         return foodShops.stream()
-                .map(shop -> new FoodShopDTO(shop.getId(), shop.getName(), shop.getPhoto()))
+                .map(shop -> new FoodShopDTO(shop.getId(), shop.getName(), shop.getPhoto(),shop.getEmail(),shop.getBusinessName(),shop.getBusinessDescription()))
                 .collect(Collectors.toList());
     }
 
@@ -31,7 +31,7 @@ public class FoodShopService {
         return convertToDTO(foodShop);
     }
     private FoodShopDTO convertToDTO(FoodShop foodShop){
-        return new FoodShopDTO(foodShop.getId(),foodShop.getName(),foodShop.getPhoto()
+        return new FoodShopDTO(foodShop.getId(),foodShop.getName(),foodShop.getPhoto(),foodShop.getEmail(),foodShop.getBusinessName(), foodShop.getBusinessDescription()
         );
     }
 
