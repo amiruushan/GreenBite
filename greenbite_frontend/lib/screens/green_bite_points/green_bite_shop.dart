@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/service/auth_service';
+import 'package:greenbite_frontend/screens/green_bite_points/inventory_screen.dart'; // Import Inventory Screen
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -32,7 +33,7 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
       }
 
       final response = await http.get(
-        Uri.parse('http://192.168.1.2:8080/api/user/points?userId=$userId'),
+        Uri.parse('http://192.168.1.3:8080/api/users/points?userId=$userId'),
       );
 
       if (response.statusCode == 200) {
@@ -59,7 +60,7 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
   Future<void> _fetchDeals() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.1.2:8080/api/deals'),
+        Uri.parse('http://192.168.1.3:8080/api/deals'),
       );
 
       if (response.statusCode == 200) {
@@ -79,8 +80,11 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
     }
   }
 
-  Future<void> _purchaseDeal(String dealName, int cost) async {
-    if (greenBitePoints < cost) {
+  Future<void> _purchaseDeal(int dealId, String couponCode) async {
+    int dealCost =
+        deals.firstWhere((deal) => deal["id"] == dealId)["cost"] as int;
+
+    if (greenBitePoints < dealCost) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Not enough points!")),
       );
@@ -94,19 +98,20 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
       }
 
       final response = await http.post(
-        Uri.parse('http://192.168.1.2:8080/api/user/purchase-deal'),
+        Uri.parse('http://192.168.1.3:8080/api/user/inventory/purchase-deal'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "userId": userId,
-          "dealName": dealName,
-          "cost": cost,
+          "dealId": dealId,
+          "couponCode": couponCode,
         }),
       );
 
       if (response.statusCode == 200) {
         setState(() {
-          greenBitePoints -= cost;
+          greenBitePoints -= dealCost;
         });
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Deal purchased successfully!")),
         );
@@ -130,8 +135,20 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
         centerTitle: true,
         backgroundColor: Colors.green,
         actions: [
+          // ✅ Inventory Icon Button
           IconButton(
-            icon: Icon(Icons.refresh),
+            icon: Icon(Icons.inventory_2, color: Colors.white),
+            tooltip: "My Inventory",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => InventoryScreen()),
+              );
+            },
+          ),
+          // ✅ Refresh Points Button
+          IconButton(
+            icon: Icon(Icons.refresh, color: Colors.white),
             onPressed: _fetchPoints,
           ),
         ],
@@ -150,6 +167,7 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
                     _getIcon(deal["icon"]),
                     _getColor(deal["color"]),
                     deal["cost"],
+                    deal["id"],
                   );
                 }).toList(),
               ),
@@ -157,7 +175,8 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
     );
   }
 
-  Widget _buildDealItem(String title, IconData icon, Color color, int cost) {
+  Widget _buildDealItem(
+      String title, IconData icon, Color color, int cost, int dealId) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -171,7 +190,7 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
             ElevatedButton(
-              onPressed: () => _purchaseDeal(title, cost),
+              onPressed: () => _purchaseDeal(dealId, "COUPON123"),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
               child: Text("Purchase for $cost GBP"),
             ),

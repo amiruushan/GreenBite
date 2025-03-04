@@ -36,7 +36,7 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
 
       // Fetch points using the user ID
       final response = await http.get(
-        Uri.parse('http://192.168.1.2:8080/api/user/points?userId=$userId'),
+        Uri.parse('http://192.168.1.3:8080/api/users/points?userId=$userId'),
       );
 
       if (response.statusCode == 200) {

@@ -35,7 +35,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
       if (userId == null) throw Exception("User ID not found");
 
       final response = await http.post(
-        Uri.parse("http://192.168.1.2:8080/api/user/add-points"),
+        Uri.parse("http://192.168.1.3:8080/api/users/add-points"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"userId": userId, "normalPoints": earnedPoints}),
       );

@@ -1,7 +1,11 @@
 package com.greenbite.backend.service;
 
 import com.greenbite.backend.dto.UserDTO;
+import com.greenbite.backend.model.Deal;
+import com.greenbite.backend.model.Inventory;
 import com.greenbite.backend.model.User;
+import com.greenbite.backend.repository.DealRepository;
+import com.greenbite.backend.repository.InventoryRepository;
 import com.greenbite.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -10,9 +14,13 @@ import java.util.Optional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final DealRepository dealRepository;
+    private final InventoryRepository inventoryRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, DealRepository dealRepository, InventoryRepository inventoryRepository) {
         this.userRepository = userRepository;
+        this.dealRepository = dealRepository;
+        this.inventoryRepository = inventoryRepository;
     }
 
     public UserDTO getUserById(Long id) {
@@ -72,5 +80,24 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return user.getGreenBitePoints();
+    }
+
+    public void purchaseDeal(Long userId, Long dealId, String couponCode) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Deal deal = dealRepository.findById(dealId)
+                .orElseThrow(() -> new RuntimeException("Deal not found"));
+
+        if (user.getGreenBitePoints() < deal.getCost()) {
+            throw new RuntimeException("Not enough Green Bite Points");
+        }
+
+        // Deduct GBP
+        user.setGreenBitePoints(user.getGreenBitePoints() - deal.getCost());
+        userRepository.save(user);
+
+        // Save to inventory
+        Inventory inventory = new Inventory(user, deal, couponCode);
+        inventoryRepository.save(inventory);
     }
 }

@@ -74,7 +74,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
     try {
       var response = await http.post(
-        Uri.parse("http://192.168.1.1:8080/auth/signup"),
+        Uri.parse("http://192.168.1.3:8080/auth/signup"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(signupData),
       );

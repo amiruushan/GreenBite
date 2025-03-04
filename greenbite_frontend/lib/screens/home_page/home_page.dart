@@ -58,13 +58,13 @@ class _HomePageState extends State<HomePage> {
 
       // Fetch all food items
       final foodResponse = await http.get(
-        Uri.parse('http://192.168.1.2:8080/api/food-items/get'),
+        Uri.parse('http://192.168.1.3:8080/api/food-items/get'),
         headers: {"Authorization": "Bearer $token"},
       );
 
       // Fetch favorite items
       final favoriteResponse = await http.get(
-        Uri.parse('http://192.168.1.2:8080/api/favorites/user/$userId'),
+        Uri.parse('http://192.168.1.3:8080/api/favorites/user/$userId'),
         headers: {"Authorization": "Bearer $token"},
       );
 
@@ -111,7 +111,7 @@ class _HomePageState extends State<HomePage> {
         // If already in favorites, remove from backend
         final response = await http.delete(
           Uri.parse(
-              'http://192.168.1.2:8080/api/favorites/remove/$userId/${item.id}'),
+              'http://192.168.1.3:8080/api/favorites/remove/$userId/${item.id}'),
           headers: {"Authorization": "Bearer $token"},
         );
 
@@ -126,7 +126,7 @@ class _HomePageState extends State<HomePage> {
         // If not in favorites, add to backend
         final response = await http.post(
           Uri.parse(
-              'http://192.168.1.2:8080/api/favorites/add?userId=$userId&foodItemId=${item.id}'),
+              'http://192.168.1.3:8080/api/favorites/add?userId=$userId&foodItemId=${item.id}'),
           headers: {"Authorization": "Bearer $token"},
         );
 

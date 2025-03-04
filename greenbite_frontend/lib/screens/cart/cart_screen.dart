@@ -32,12 +32,24 @@ class _CartScreenState extends State<CartScreen> {
       if (userId == null) throw Exception('User ID not found');
 
       final response = await http.get(
-        Uri.parse('http://192.168.1.2:8080/api/user/inventory?userId=$userId'),
+        Uri.parse('http://192.168.1.3:8080/api/user/inventory/$userId'),
       );
 
       if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+
         setState(() {
-          inventoryCoupons = jsonDecode(response.body);
+          inventoryCoupons = data
+              .where((item) =>
+                  item["redeemed"] == false) // ✅ Filter out redeemed coupons
+              .map((item) => {
+                    "deal_name": item["deal_name"] ?? "Unknown Deal",
+                    "coupon_code": item["coupon_code"] ?? "UNKNOWN_CODE",
+                    "discount": (item["discount"] is num)
+                        ? item["discount"]
+                        : 0, // ✅ Ensure it's a number
+                  })
+              .toList();
         });
       } else {
         print("Failed to fetch inventory: ${response.body}");
