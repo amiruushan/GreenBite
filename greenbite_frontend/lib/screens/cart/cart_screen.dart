@@ -3,7 +3,6 @@ import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/screens/checkout_page/checkout_page.dart';
 import 'package:greenbite_frontend/screens/green_bite_points/inventory_screen.dart';
 import 'package:greenbite_frontend/service/auth_service';
-
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
@@ -37,21 +36,34 @@ class _CartScreenState extends State<CartScreen> {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-
-        // Filter for unredeemed coupons and remove duplicates based on coupon_code
+        // Deduplicate coupons using a Map keyed by coupon_code.
         Map<String, dynamic> uniqueCoupons = {};
         for (var item in data) {
-          if (item["redeemed"] == false) {
-            String code = item["coupon_code"] ?? "UNKNOWN_CODE";
+          // Ensure each field has a default value.
+          String code = (item["coupon_code"] ?? "UNKNOWN_CODE").toString();
+          bool redeemed = item["redeemed"] ?? false;
+          double discount =
+              (item["discount"] is num) ? item["discount"].toDouble() : 0;
+          String dealName = item["deal_name"] ?? "Unknown Deal";
+          // Only add non-redeemed coupons OR the coupon that is currently selected.
+          if (!redeemed || (selectedCoupon != null && code == selectedCoupon)) {
             uniqueCoupons[code] = {
-              "deal_name": item["deal_name"] ?? "Unknown Deal",
+              "deal_name": dealName,
               "coupon_code": code,
-              "discount": (item["discount"] is num) ? item["discount"] : 0,
+              "discount": discount,
+              "redeemed": redeemed,
             };
           }
         }
         setState(() {
           inventoryCoupons = uniqueCoupons.values.toList();
+          // If the currently selected coupon is no longer available, clear it.
+          if (selectedCoupon != null &&
+              !inventoryCoupons
+                  .any((coupon) => coupon['coupon_code'] == selectedCoupon)) {
+            selectedCoupon = null;
+            discountAmount = 0.0;
+          }
         });
       } else {
         print("Failed to fetch inventory: ${response.body}");
@@ -62,12 +74,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   void _applyDiscount(String couponCode, double discount) async {
-    setState(() {
-      discountAmount = discount;
-      selectedCoupon = couponCode;
-    });
-
-    // Redeem coupon from backend
+    // Call backend to redeem coupon first
     try {
       final response = await http.post(
         Uri.parse('http://192.168.1.3:8080/api/user/inventory/redeem-coupon'),
@@ -77,9 +84,15 @@ class _CartScreenState extends State<CartScreen> {
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Applied & Redeemed Coupon: $couponCode!")),
+          SnackBar(content: Text("Applied & redeemed coupon: $couponCode!")),
         );
-        _fetchInventoryCoupons(); // ✅ Refresh coupon list
+        // Update selected coupon and discount
+        setState(() {
+          selectedCoupon = couponCode;
+          discountAmount = discount;
+        });
+        // Refresh the coupon list so that other redeemed coupons are filtered out.
+        _fetchInventoryCoupons();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Failed to redeem coupon: ${response.body}")),
@@ -145,7 +158,6 @@ class _CartScreenState extends State<CartScreen> {
                                 ),
                               ),
                               const SizedBox(width: 12),
-
                               // Item Details
                               Expanded(
                                 child: Column(
@@ -180,7 +192,6 @@ class _CartScreenState extends State<CartScreen> {
                                   ],
                                 ),
                               ),
-
                               // Quantity Display
                               Container(
                                 padding: const EdgeInsets.symmetric(
@@ -199,7 +210,6 @@ class _CartScreenState extends State<CartScreen> {
                                 ),
                               ),
                               const SizedBox(width: 12),
-
                               // Remove Button (Trash Icon)
                               IconButton(
                                 icon:
@@ -215,7 +225,6 @@ class _CartScreenState extends State<CartScreen> {
                     },
                   ),
                 ),
-
                 // Coupon Redemption Section
                 if (inventoryCoupons.isNotEmpty)
                   Padding(
@@ -239,7 +248,6 @@ class _CartScreenState extends State<CartScreen> {
                       },
                     ),
                   ),
-
                 // Checkout Section (Sticky Bottom Bar)
                 Container(
                   padding:
@@ -277,7 +285,6 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                         ],
                       ),
-
                       // Discount Applied
                       if (selectedCoupon != null)
                         Row(
@@ -301,9 +308,7 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                           ],
                         ),
-
                       const SizedBox(height: 8),
-
                       // Final Price
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -326,7 +331,6 @@ class _CartScreenState extends State<CartScreen> {
                         ],
                       ),
                       const SizedBox(height: 12),
-
                       // Checkout Button
                       SizedBox(
                         width: double.infinity,
