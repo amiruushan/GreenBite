@@ -96,8 +96,8 @@ public class UserService {
         user.setGreenBitePoints(user.getGreenBitePoints() - deal.getCost());
         userRepository.save(user);
 
-        // Save to inventory
-        Inventory inventory = new Inventory(user, deal, couponCode);
+        // Save to inventory with discount
+        Inventory inventory = new Inventory(user, deal, couponCode, deal.getDiscount()); // ✅ Pass discount
         inventoryRepository.save(inventory);
     }
 }

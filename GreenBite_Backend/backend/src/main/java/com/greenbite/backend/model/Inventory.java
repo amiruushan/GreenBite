@@ -22,22 +22,23 @@ public class Inventory {
     private Deal deal;
 
     @Column(nullable = false)
-    private String dealName; // ✅ Add this field
-
-    @Column(nullable = false)
     private String couponCode;
 
     @Column(nullable = false)
     private boolean isActive = true;
 
-    // ✅ Constructor to include dealName
-    public Inventory(User user, Deal deal, String couponCode) {
-        this.user = user;
-        this.deal = deal;
-        this.dealName = deal.getTitle(); // ✅ Set deal name from the deal entity
-        this.couponCode = couponCode;
+    @Column(nullable = false)
+    private double discount; // ✅ Added discount field
+
+    // Default constructor
+    public Inventory() {
     }
 
-    public Inventory() {
+    // Constructor for creating an inventory item
+    public Inventory(User user, Deal deal, String couponCode, double discount) {
+        this.user = user;
+        this.deal = deal;
+        this.couponCode = couponCode;
+        this.discount = discount; // ✅ Initialize discount
     }
 }

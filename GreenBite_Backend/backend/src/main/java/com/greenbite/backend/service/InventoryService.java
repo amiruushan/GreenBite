@@ -33,7 +33,7 @@ public class InventoryService {
             Map<String, Object> map = new HashMap<>();
             map.put("deal_name", item.getDeal().getTitle());
             map.put("coupon_code", item.getCouponCode());
-            map.put("discount", item.getDeal().getCost()); // ✅ Include discount
+            map.put("discount", item.getDiscount()); // ✅ Include discount
             map.put("redeemed", !item.isActive()); // ✅ Fix redeemed status
             inventoryData.add(map);
         }
@@ -57,8 +57,8 @@ public class InventoryService {
         user.setGreenBitePoints(user.getGreenBitePoints() - deal.getCost());
         userRepository.save(user);
 
-        // ✅ Save to inventory with dealName
-        Inventory inventory = new Inventory(user, deal, couponCode);
+        // Save to inventory with discount
+        Inventory inventory = new Inventory(user, deal, couponCode, deal.getDiscount());
         inventoryRepository.save(inventory);
     }
 

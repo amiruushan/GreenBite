@@ -25,15 +25,19 @@ public class Deal {
     @Column(nullable = false)
     private int cost;
 
+    @Column(nullable = false)
+    private double discount; // ✅ Added discount field
+
     // Default constructor
     public Deal() {
     }
 
     // Constructor for creating a deal
-    public Deal(String title, String icon, String color, int cost) {
+    public Deal(String title, String icon, String color, int cost, double discount) {
         this.title = title;
         this.icon = icon;
         this.color = color;
         this.cost = cost;
+        this.discount = discount; // ✅ Initialize discount
     }
 }

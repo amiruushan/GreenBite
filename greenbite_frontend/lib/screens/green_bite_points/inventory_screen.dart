@@ -126,29 +126,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               : Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        // ✅ Copy Coupon Code to Clipboard
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                                "Copied: ${item['coupon_code']}"),
-                                          ),
-                                        );
-                                      },
-                                      child: Text("Copy"),
-                                    ),
                                     SizedBox(width: 8), // Spacing
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        _redeemCoupon(item[
-                                            'coupon_code']); // ✅ Call redeem function
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.red),
-                                      child: Text("Redeem"),
-                                    ),
                                   ],
                                 ),
                         ),
