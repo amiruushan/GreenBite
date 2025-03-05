@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/service/auth_service';
 import 'package:http/http.dart' as http;
 // Import AuthService
@@ -20,7 +21,7 @@ class UserProfileService {
 
       // Fetch user profile using the user ID
       final response = await http.get(
-        Uri.parse('http://127.0.0.1:8080/api/users/$userId'),
+        Uri.parse('${Config.apiBaseUrl}/api/users/$userId'),
         headers: {"Authorization": "Bearer $token"},
       );
 
@@ -43,7 +44,7 @@ class UserProfileService {
         print("No token found");
       }
       final response = await http.put(
-        Uri.parse('http://127.0.0.1:8080/api/users/update'),
+        Uri.parse('${Config.apiBaseUrl}/api/users/update'),
         //headers: {"Content-Type": "application/json"},
         headers: {"Authorization": "Bearer $token"},
         body: json.encode(updatedProfile.toJson()),

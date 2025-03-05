@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/screens/home_page/home_page.dart';
 import 'package:greenbite_frontend/service/auth_service';
@@ -51,7 +52,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
       // Confirm order in backend
       final orderResponse = await http.post(
-        Uri.parse("http://127.0.0.1:8080/api/orders/confirm"),
+        Uri.parse("${Config.apiBaseUrl}0/api/orders/confirm"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token"
@@ -103,7 +104,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       // Call backend with dynamic amount
       final response = await http.post(
         Uri.parse(
-            'http://127.0.0.1:8080/api/payments/create?amount=$amountInCents&currency=usd'),
+            '${Config.apiBaseUrl}/api/payments/create?amount=$amountInCents&currency=usd'),
         headers: {"Authorization": "Bearer $token"},
       );
 

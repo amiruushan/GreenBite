@@ -87,8 +87,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               children: [
                 CircleAvatar(
                   radius: 60,
-                  backgroundImage:
-                      NetworkImage(widget.userProfile.profilePictureUrl),
+                  backgroundImage: NetworkImage(
+                    widget.userProfile.profilePictureUrl ??
+                        UserProfile.placeholderProfilePictureUrl,
+                  ),
                 ),
                 Positioned(
                   bottom: 0,
