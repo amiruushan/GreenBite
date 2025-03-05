@@ -1,26 +1,24 @@
 package com.greenbite.backend.service;
 
 import com.greenbite.backend.dto.UserDTO;
-import com.greenbite.backend.model.Deal;
-import com.greenbite.backend.model.Inventory;
+import com.greenbite.backend.model.Coupon;
+import com.greenbite.backend.model.CouponManagement;
 import com.greenbite.backend.model.User;
-import com.greenbite.backend.repository.DealRepository;
-import com.greenbite.backend.repository.InventoryRepository;
+import com.greenbite.backend.repository.CouponRepository;
+import com.greenbite.backend.repository.CouponManagementRepository;
 import com.greenbite.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final DealRepository dealRepository;
-    private final InventoryRepository inventoryRepository;
+    private final CouponRepository couponRepository;
+    private final CouponManagementRepository couponManagementRepository;
 
-    public UserService(UserRepository userRepository, DealRepository dealRepository, InventoryRepository inventoryRepository) {
+    public UserService(UserRepository userRepository, CouponRepository couponRepository, CouponManagementRepository couponManagementRepository) {
         this.userRepository = userRepository;
-        this.dealRepository = dealRepository;
-        this.inventoryRepository = inventoryRepository;
+        this.couponRepository = couponRepository;
+        this.couponManagementRepository = couponManagementRepository;
     }
 
     public UserDTO getUserById(Long id) {
@@ -53,6 +51,7 @@ public class UserService {
                 user.getAddress()
         );
     }
+
     public void addPoints(Long userId, int earnedPoints) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -82,22 +81,22 @@ public class UserService {
         return user.getGreenBitePoints();
     }
 
-    public void purchaseDeal(Long userId, Long dealId, String couponCode) {
+    public void purchaseCoupon(Long userId, Long couponId, String couponCode) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        Deal deal = dealRepository.findById(dealId)
-                .orElseThrow(() -> new RuntimeException("Deal not found"));
+        Coupon coupon = couponRepository.findById(couponId)
+                .orElseThrow(() -> new RuntimeException("Coupon not found"));
 
-        if (user.getGreenBitePoints() < deal.getCost()) {
+        if (user.getGreenBitePoints() < coupon.getCost()) {
             throw new RuntimeException("Not enough Green Bite Points");
         }
 
         // Deduct GBP
-        user.setGreenBitePoints(user.getGreenBitePoints() - deal.getCost());
+        user.setGreenBitePoints(user.getGreenBitePoints() - coupon.getCost());
         userRepository.save(user);
 
-        // Save to inventory with discount
-        Inventory inventory = new Inventory(user, deal, couponCode, deal.getDiscount()); // ✅ Pass discount
-        inventoryRepository.save(inventory);
+        // Save to CouponManagement with discount
+        CouponManagement couponManagement = new CouponManagement(user, coupon, couponCode, coupon.getDiscount());
+        couponManagementRepository.save(couponManagement);
     }
 }

@@ -5,10 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "inventory")
+@Table(name = "coupon_management")
 @Getter
 @Setter
-public class Inventory {
+public class CouponManagement {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -18,8 +18,8 @@ public class Inventory {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "deal_id", nullable = false)
-    private Deal deal;
+    @JoinColumn(name = "coupon_id", nullable = false)
+    private Coupon coupon;
 
     @Column(nullable = false)
     private String couponCode;
@@ -28,17 +28,15 @@ public class Inventory {
     private boolean isActive = true;
 
     @Column(nullable = false)
-    private double discount; // ✅ Added discount field
+    private double discount;
 
-    // Default constructor
-    public Inventory() {
+    public CouponManagement() {
     }
 
-    // Constructor for creating an inventory item
-    public Inventory(User user, Deal deal, String couponCode, double discount) {
+    public CouponManagement(User user, Coupon coupon, String couponCode, double discount) {
         this.user = user;
-        this.deal = deal;
+        this.coupon = coupon;
         this.couponCode = couponCode;
-        this.discount = discount; // ✅ Initialize discount
+        this.discount = discount;
     }
 }

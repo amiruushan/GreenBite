@@ -5,10 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "deals")
+@Table(name = "coupons")
 @Getter
 @Setter
-public class Deal {
+public class Coupon {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -26,18 +26,16 @@ public class Deal {
     private int cost;
 
     @Column(nullable = false)
-    private double discount; // ✅ Added discount field
+    private double discount;
 
-    // Default constructor
-    public Deal() {
+    public Coupon() {
     }
 
-    // Constructor for creating a deal
-    public Deal(String title, String icon, String color, int cost, double discount) {
+    public Coupon(String title, String icon, String color, int cost, double discount) {
         this.title = title;
         this.icon = icon;
         this.color = color;
         this.cost = cost;
-        this.discount = discount; // ✅ Initialize discount
+        this.discount = discount;
     }
 }

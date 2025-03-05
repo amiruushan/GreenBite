@@ -5,8 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PurchaseDealDTO {
+public class PurchaseCouponDTO {
     private Long userId;
-    private Long dealId;
+    private Long couponId;
     private String couponCode;
 }

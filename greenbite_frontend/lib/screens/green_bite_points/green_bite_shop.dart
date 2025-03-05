@@ -94,7 +94,7 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
         Uri.parse('${Config.apiBaseUrl}/api/user/inventory/purchase-deal'),
         headers: await _getHeaders(),
         body: jsonEncode(
-            {"userId": userId, "dealId": dealId, "couponCode": couponCode}),
+            {"userId": userId, "couponId": dealId, "couponCode": couponCode}),
       );
 
       if (response.statusCode == 200) {
