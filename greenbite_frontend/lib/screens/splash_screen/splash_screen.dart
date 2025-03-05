@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/home_page/home_page.dart';
+import 'package:greenbite_frontend/screens/login/user_type_validation_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,13 +16,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
     // Navigate to login page with fade animation after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacement(_fadeRoute(const HomePage()));
+      Navigator.of(context)
+          .pushReplacement(_fadeRoute(UserTypeValidationScreen()));
     });
   }
 
   Route _fadeRoute(Widget page) {
     return PageRouteBuilder(
-      transitionDuration: const Duration(milliseconds: 500), // Adjust duration as needed
+      transitionDuration:
+          const Duration(milliseconds: 500), // Adjust duration as needed
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeTransition(
@@ -31,7 +34,6 @@ class _SplashScreenState extends State<SplashScreen> {
       },
     );
   }
-
 
   // Function to create fade animation route
 

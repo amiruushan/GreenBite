@@ -11,6 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RequestMapping("/auth")
 @RestController
 public class AuthenticationController {
@@ -28,6 +31,7 @@ public class AuthenticationController {
         User registeredUser = authenticationService.signup(registerUserDto);
         return ResponseEntity.ok(registeredUser);
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto) {
@@ -64,4 +68,18 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @GetMapping("/getUserID")
+    public ResponseEntity<Map<String, Object>> getUserIdByEmail(@RequestParam String email) {
+        Long userId = authenticationService.getUserIdByEmail(email);
+        Map<String, Object> response = new HashMap<>();
+
+        if (userId != null) {
+            response.put("userId", userId);
+            return ResponseEntity.ok(response);
+        } else {
+            response.put("error", "User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
 }

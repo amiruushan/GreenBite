@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
+import 'package:greenbite_frontend/screens/home_page/home_page.dart';
+import 'package:greenbite_frontend/service/auth_service';
+import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class CheckoutPage extends StatefulWidget {
-  const CheckoutPage({super.key});
+  const CheckoutPage({Key? key}) : super(key: key);
 
   @override
-  State<CheckoutPage> createState() => _CheckoutPageState();
+  _CheckoutPageState createState() => _CheckoutPageState();
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
@@ -15,6 +21,126 @@ class _CheckoutPageState extends State<CheckoutPage> {
     setState(() {
       selectedOption = option;
     });
+  }
+
+  Future<void> _confirmOrder(BuildContext context) async {
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+
+    // Format order data
+    final orderData = {
+      "customerId": 1, // Update this dynamically if needed
+      "paymentMethod":
+          selectedOption == "Stripe Payment" ? "Credit Card" : "Self Checkout",
+      "items": cartProvider.cartItems
+          .map((item) => {
+                "id": item.id, // Ensure your CartItem model has an `id`
+                "quantity": item.quantity,
+              })
+          .toList(),
+    };
+
+    try {
+      String? token = await AuthService.getToken(); // Retrieve token
+      if (token == null) {
+        print("No token found");
+        return;
+      }
+      if (selectedOption == "Stripe Payment") {
+        await _handleStripePayment(context);
+      }
+
+      // Confirm order in backend
+      final orderResponse = await http.post(
+        Uri.parse("http://127.0.0.1:8080/api/orders/confirm"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token"
+        },
+        body: jsonEncode(orderData),
+      );
+
+      if (orderResponse.statusCode == 200) {
+        // Clear the cart
+        cartProvider.clearCart();
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text("Order Confirmed!"), backgroundColor: Colors.green),
+        );
+
+        // Reload the app (navigate to home)
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+          (route) => false,
+        );
+      } else {
+        throw Exception("Failed to confirm order.");
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text("Order confirmation failed"),
+            backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  Future<void> _handleStripePayment(BuildContext context) async {
+    try {
+      String? token = await AuthService.getToken();
+      if (token == null) {
+        print("No token found");
+        return;
+      }
+      final cartProvider = Provider.of<CartProvider>(context, listen: false);
+      final double totalAmount =
+          cartProvider.totalPrice() + 2.50; // Include delivery fee
+      final int amountInCents =
+          (totalAmount * 100).toInt(); // Stripe requires amount in cents
+
+      // Call backend with dynamic amount
+      final response = await http.post(
+        Uri.parse(
+            'http://127.0.0.1:8080/api/payments/create?amount=$amountInCents&currency=usd'),
+        headers: {"Authorization": "Bearer $token"},
+      );
+
+      final responseData = json.decode(response.body);
+      final clientSecret = responseData['clientSecret']; // Extract clientSecret
+
+      // Initialize the PaymentSheet
+      await Stripe.instance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: clientSecret,
+          merchantDisplayName: 'GreenBite',
+        ),
+      );
+
+      // Present the PaymentSheet
+      await Stripe.instance.presentPaymentSheet();
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Payment successful!"),
+            backgroundColor: Colors.green),
+      );
+
+      // Clear the cart and navigate to the home page
+      cartProvider.clearCart();
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+        (route) => false,
+      );
+    } catch (e) {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Payment failed"), backgroundColor: Colors.red),
+      );
+    }
   }
 
   @override
@@ -37,7 +163,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
-              // 🍽️ Header Image
+              // 🍽 Header Image
               Center(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
@@ -64,11 +190,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
               const SizedBox(height: 15),
 
               // Card Payment Option
+
+              const SizedBox(height: 15),
+
+              // Stripe Payment Option
               _buildOptionTile(
                 title: "Card Payment",
-                icon: LucideIcons.creditCard,
-                isSelected: selectedOption == "Card Payment",
-                onTap: () => _selectOption("Card Payment"),
+                icon: Icons.payment,
+                isSelected: selectedOption == "Stripe Payment",
+                onTap: () => _selectOption("Stripe Payment"),
               ),
 
               const SizedBox(height: 15),
@@ -76,7 +206,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               // Self Pickup Option
               _buildOptionTile(
                 title: "Self Pick-up",
-                icon: LucideIcons.mapPin,
+                icon: Icons.map,
                 isSelected: selectedOption == "Self Pick-up",
                 onTap: () => _selectOption("Self Pick-up"),
               ),
@@ -88,12 +218,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Selected: $selectedOption"),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
+                    _confirmOrder(context);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
@@ -115,8 +240,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-  // 🛍️ Order Summary Widget
+  // 🛍 Order Summary Widget
   Widget _buildOrderSummary() {
+    final cartProvider = Provider.of<CartProvider>(context);
+    final cartItems = cartProvider.cartItems;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -139,9 +267,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
-          _buildSummaryRow("Subtotal", "\$25.00"),
+          _buildSummaryRow(
+              "Subtotal", "\$${cartProvider.totalPrice().toStringAsFixed(2)}"),
           _buildSummaryRow("Delivery Fee", "\$2.50"),
-          _buildSummaryRow("Total", "\$27.50", isTotal: true),
+          _buildSummaryRow("Total",
+              "\$${(cartProvider.totalPrice() + 2.50).toStringAsFixed(2)}",
+              isTotal: true),
         ],
       ),
     );

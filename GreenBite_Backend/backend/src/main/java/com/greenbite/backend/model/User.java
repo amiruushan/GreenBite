@@ -57,6 +57,12 @@ public class User implements UserDetails {
 
     private boolean enabled;
 
+    @Column(name = "normal_points", nullable = false)
+    private int normalPoints = 0;
+
+    @Column(name = "green_bite_points", nullable = false)
+    private int greenBitePoints = 0;
+
     // Constructor for new user with required fields
     public User(String username, String email, String password, String firstName, String surname, String district, String address, String role) {
         this.username = username;

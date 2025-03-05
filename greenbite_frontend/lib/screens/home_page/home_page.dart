@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/shop_tab.dart';
+import 'package:greenbite_frontend/service/auth_service';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/favorites_screen/favorites_screen.dart';
@@ -19,6 +20,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int? _userId;
   int _selectedIndex = 0;
   List<FoodItem> foodItems = [];
   Set<FoodItem> favoriteItems = {}; // Use a Set to avoid duplicates
@@ -27,18 +29,41 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _loadFoodItems();
+    _fetchUserId(); // Fetch the user ID
+  }
+
+  Future<void> _fetchUserId() async {
+    int? userId = await AuthService.getUserId();
+    setState(() {
+      _userId = userId ?? 1; // Fallback to 1 if null
+    });
   }
 
   Future<void> _loadFoodItems() async {
-    final userId = 1; // Replace with the actual user ID
     try {
+      int? userId = await AuthService.getUserId(); // Retrieve user ID
+      if (userId == null) {
+        print("No user ID found");
+        return;
+      }
+
+      String? token = await AuthService.getToken(); // Retrieve token
+      if (token == null) {
+        print("No token found");
+        return;
+      }
+
       // Fetch all food items
-      final foodResponse =
-          await http.get(Uri.parse('http://127.0.0.1:8080/api/food-items/get'));
+      final foodResponse = await http.get(
+        Uri.parse('http://127.0.0.1:8080/api/food-items/get'),
+        headers: {"Authorization": "Bearer $token"},
+      );
 
       // Fetch favorite items
-      final favoriteResponse = await http
-          .get(Uri.parse('http://127.0.0.1:8080/api/favorites/user/$userId'));
+      final favoriteResponse = await http.get(
+        Uri.parse('http://127.0.0.1:8080/api/favorites/user/$userId'),
+        headers: {"Authorization": "Bearer $token"},
+      );
 
       if (foodResponse.statusCode == 200 &&
           favoriteResponse.statusCode == 200) {
@@ -55,7 +80,7 @@ class _HomePageState extends State<HomePage> {
 
         setState(() {
           foodItems = allFoodItems;
-          favoriteItems = favorites; // ✅ Ensure the favorite icon is updated
+          favoriteItems = favorites;
         });
       } else {
         print("Failed to load food or favorite items");
@@ -66,14 +91,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _toggleFavorite(FoodItem item) async {
-    final userId = 1; // Replace with actual user ID if available
+    //final userId = 1; // Replace with actual user ID if available
 
     try {
+      int? userId = await AuthService.getUserId(); // Retrieve user ID
+      if (userId == null) {
+        print("No user ID found");
+        return;
+      }
+      String? token = await AuthService.getToken(); // Retrieve token
+      if (token == null) {
+        print("No token found");
+        return;
+      }
       if (favoriteItems.contains(item)) {
         // If already in favorites, remove from backend
         final response = await http.delete(
           Uri.parse(
               'http://127.0.0.1:8080/api/favorites/remove/$userId/${item.id}'),
+          headers: {"Authorization": "Bearer $token"},
         );
 
         if (response.statusCode == 200) {
@@ -88,6 +124,7 @@ class _HomePageState extends State<HomePage> {
         final response = await http.post(
           Uri.parse(
               'http://127.0.0.1:8080/api/favorites/add?userId=$userId&foodItemId=${item.id}'),
+          headers: {"Authorization": "Bearer $token"},
         );
 
         if (response.statusCode == 200) {
@@ -118,7 +155,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final int userId = 1;
+    if (_userId == null) {
+      // Show a loading indicator while waiting for the user ID
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
     final List<Widget> screens = [
       HomePageContent(
         foodItems: foodItems,
@@ -127,7 +169,7 @@ class _HomePageState extends State<HomePage> {
       ),
       SearchScreen(foodItems: foodItems),
       FavoritesScreen(
-        userId: userId,
+        userId: _userId!,
         onRemoveFavorite: _removeFavorite,
       ),
       UserProfileScreen(),
