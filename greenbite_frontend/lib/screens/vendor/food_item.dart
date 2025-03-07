@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 class FoodItemScreen extends StatefulWidget {
@@ -42,7 +44,7 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
   }
 
   // Function to handle form submission (Update)
-  void _updateFoodItem() {
+  void _updateFoodItem() async {
     final updatedFoodItem = {
       "id": widget.foodItem["id"],
       "name": _nameController.text,
@@ -55,13 +57,33 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
       "category": _selectedCategory,
     };
 
-    // Print the updated data (for demonstration)
-    print("Updated Food Item: $updatedFoodItem");
+    // Convert the updated food item to JSON
+    final jsonBody = jsonEncode(updatedFoodItem);
 
-    // Show a success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Food item updated successfully!")),
+    // Send the PUT request to the backend API
+    final response = await http.put(
+      Uri.parse('http://192.168.1.3:8080/api/food-items/update'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonBody,
     );
+
+    // Check the response status
+    if (response.statusCode == 200) {
+      // Show a success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Food item updated successfully!")),
+      );
+
+      // Optionally, you can navigate back to the previous screen
+      Navigator.pop(context);
+    } else {
+      // Show an error message if the update failed
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to update food item!")),
+      );
+    }
   }
 
   // Function to handle delete

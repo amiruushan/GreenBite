@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../../widgets/vendor_nav_bar.dart';
 import 'vendor_home.dart';
 import 'list_food.dart';
@@ -6,7 +8,9 @@ import 'orders.dart';
 import 'edit_profile.dart'; // Import the EditProfile screen
 
 class VendorProfile extends StatefulWidget {
-  const VendorProfile({super.key});
+  final int vendorId;
+
+  const VendorProfile({super.key, required this.vendorId});
 
   @override
   State<VendorProfile> createState() => _VendorProfileState();
@@ -14,18 +18,46 @@ class VendorProfile extends StatefulWidget {
 
 class _VendorProfileState extends State<VendorProfile> {
   final int _selectedIndex = 3; // Set to 3 for Profile screen
+  Map<String, dynamic> _vendorProfile = {};
+  bool _isLoading = true;
 
-  // Dummy vendor profile data
-  final Map<String, dynamic> _vendorProfile = {
-    "profilePictureUrl":
-    "https://lh3.googleusercontent.com/p/AF1QipOv6Va9c7dh1Tml4WiUHs2o5PO0jKF6vZlvLk_U=s680-w680-h510",
-    "username": "Street Za",
-    "email": "streetza@example.com",
-    "phoneNumber": "+1 123 456 7890",
-    "address": "123 Green Street, Organic City",
-    "businessName": "Street Za Organic Foods",
-    "businessDescription": "Best organic and fresh produce in town.",
-  };
+  @override
+  void initState() {
+    super.initState();
+    _fetchVendorProfile();
+  }
+
+  // Fetch vendor profile data from backend
+  Future<void> _fetchVendorProfile() async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://192.168.1.3:8080/api/shop/${widget.vendorId}'),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        setState(() {
+          _vendorProfile = {
+            "profilePictureUrl": data["photo"] ?? "",
+            "username": data["name"] ?? "Unknown Vendor",
+            "email": data["email"] ?? "",
+            "phoneNumber": data["tele_number"] ?? "",
+            "address": data["address"] ?? "",
+            "businessName": data["businessName"] ?? "",
+            "businessDescription": data["businessDescription"] ?? "",
+          };
+          _isLoading = false;
+        });
+      } else {
+        throw Exception("Failed to load vendor profile");
+      }
+    } catch (e) {
+      print("Error fetching vendor profile: $e");
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   // Function to handle navigation
   void _onItemTapped(int index) {
@@ -49,23 +81,27 @@ class _VendorProfileState extends State<VendorProfile> {
 
   // ✅ Navigate to Edit Profile Screen
   Future<void> _editProfile() async {
-    // Navigate to the EditProfile screen and pass the current profile data
     final updatedProfile = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditProfile(vendorProfile: _vendorProfile),
+        builder: (context) => EditProfile(
+          vendorProfile: _vendorProfile,
+          vendorId: widget.vendorId,
+        ),
       ),
     );
 
-    // If the user saved changes, update the UI with the new profile data
     if (updatedProfile != null && updatedProfile is Map<String, dynamic>) {
       setState(() {
-        _vendorProfile["username"] = updatedProfile["username"];
-        _vendorProfile["email"] = updatedProfile["email"];
-        _vendorProfile["phoneNumber"] = updatedProfile["phoneNumber"];
-        _vendorProfile["address"] = updatedProfile["address"];
-        _vendorProfile["businessName"] = updatedProfile["businessName"];
-        _vendorProfile["businessDescription"] = updatedProfile["businessDescription"];
+        _vendorProfile = {
+          "profilePictureUrl": updatedProfile["photo"] ?? _vendorProfile["profilePictureUrl"] ?? "",
+          "username": updatedProfile["name"] ?? _vendorProfile["username"] ?? "Unknown Vendor",
+          "email": updatedProfile["email"] ?? _vendorProfile["email"] ?? "",
+          "phoneNumber": updatedProfile["tele_number"] ?? _vendorProfile["phoneNumber"] ?? "",
+          "address": updatedProfile["address"] ?? _vendorProfile["address"] ?? "",
+          "businessName": updatedProfile["businessName"] ?? _vendorProfile["businessName"] ?? "",
+          "businessDescription": updatedProfile["businessDescription"] ?? _vendorProfile["businessDescription"] ?? "",
+        };
       });
     }
   }
@@ -91,7 +127,9 @@ class _VendorProfileState extends State<VendorProfile> {
         centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 117, 237, 123),
       ),
-      body: SingleChildScrollView(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -99,7 +137,9 @@ class _VendorProfileState extends State<VendorProfile> {
             // Profile Picture
             CircleAvatar(
               radius: 60,
-              backgroundImage: NetworkImage(_vendorProfile["profilePictureUrl"]),
+              backgroundImage: NetworkImage(
+                _vendorProfile["profilePictureUrl"] ?? "https://via.placeholder.com/150",
+              ),
             ),
             const SizedBox(height: 16),
 
