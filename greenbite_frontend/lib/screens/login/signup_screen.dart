@@ -71,6 +71,7 @@ class _SignupScreenState extends State<SignupScreen> {
       "password": _passwordController.text,
       "streetAddress": _streetAddressController.text,
       "district": _selectedDistrict,
+      "role": "Customer",
     };
 
     try {

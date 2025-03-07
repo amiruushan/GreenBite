@@ -1,5 +1,6 @@
 package com.greenbite.backend.service;
 
+import com.greenbite.backend.dto.LocationUpdateDTO;
 import com.greenbite.backend.dto.UserDTO;
 import com.greenbite.backend.model.Coupon;
 import com.greenbite.backend.model.CouponManagement;
@@ -28,6 +29,7 @@ public class UserService {
     }
 
     public UserDTO updateUser(UserDTO userDTO) {
+
         User user = userRepository.findById(userDTO.getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -38,6 +40,22 @@ public class UserService {
         user.setAddress(userDTO.getAddress());
 
         user = userRepository.save(user);
+        return convertToDTO(user);
+    }
+
+    // NEW: Update the user’s location
+    public UserDTO updateUserLocation(LocationUpdateDTO dto) {
+        System.out.println("HHHHHHHHHHHH");
+        System.out.println(dto.getUserId());
+
+
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        System.out.println("HHHHHHHHHHHH");
+
+        user.setLatitude(dto.getLatitude());
+        user.setLongitude(dto.getLongitude());
+        userRepository.save(user);
         return convertToDTO(user);
     }
 
@@ -99,4 +117,5 @@ public class UserService {
         CouponManagement couponManagement = new CouponManagement(user, coupon, couponCode, coupon.getDiscount());
         couponManagementRepository.save(couponManagement);
     }
+
 }

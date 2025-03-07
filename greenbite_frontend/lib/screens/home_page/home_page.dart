@@ -4,6 +4,7 @@ import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
 import 'package:greenbite_frontend/screens/food_detail_screen/food_detail_screen.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/shop_tab.dart';
+import 'package:greenbite_frontend/screens/home_page/widgets/update_location_button.dart';
 import 'package:greenbite_frontend/screens/vendor/food_item.dart';
 import 'package:greenbite_frontend/service/auth_service';
 import 'package:http/http.dart' as http;
@@ -310,6 +311,7 @@ class _HomePageContentState extends State<HomePageContent> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        UpdateLocationButton(userId: 1),
                         // 🔍 Search Bar
                         Container(
                           decoration: BoxDecoration(

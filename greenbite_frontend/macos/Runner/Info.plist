@@ -28,5 +28,9 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs your location to show nearby food vendors while you use the app.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app needs your location to continuously provide location-based services.</string>
 </dict>
 </plist>

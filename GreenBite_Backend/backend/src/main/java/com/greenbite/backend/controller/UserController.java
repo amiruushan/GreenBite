@@ -1,6 +1,7 @@
 package com.greenbite.backend.controller;
 
 import com.greenbite.backend.dto.AddPointsDTO;
+import com.greenbite.backend.dto.LocationUpdateDTO;
 import com.greenbite.backend.dto.UserDTO;
 import com.greenbite.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -50,5 +51,12 @@ public class UserController {
 
         return ResponseEntity.ok(response);
     }
+    @PutMapping("/updateLocation")
+    public ResponseEntity<UserDTO> updateUserLocation(@RequestBody LocationUpdateDTO locationUpdateDTO) {
+        System.out.println("LOcatio000000ekirwrwhkledhk");
+        UserDTO updatedUser = userService.updateUserLocation(locationUpdateDTO);
+        return ResponseEntity.ok(updatedUser);
+    }
+
 }
 
