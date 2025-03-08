@@ -27,7 +27,6 @@ public class AuthenticationController {
 
     @PostMapping("/signup")
     public ResponseEntity<User> register(@RequestBody RegisterUserDto registerUserDto) {
-        System.out.println("Signup working");
         User registeredUser = authenticationService.signup(registerUserDto);
         return ResponseEntity.ok(registeredUser);
     }
@@ -35,10 +34,8 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto) {
-        System.out.println("HHHHHHHHHHH");
         try {
             User authenticatedUser = authenticationService.authenticate(loginUserDto);
-            System.out.println("Hiiiiiiiiiiiiiiiiiiiiii");
             String jwtToken = jwtService.generateToken(authenticatedUser);
             LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime());
             return ResponseEntity.ok(loginResponse);

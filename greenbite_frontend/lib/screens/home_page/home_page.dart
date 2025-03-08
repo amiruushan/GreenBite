@@ -1,6 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
+import 'package:greenbite_frontend/screens/food_detail_screen/food_detail_screen.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/shop_tab.dart';
+import 'package:greenbite_frontend/screens/home_page/widgets/update_location_button.dart';
+import 'package:greenbite_frontend/screens/vendor/food_item.dart';
 import 'package:greenbite_frontend/service/auth_service';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -55,13 +60,13 @@ class _HomePageState extends State<HomePage> {
 
       // Fetch all food items
       final foodResponse = await http.get(
-        Uri.parse('http://127.0.0.1:8080/api/food-items/get'),
+        Uri.parse('${Config.apiBaseUrl}/api/food-items/get'),
         headers: {"Authorization": "Bearer $token"},
       );
 
       // Fetch favorite items
       final favoriteResponse = await http.get(
-        Uri.parse('http://127.0.0.1:8080/api/favorites/user/$userId'),
+        Uri.parse('${Config.apiBaseUrl}/api/favorites/user/$userId'),
         headers: {"Authorization": "Bearer $token"},
       );
 
@@ -108,7 +113,7 @@ class _HomePageState extends State<HomePage> {
         // If already in favorites, remove from backend
         final response = await http.delete(
           Uri.parse(
-              'http://127.0.0.1:8080/api/favorites/remove/$userId/${item.id}'),
+              '${Config.apiBaseUrl}/api/favorites/remove/$userId/${item.id}'),
           headers: {"Authorization": "Bearer $token"},
         );
 
@@ -123,7 +128,7 @@ class _HomePageState extends State<HomePage> {
         // If not in favorites, add to backend
         final response = await http.post(
           Uri.parse(
-              'http://127.0.0.1:8080/api/favorites/add?userId=$userId&foodItemId=${item.id}'),
+              '${Config.apiBaseUrl}/api/favorites/add?userId=$userId&foodItemId=${item.id}'),
           headers: {"Authorization": "Bearer $token"},
         );
 
@@ -185,7 +190,7 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class HomePageContent extends StatelessWidget {
+class HomePageContent extends StatefulWidget {
   final List<FoodItem> foodItems;
   final Set<FoodItem> favoriteItems;
   final Function(FoodItem) onToggleFavorite;
@@ -198,9 +203,67 @@ class HomePageContent extends StatelessWidget {
   });
 
   @override
+  State<HomePageContent> createState() => _HomePageContentState();
+}
+
+class _HomePageContentState extends State<HomePageContent> {
+  List<String> _selectedTags = []; // Track multiple selected tags
+  final PageController _featuredController =
+      PageController(); // Controller for featured items
+  int _currentFeaturedIndex = 0; // Track the current featured item index
+  Timer? _featuredTimer; // Timer for auto-switching featured items
+
+  @override
+  void initState() {
+    super.initState();
+    // Start auto-switching featured items every 5 seconds
+    _startFeaturedTimer();
+  }
+
+  @override
+  void dispose() {
+    _featuredController.dispose(); // Dispose the PageController
+    _featuredTimer?.cancel(); // Cancel the timer
+    super.dispose();
+  }
+
+  // Start the timer for auto-switching featured items
+  void _startFeaturedTimer() {
+    _featuredTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (_currentFeaturedIndex < widget.foodItems.length - 1) {
+        _currentFeaturedIndex++;
+      } else {
+        _currentFeaturedIndex = 0; // Loop back to the first item
+      }
+      _featuredController.animateToPage(
+        _currentFeaturedIndex,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  // Extract unique tags from all food items
+  List<String> getUniqueTags() {
+    final Set<String> uniqueTags = {};
+    for (var item in widget.foodItems) {
+      uniqueTags.addAll(item.tags);
+    }
+    return uniqueTags.toList();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Filter recommended items based on the selected tags
+    List<FoodItem> recommendedItems = widget.foodItems
+        .where((item) =>
+            _selectedTags.isEmpty || // Show all items if no tags are selected
+            _selectedTags.every(
+                (tag) => item.tags.contains(tag))) // Match ALL selected tags
+        .toList();
+
     return DefaultTabController(
-      length: 2, // ✅ Two tabs
+      length: 2, // Two tabs (Food Items & Shops)
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Green Bite"),
@@ -233,21 +296,22 @@ class HomePageContent extends StatelessWidget {
             labelColor: Colors.green,
             unselectedLabelColor: Colors.grey,
             tabs: [
-              Tab(text: "Food Items"), // 🍽 Food Tab
-              Tab(text: "Shops"), // 🏪 Shops Tab
+              Tab(text: "Food Items"),
+              Tab(text: "Shops"),
             ],
           ),
         ),
         body: TabBarView(
           children: [
-            // 🍽 Food Items Page
-            foodItems.isEmpty
+            // 🍽 Food Items Tab
+            widget.foodItems.isEmpty
                 ? const Center(child: CircularProgressIndicator())
                 : SingleChildScrollView(
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        UpdateLocationButton(userId: 1),
                         // 🔍 Search Bar
                         Container(
                           decoration: BoxDecoration(
@@ -259,7 +323,7 @@ class HomePageContent extends StatelessWidget {
                                 blurRadius: 8,
                                 spreadRadius: 2,
                                 offset: const Offset(0, 2),
-                              ),
+                              )
                             ],
                           ),
                           child: TextField(
@@ -274,31 +338,9 @@ class HomePageContent extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 20),
-
-                        // 📌 Categories Section
-                        const Text(
-                          "Categories",
-                          style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold),
-                        ),
                         const SizedBox(height: 10),
-                        SizedBox(
-                          height: 100,
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            children: foodCategories.map((category) {
-                              return CategoryCard(
-                                icon: category["icon"],
-                                label: category["label"],
-                              );
-                            }).toList(),
-                          ),
-                        ),
 
-                        const SizedBox(height: 20),
-
-                        // 🍽 Recommended Section
+                        // 🍽 Featured Items Section
                         const Text(
                           "Recommended For You",
                           style: TextStyle(
@@ -306,29 +348,228 @@ class HomePageContent extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         SizedBox(
-                          height: 250,
+                          height: 170, // Adjust height as needed
+                          child: Stack(
+                            children: [
+                              // PageView for Featured Items
+                              PageView.builder(
+                                controller: _featuredController,
+                                itemCount: widget.foodItems.length,
+                                onPageChanged: (index) {
+                                  setState(() {
+                                    _currentFeaturedIndex = index;
+                                  });
+                                },
+                                itemBuilder: (context, index) {
+                                  final item = widget.foodItems[index];
+                                  return GestureDetector(
+                                    onTap: () {
+                                      // Navigate to the food details page
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              FoodDetailScreen(foodItem: item),
+                                        ),
+                                      );
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Stack(
+                                          children: [
+                                            Image.network(
+                                              item.photo,
+                                              fit: BoxFit.cover,
+                                              width: double.infinity,
+                                            ),
+                                            // Overlay for item name and price
+                                            Positioned(
+                                              bottom: 0,
+                                              left: 0,
+                                              right: 0,
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black
+                                                      .withOpacity(0.5),
+                                                  borderRadius:
+                                                      const BorderRadius.only(
+                                                    bottomLeft:
+                                                        Radius.circular(12),
+                                                    bottomRight:
+                                                        Radius.circular(12),
+                                                  ),
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      item.name,
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "\$${item.price.toStringAsFixed(2)}",
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+
+                              // Previous Button (<)
+                              Positioned(
+                                left: 8,
+                                top: 0,
+                                bottom: 0,
+                                child: IconButton(
+                                  icon: const Icon(Icons.arrow_back_ios,
+                                      color: Colors.white),
+                                  onPressed: () {
+                                    if (_currentFeaturedIndex > 0) {
+                                      _featuredController.previousPage(
+                                        duration:
+                                            const Duration(milliseconds: 500),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+
+                              // Next Button (>)
+                              Positioned(
+                                right: 8,
+                                top: 0,
+                                bottom: 0,
+                                child: IconButton(
+                                  icon: const Icon(Icons.arrow_forward_ios,
+                                      color: Colors.white),
+                                  onPressed: () {
+                                    if (_currentFeaturedIndex <
+                                        widget.foodItems.length - 1) {
+                                      _featuredController.nextPage(
+                                        duration:
+                                            const Duration(milliseconds: 500),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // 🍽 Recommended Section
+                        const Text(
+                          "Food to Suit Your Diet",
+                          style: TextStyle(
+                              fontSize: 22, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 10),
+
+                        // 🏷 Clickable Tags for Filtering (Horizontal List)
+                        SizedBox(
+                          height:
+                              50, // Set a fixed height for the horizontal tags
                           child: ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: foodItems.length,
+                            scrollDirection:
+                                Axis.horizontal, // Make the list horizontal
+                            itemCount: getUniqueTags().length,
                             separatorBuilder: (context, index) =>
-                                const SizedBox(width: 10),
+                                const SizedBox(
+                                    width: 8), // Add spacing between tags
                             itemBuilder: (context, index) {
-                              final item = foodItems[index];
-                              return SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.4,
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4),
-                                  child: FoodCard(
-                                    foodItem: item,
-                                    isFavorite: favoriteItems.contains(item),
-                                    onFavoritePressed: () =>
-                                        onToggleFavorite(item),
+                              final tag =
+                                  getUniqueTags()[index]; // Get the current tag
+                              bool isSelected = _selectedTags.contains(
+                                  tag); // Check if the tag is selected
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    if (isSelected) {
+                                      _selectedTags
+                                          .remove(tag); // Deselect the tag
+                                    } else {
+                                      _selectedTags.add(tag); // Select the tag
+                                    }
+                                  });
+                                },
+                                child: Chip(
+                                  label: Text(tag),
+                                  backgroundColor: isSelected
+                                      ? Colors.green
+                                      : Colors.grey[300],
+                                  labelStyle: TextStyle(
+                                    color: isSelected
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               );
                             },
                           ),
+                        ),
+                        const SizedBox(height: 10),
+
+                        // 🍽 Recommended Items ListView
+                        SizedBox(
+                          height: 250,
+                          child: recommendedItems.isEmpty
+                              ? const Center(
+                                  child: Text(
+                                    "No items match this filter!",
+                                    style: TextStyle(
+                                        fontSize: 18, color: Colors.grey),
+                                  ),
+                                )
+                              : ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: recommendedItems.length,
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(width: 10),
+                                  itemBuilder: (context, index) {
+                                    final item = recommendedItems[index];
+                                    return SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.4,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 4),
+                                        child: FoodCard(
+                                          foodItem: item,
+                                          isFavorite: widget.favoriteItems
+                                              .contains(item),
+                                          onFavoritePressed: () =>
+                                              widget.onToggleFavorite(item),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
                         ),
 
                         const SizedBox(height: 20),
@@ -343,15 +584,16 @@ class HomePageContent extends StatelessWidget {
                         ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: foodItems.length,
+                          itemCount: widget.foodItems.length,
                           itemBuilder: (context, index) {
-                            final item = foodItems[index];
+                            final item = widget.foodItems[index];
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 10),
                               child: FoodCard(
                                 foodItem: item,
-                                isFavorite: favoriteItems.contains(item),
-                                onFavoritePressed: () => onToggleFavorite(item),
+                                isFavorite: widget.favoriteItems.contains(item),
+                                onFavoritePressed: () =>
+                                    widget.onToggleFavorite(item),
                               ),
                             );
                           },

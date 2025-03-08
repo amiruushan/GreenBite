@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import '../../widgets/vendor_nav_bar.dart';
 import 'vendor_home.dart';
@@ -53,41 +55,58 @@ class _ListFoodState extends State<ListFood> {
     } else if (index == 3) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const VendorProfile()),
+        MaterialPageRoute(builder: (context) => const VendorProfile(vendorId: 1)),
       );
     }
   }
 
-  // Function to handle form submission
-  void _submitForm() {
+// Function to handle form submission
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       // Prepare the data in JSON format
       final foodItem = {
-        "id": null,
         "name": _nameController.text,
         "description": _descriptionController.text,
         "price": double.parse(_priceController.text),
         "quantity": int.parse(_quantityController.text),
-        "photo": _imageUrl ?? "https://example.com/placeholder.jpg",
-        "shopId": 1, // Hardcoded for now
-        "tags": _tagsController.text.split(','),
+        "photo": _imageUrl ?? "https://lh3.googleusercontent.com/p/AF1QipNhe1RTd28nuHie5MFwaU_OXuU33ZNN1rdTYhgG=s1360-w1360-h1020",
+        "shopId": 1, // Replace with dynamic shop ID if needed
+        "tags": _tagsController.text.split(',').map((tag) => tag.trim()).toList(),
         "category": _selectedCategory,
       };
 
-      // Print the JSON data (for demonstration)
-      print("Food Item Data: $foodItem");
+      try {
+        // Send the POST request to the backend
+        final response = await http.post(
+          Uri.parse('http://192.168.1.3:8080/api/food-items'),
+          headers: {"Content-Type": "application/json"},
+          body: json.encode(foodItem),
+        );
 
-      // Show a success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Food item added successfully!")),
-      );
+        if (response.statusCode == 200) {
+          // Show a success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Food item added successfully!")),
+          );
 
-      // Clear the form
-      _formKey.currentState!.reset();
-      setState(() {
-        _imageUrl = null;
-        _selectedCategory = null;
-      });
+          // Clear the form
+          _formKey.currentState!.reset();
+          setState(() {
+            _imageUrl = null;
+            _selectedCategory = null;
+          });
+        } else {
+          // Handle error
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Failed to add food item. Please try again.")),
+          );
+        }
+      } catch (e) {
+        // Handle network or other errors
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("An error occurred: $e")),
+        );
+      }
     }
   }
 

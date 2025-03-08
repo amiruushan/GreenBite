@@ -1,16 +1,128 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/screens/checkout_page/checkout_page.dart';
+import 'package:greenbite_frontend/screens/green_bite_points/inventory_screen.dart';
+import 'package:greenbite_frontend/service/auth_service';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:provider/provider.dart';
-import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
+
+  @override
+  _CartScreenState createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  String? selectedCoupon;
+  double discountAmount = 0.0;
+  List<dynamic> inventoryCoupons = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchInventoryCoupons();
+  }
+
+  Future<Map<String, String>> _getHeaders() async {
+    String? token = await AuthService.getToken();
+    if (token == null) throw Exception("No JWT token found.");
+    return {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token", // ✅ Add Authorization header
+    };
+  }
+
+  Future<void> _fetchInventoryCoupons() async {
+    try {
+      int? userId = await AuthService.getUserId();
+      if (userId == null) throw Exception('User ID not found');
+
+      final response = await http.get(
+        Uri.parse('${Config.apiBaseUrl}/api/user/inventory/$userId'),
+        headers: await _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        // Deduplicate coupons using a Map keyed by coupon_code.
+        Map<String, dynamic> uniqueCoupons = {};
+        for (var item in data) {
+          // Ensure each field has a default value.
+          String code = (item["coupon_code"] ?? "UNKNOWN_CODE").toString();
+          bool redeemed = item["redeemed"] ?? false;
+          double discount =
+              (item["discount"] is num) ? item["discount"].toDouble() : 0;
+          String dealName = item["deal_name"] ?? "Unknown Deal";
+          // Only add non-redeemed coupons OR the coupon that is currently selected.
+          if (!redeemed || (selectedCoupon != null && code == selectedCoupon)) {
+            uniqueCoupons[code] = {
+              "deal_name": dealName,
+              "coupon_code": code,
+              "discount": discount,
+              "redeemed": redeemed,
+            };
+          }
+        }
+        setState(() {
+          inventoryCoupons = uniqueCoupons.values.toList();
+          // If the currently selected coupon is no longer available, clear it.
+          if (selectedCoupon != null &&
+              !inventoryCoupons
+                  .any((coupon) => coupon['coupon_code'] == selectedCoupon)) {
+            selectedCoupon = null;
+            discountAmount = 0.0;
+          }
+        });
+      } else {
+        print("Failed to fetch inventory: ${response.body}");
+      }
+    } catch (e) {
+      print("Error fetching inventory: $e");
+    }
+  }
+
+  void _applyDiscount(String couponCode, double discount) async {
+    // Call backend to redeem coupon first
+    try {
+      final response = await http.post(
+        Uri.parse('${Config.apiBaseUrl}/api/user/inventory/redeem-coupon'),
+        headers: await _getHeaders(),
+        body: jsonEncode({"couponCode": couponCode}),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Applied & redeemed coupon: $couponCode!")),
+        );
+        // Update selected coupon and discount
+        setState(() {
+          selectedCoupon = couponCode;
+          discountAmount = discount;
+        });
+        // Refresh the coupon list so that other redeemed coupons are filtered out.
+        _fetchInventoryCoupons();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to redeem coupon: ${response.body}")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error redeeming coupon: $e")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
     final cartItems = cartProvider.cartItems;
+
+    double totalPrice = cartProvider.totalPrice();
+    double finalPrice = (totalPrice - discountAmount).clamp(0, double.infinity);
 
     return Scaffold(
       appBar: AppBar(
@@ -57,7 +169,6 @@ class CartScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 12),
-
                               // Item Details
                               Expanded(
                                 child: Column(
@@ -92,7 +203,6 @@ class CartScreen extends StatelessWidget {
                                   ],
                                 ),
                               ),
-
                               // Quantity Display
                               Container(
                                 padding: const EdgeInsets.symmetric(
@@ -111,7 +221,6 @@ class CartScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 12),
-
                               // Remove Button (Trash Icon)
                               IconButton(
                                 icon:
@@ -127,7 +236,29 @@ class CartScreen extends StatelessWidget {
                     },
                   ),
                 ),
-
+                // Coupon Redemption Section
+                if (inventoryCoupons.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: DropdownButton<String>(
+                      hint: const Text("Select Coupon"),
+                      value: selectedCoupon,
+                      items: inventoryCoupons
+                          .map<DropdownMenuItem<String>>((coupon) {
+                        return DropdownMenuItem<String>(
+                          value: coupon['coupon_code'],
+                          child: Text(
+                              "${coupon['deal_name']} - \$${coupon['discount']}"),
+                        );
+                      }).toList(),
+                      onChanged: (couponCode) {
+                        var selectedItem = inventoryCoupons.firstWhere(
+                            (item) => item['coupon_code'] == couponCode);
+                        _applyDiscount(selectedItem['coupon_code'],
+                            selectedItem['discount']);
+                      },
+                    ),
+                  ),
                 // Checkout Section (Sticky Bottom Bar)
                 Container(
                   padding:
@@ -156,9 +287,54 @@ class CartScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            "\$${cartProvider.totalPrice().toStringAsFixed(2)}",
+                            "\$${totalPrice.toStringAsFixed(2)}",
                             style: const TextStyle(
                               fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                      // Discount Applied
+                      if (selectedCoupon != null)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Discount ($selectedCoupon):",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                              ),
+                            ),
+                            Text(
+                              "-\$${discountAmount.toStringAsFixed(2)}",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                      const SizedBox(height: 8),
+                      // Final Price
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Final Total:",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            "\$${finalPrice.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                              fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: Colors.green,
                             ),
@@ -166,7 +342,6 @@ class CartScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 12),
-
                       // Checkout Button
                       SizedBox(
                         width: double.infinity,

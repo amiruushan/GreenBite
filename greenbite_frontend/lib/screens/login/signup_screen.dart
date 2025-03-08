@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
-import 'email_verification_screen.dart';
-import 'login_screen.dart';
-import '/../widgets/custom_textfield_widget.dart';
-import '/../widgets/custom_button_widget.dart';
+import 'package:greenbite_frontend/config.dart';
+import 'package:greenbite_frontend/screens/login/email_verification_screen.dart';
 import 'package:http/http.dart' as http;
+import 'package:lottie/lottie.dart'; // ✅ Animation support
 import 'dart:convert';
 
 class SignupScreen extends StatefulWidget {
-  final String? userType;
-
-  SignupScreen({this.userType});
-
   @override
   _SignupScreenState createState() => _SignupScreenState();
 }
@@ -24,6 +19,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _streetAddressController = TextEditingController();
   String? _selectedDistrict;
   bool termsAccepted = false;
+  bool _isLoading = false; // ✅ Loading state
 
   @override
   void dispose() {
@@ -45,7 +41,7 @@ class _SignupScreenState extends State<SignupScreen> {
         _streetAddressController.text.isEmpty ||
         _selectedDistrict == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text("Please fill in all fields before continuing."),
           backgroundColor: Colors.red,
         ),
@@ -55,7 +51,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
     if (!termsAccepted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text("You must accept the terms to continue."),
           backgroundColor: Colors.red,
         ),
@@ -63,7 +59,10 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
 
-    // Prepare the data to send, including userType
+    setState(() {
+      _isLoading = true;
+    });
+
     Map<String, dynamic> signupData = {
       "email": _emailController.text,
       "firstName": _firstNameController.text,
@@ -72,12 +71,12 @@ class _SignupScreenState extends State<SignupScreen> {
       "password": _passwordController.text,
       "streetAddress": _streetAddressController.text,
       "district": _selectedDistrict,
-      "role": widget.userType, // Add userType here
+      "role": "Customer",
     };
 
     try {
       var response = await http.post(
-        Uri.parse("http://127.0.0.1:8080/auth/signup"),
+        Uri.parse("${Config.apiBaseUrl}/auth/signup"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(signupData),
       );
@@ -87,7 +86,7 @@ class _SignupScreenState extends State<SignupScreen> {
           context,
           MaterialPageRoute(
             builder: (context) => EmailVerificationScreen(
-              email: _emailController.text, // Pass the email
+              email: _emailController.text,
             ),
           ),
         );
@@ -101,70 +100,113 @@ class _SignupScreenState extends State<SignupScreen> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text("Error: Unable to connect to server"),
           backgroundColor: Colors.red,
         ),
       );
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: BackButton(color: Colors.black),
-      ),
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Colors.white, // Clean background
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("Sign Up",
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-            SizedBox(height: 5),
-            Text("Create your Account with GreenBite.",
-                style: TextStyle(color: Colors.black54)),
-            SizedBox(height: 20),
-            CustomTextField(label: "Email", controller: _emailController),
-            SizedBox(height: 10),
-            CustomTextField(
-                label: "First Name", controller: _firstNameController),
-            SizedBox(height: 10),
-            CustomTextField(label: "Surname", controller: _surnameController),
-            SizedBox(height: 10),
-            CustomTextField(label: "Username", controller: _usernameController),
-            SizedBox(height: 10),
-            CustomTextField(
-                label: "Password",
-                isPassword: true,
-                controller: _passwordController),
-            SizedBox(height: 50),
-            Text("Your Address Details",
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            CustomTextField(
-                label: "Street Address", controller: _streetAddressController),
-            SizedBox(height: 10),
+            const SizedBox(height: 30), // Top spacing
+
+            const SizedBox(height: 10),
+
+            // ✅ Title & Subtitle
+            Text(
+              "Create an Account",
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              "Sign up to start ordering delicious meals.",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+            ),
+            const SizedBox(height: 25),
+
+            // ✅ Name Fields
+            _CustomTextField(
+              label: "First Name",
+              controller: _firstNameController,
+              prefixIcon: Icons.person,
+            ),
+            const SizedBox(height: 10),
+            _CustomTextField(
+              label: "Surname",
+              controller: _surnameController,
+              prefixIcon: Icons.person_outline,
+            ),
+            const SizedBox(height: 10),
+
+            // ✅ Email & Username
+            _CustomTextField(
+              label: "Email",
+              controller: _emailController,
+              prefixIcon: Icons.email_outlined,
+            ),
+            const SizedBox(height: 10),
+            _CustomTextField(
+              label: "Username",
+              controller: _usernameController,
+              prefixIcon: Icons.account_circle_outlined,
+            ),
+            const SizedBox(height: 10),
+
+            // ✅ Password Field
+            _CustomTextField(
+              label: "Password",
+              isPassword: true,
+              controller: _passwordController,
+              prefixIcon: Icons.lock_outline,
+            ),
+            const SizedBox(height: 20),
+
+            const SizedBox(height: 10),
+            _CustomTextField(
+              label: "Street Address",
+              controller: _streetAddressController,
+              prefixIcon: Icons.home_outlined,
+            ),
+            const SizedBox(height: 10),
             DropdownButtonFormField<String>(
-              decoration: InputDecoration(labelText: "District"),
-              items:
-                  ["Colombo", "Galle", "Gampaha", "Ratnapura"].map((district) {
-                return DropdownMenuItem(
-                  value: district,
-                  child: Text(district),
-                );
-              }).toList(),
+              decoration: InputDecoration(
+                labelText: "District",
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              items: ["Colombo", "Galle", "Gampaha", "Ratnapura"]
+                  .map((district) => DropdownMenuItem(
+                        value: district,
+                        child: Text(district),
+                      ))
+                  .toList(),
               onChanged: (value) {
                 setState(() {
                   _selectedDistrict = value;
                 });
               },
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
+
+            // ✅ Terms & Conditions
             Row(
               children: [
                 Checkbox(
@@ -175,34 +217,99 @@ class _SignupScreenState extends State<SignupScreen> {
                     });
                   },
                 ),
-                Expanded(child: Text("I accept all terms and conditions")),
+                const Expanded(
+                    child: Text("I accept all terms and conditions")),
               ],
             ),
-            SizedBox(height: 10),
-            CustomButton(
-              text: "Continue",
-              onPressed: _validateAndProceed,
-              backgroundColor: Colors.green,
-              textColor: Colors.white,
-            ),
-            SizedBox(height: 10),
-            Center(
-              child: TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EmailVerificationScreen(
-                        email: _emailController.text, // Pass the email
-                      ),
-                    ),
-                  );
-                },
-                child: Text("Already a member? Log In",
-                    style: TextStyle(color: Colors.green)),
-              ),
-            ),
+            const SizedBox(height: 15),
+
+            // ✅ Signup Button
+            _isLoading
+                ? const CircularProgressIndicator()
+                : _CustomButton(
+                    text: "Continue",
+                    onPressed: _validateAndProceed,
+                    backgroundColor: Colors.green,
+                    textColor: Colors.white,
+                    shadow: true,
+                  ),
+            const SizedBox(height: 15),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// ✅ **Custom Text Field**
+class _CustomTextField extends StatelessWidget {
+  final String label;
+  final bool isPassword;
+  final IconData? prefixIcon;
+  final TextEditingController controller;
+
+  const _CustomTextField({
+    super.key,
+    required this.label,
+    required this.controller,
+    this.isPassword = false,
+    this.prefixIcon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      obscureText: isPassword,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon:
+            prefixIcon != null ? Icon(prefixIcon, color: Colors.green) : null,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        filled: true,
+        fillColor: Colors.grey[100],
+      ),
+    );
+  }
+}
+
+/// ✅ **Custom Button**
+class _CustomButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final Color backgroundColor;
+  final Color textColor;
+  final bool shadow;
+
+  const _CustomButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    required this.backgroundColor,
+    required this.textColor,
+    this.shadow = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor,
+          foregroundColor: textColor,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: shadow ? 5 : 0,
+        ),
+        child: Text(
+          text, // Display the text here
+          style: TextStyle(
+            fontSize: 16, // Adjust the font size if needed
+            fontWeight: FontWeight.bold, // Make it bold if necessary
+          ),
         ),
       ),
     );

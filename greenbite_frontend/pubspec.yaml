@@ -39,6 +39,9 @@ dependencies:
   lucide_icons: ^0.257.0
   flutter_stripe: ^11.4.0
   shared_preferences: ^2.2.2
+  lottie: ^3.3.1
+  percent_indicator: ^4.2.4
+  geolocator: ^9.0.1
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +62,7 @@ flutter:
   assets:
     - assets/store.jpg
     - assets/logo.png
+    - assets/logo_long.png
     - assets/user.jpg
     - assets/food_data.json
 

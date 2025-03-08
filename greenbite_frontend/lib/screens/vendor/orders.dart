@@ -29,7 +29,7 @@ class _OrdersState extends State<Orders> {
     } else if (index == 3) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const VendorProfile()),
+        MaterialPageRoute(builder: (context) => const VendorProfile(vendorId: 1)),
       );
     }
   }

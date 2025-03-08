@@ -1,0 +1,2 @@
+D:/IIT Second Year/Green Bite/GreenBite/greenbite_frontend/android/app/.cxx/Debug/4t3h5010/x86/CMakeFiles/edit_cache.dir
+D:/IIT Second Year/Green Bite/GreenBite/greenbite_frontend/android/app/.cxx/Debug/4t3h5010/x86/CMakeFiles/rebuild_cache.dir

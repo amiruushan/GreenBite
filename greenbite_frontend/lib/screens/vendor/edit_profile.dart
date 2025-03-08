@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class EditProfile extends StatefulWidget {
   final Map<String, dynamic> vendorProfile;
+  final int vendorId;
 
-  const EditProfile({super.key, required this.vendorProfile});
+  const EditProfile({super.key, required this.vendorProfile, required this.vendorId});
 
   @override
   State<EditProfile> createState() => _EditProfileState();
@@ -18,16 +21,18 @@ class _EditProfileState extends State<EditProfile> {
   late TextEditingController _businessNameController;
   late TextEditingController _businessDescriptionController;
 
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
     // Initialize controllers with the vendor profile data
-    _usernameController = TextEditingController(text: widget.vendorProfile["username"]);
-    _emailController = TextEditingController(text: widget.vendorProfile["email"]);
-    _phoneController = TextEditingController(text: widget.vendorProfile["phoneNumber"]);
-    _addressController = TextEditingController(text: widget.vendorProfile["address"]);
-    _businessNameController = TextEditingController(text: widget.vendorProfile["businessName"]);
-    _businessDescriptionController = TextEditingController(text: widget.vendorProfile["businessDescription"]);
+    _usernameController = TextEditingController(text: widget.vendorProfile["username"] ?? "");
+    _emailController = TextEditingController(text: widget.vendorProfile["email"] ?? "");
+    _phoneController = TextEditingController(text: widget.vendorProfile["phoneNumber"] ?? "");
+    _addressController = TextEditingController(text: widget.vendorProfile["address"] ?? "");
+    _businessNameController = TextEditingController(text: widget.vendorProfile["businessName"] ?? "");
+    _businessDescriptionController = TextEditingController(text: widget.vendorProfile["businessDescription"] ?? "");
   }
 
   @override
@@ -43,18 +48,53 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   // Function to handle form submission (Save)
-  void _saveProfile() {
+  Future<void> _saveProfile() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     final updatedProfile = {
-      "username": _usernameController.text,
+      "id": widget.vendorId, // Ensure vendorId is included
+      "name": _usernameController.text,
       "email": _emailController.text,
-      "phoneNumber": _phoneController.text,
+      "tele_number": _phoneController.text,
       "address": _addressController.text,
       "businessName": _businessNameController.text,
       "businessDescription": _businessDescriptionController.text,
     };
 
-    // Return the updated profile data to the previous screen
-    Navigator.pop(context, updatedProfile);
+    try {
+      final response = await http.put(
+        Uri.parse('http://192.168.1.3:8080/api/shop/update'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(updatedProfile),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile updated successfully!')),
+        );
+        try {
+          Navigator.pop(context, responseData); // Return updated profile data
+        } catch (e) {
+          print("Error returning updated profile: $e");
+          Navigator.pop(context); // Close the screen without returning data
+        }
+      } else {
+        throw Exception('Failed to update profile: ${response.body}');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update profile: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -72,11 +112,13 @@ class _EditProfileState extends State<EditProfile> {
         actions: [
           IconButton(
             icon: const Icon(Icons.save, color: Colors.white),
-            onPressed: _saveProfile,
+            onPressed: _isLoading ? null : _saveProfile,
           ),
         ],
       ),
-      body: SingleChildScrollView(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,7 +188,7 @@ class _EditProfileState extends State<EditProfile> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _saveProfile,
+                onPressed: _isLoading ? null : _saveProfile,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: Colors.green,

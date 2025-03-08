@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/home_page/models/shop_item.dart';
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
 import 'package:greenbite_frontend/service/auth_service';
@@ -33,7 +34,7 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
         return;
       }
       final response = await http.get(
-        Uri.parse("http://127.0.0.1:8080/api/shop/$shopId"),
+        Uri.parse("${Config.apiBaseUrl}/api/shop/$shopId"),
         headers: {"Authorization": "Bearer $token"},
       );
 
@@ -77,7 +78,7 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
         return;
       }
       final response = await http.get(
-        Uri.parse("http://127.0.0.1:8080/api/food-items/shop/$shopId"),
+        Uri.parse("${Config.apiBaseUrl}/api/food-items/shop/$shopId"),
         headers: {"Authorization": "Bearer $token"},
       );
 

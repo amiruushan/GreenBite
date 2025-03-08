@@ -63,6 +63,13 @@ public class User implements UserDetails {
     @Column(name = "green_bite_points", nullable = false)
     private int greenBitePoints = 0;
 
+    // NEW: Latitude and Longitude fields for user location
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
+
     // Constructor for new user with required fields
     public User(String username, String email, String password, String firstName, String surname, String district, String address, String role) {
         this.username = username;
@@ -71,8 +78,8 @@ public class User implements UserDetails {
         this.firstName = firstName;
         this.surname = surname;
         this.district = district;
-        this.address=address;
-        this.role=role;
+        this.address = address;
+        this.role = role;
     }
 
     // Default constructor
@@ -85,33 +92,20 @@ public class User implements UserDetails {
     }
 
     @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+    public boolean isAccountNonExpired() { return true; }
 
     @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+    public boolean isAccountNonLocked() { return true; }
 
     @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+    public boolean isCredentialsNonExpired() { return true; }
 
     @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
+    public boolean isEnabled() { return enabled; }
 
     @Override
-    public String getUsername() {
-        return username;
-    }
+    public String getUsername() { return username; }
 
     @Override
-    public String getPassword() {
-        return password;
-    }
+    public String getPassword() { return password; }
 }
-
