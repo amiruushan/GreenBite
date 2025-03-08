@@ -10,9 +10,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FoodShopDTO {
-    private Long shopId;
+    private Long id;
     private String name;
-    private String imageUrl;
+    private String address;
+    private String tele_number;
+    private String photo;
     private String email;
     private String businessName;
     private String businessDescription;

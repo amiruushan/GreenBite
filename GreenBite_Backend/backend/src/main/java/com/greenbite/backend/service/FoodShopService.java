@@ -18,10 +18,9 @@ public class FoodShopService {
     public FoodShop saveFoodShop(FoodShop foodShop) {
         return foodShopRepository.save(foodShop);
     }
-    public List<FoodShopDTO> getAllFoodShops() {
-        List<FoodShop> foodShops = foodShopRepository.findAll();
-        return foodShops.stream()
-                .map(shop -> new FoodShopDTO(shop.getId(), shop.getName(), shop.getPhoto(),shop.getEmail(),shop.getBusinessName(),shop.getBusinessDescription()))
+    public List<FoodShopDTO> getAllFoodShop() {
+        return foodShopRepository.findAll().stream()
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
@@ -31,8 +30,31 @@ public class FoodShopService {
         return convertToDTO(foodShop);
     }
     private FoodShopDTO convertToDTO(FoodShop foodShop){
-        return new FoodShopDTO(foodShop.getId(),foodShop.getName(),foodShop.getPhoto(),foodShop.getEmail(),foodShop.getBusinessName(), foodShop.getBusinessDescription()
+        return new FoodShopDTO(
+                foodShop.getId(),
+                foodShop.getName(),
+                foodShop.getAddress(),
+                foodShop.getTele_number(),
+                foodShop.getPhoto(),
+                foodShop.getEmail(),
+                foodShop.getBusinessName(),
+                foodShop.getBusinessDescription()
         );
+    }
+
+    public FoodShopDTO updateFoodShop(FoodShopDTO foodShopDTO){
+        FoodShop foodShop = foodShopRepository.findById(foodShopDTO.getId())
+                .orElseThrow(() -> new RuntimeException("Working"));
+        foodShop.setName(foodShopDTO.getName());
+        foodShop.setAddress(foodShopDTO.getAddress());
+        foodShop.setTele_number(foodShopDTO.getTele_number());
+        foodShop.setPhoto(foodShopDTO.getPhoto());
+        foodShop.setEmail(foodShopDTO.getEmail());
+        foodShop.setBusinessName(foodShop.getBusinessName());
+        foodShop.setBusinessDescription(foodShop.getBusinessDescription());
+
+        foodShop = foodShopRepository.save(foodShop);
+        return convertToDTO(foodShop);
     }
 
 
