@@ -8,6 +8,7 @@ import com.greenbite.backend.model.User;
 import com.greenbite.backend.repository.CouponRepository;
 import com.greenbite.backend.repository.CouponManagementRepository;
 import com.greenbite.backend.repository.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -127,5 +128,7 @@ public class UserService {
                 .map(user -> new UserDTO(user.getId(), user.getUsername(), null, null, null, null))
                 .collect(Collectors.toList());
     }
+
+
 
 }
