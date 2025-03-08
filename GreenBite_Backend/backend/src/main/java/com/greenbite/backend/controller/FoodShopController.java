@@ -24,19 +24,12 @@ public class FoodShopController {
     }
     @GetMapping("/all")
     public ResponseEntity<List<FoodShopDTO>> getAllFoodShops() {
-        List<FoodShopDTO> shops = foodShopService.getAllFoodShop();
+        List<FoodShopDTO> shops = foodShopService.getAllFoodShops();
         return ResponseEntity.ok(shops);
     }
     @GetMapping("/{id}")
     public FoodShopDTO getFoodShopById(@PathVariable Long id){
         System.out.println("work");
         return foodShopService.getFoodShopById(id);
-    }
-
-    //update food information
-    @PostMapping("/update")
-    public FoodShopDTO updateFoodShop(@RequestBody FoodShopDTO foodShopDTO){
-        System.out.println("update");
-        return foodShopService.updateFoodShop(foodShopDTO);
     }
 }
