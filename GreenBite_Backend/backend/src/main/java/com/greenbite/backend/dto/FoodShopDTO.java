@@ -13,7 +13,4 @@ public class FoodShopDTO {
     private Long shopId;
     private String name;
     private String imageUrl;
-    private String email;
-    private String businessName;
-    private String businessDescription;
 }
