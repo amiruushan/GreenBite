@@ -125,8 +125,16 @@ public class UserService {
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(user -> new UserDTO(user.getId(), user.getUsername(), null, null, null, null))
+                .map(user -> new UserDTO(user.getId(), user.getUsername(), user.getEmail(), null, user.getPhoneNumber(), user.getAddress()))
                 .collect(Collectors.toList());
+    }
+
+    public void deleteUserById(Long userId) {
+        if (userRepository.existsById(userId)) {
+            userRepository.deleteById(userId);
+        } else {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
     }
 
 

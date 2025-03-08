@@ -3,9 +3,7 @@ package com.greenbite.backend.controller;
 import com.greenbite.backend.dto.UserDTO;
 import com.greenbite.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @RestController
@@ -23,6 +21,9 @@ public class AdminPanelController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
+    @DeleteMapping("/deleteUser/{userId}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+        userService.deleteUserById(userId);
+        return ResponseEntity.ok("User deleted successfully");
+    }
 }
-
-
