@@ -1,6 +1,8 @@
 package com.greenbite.backend.controller;
 
+import com.greenbite.backend.dto.FoodShopDTO;
 import com.greenbite.backend.dto.UserDTO;
+import com.greenbite.backend.service.FoodShopService;
 import com.greenbite.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +14,11 @@ import java.util.List;
 public class AdminPanelController {
 
     private final UserService userService;
-    public AdminPanelController(UserService userService){
+    private final FoodShopService foodShopService;
+
+    public AdminPanelController(UserService userService, FoodShopService foodShopService) {
         this.userService=userService;
+        this.foodShopService=foodShopService;
     }
 
     @GetMapping("/listUsers")
@@ -25,5 +30,14 @@ public class AdminPanelController {
     public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
         userService.deleteUserById(userId);
         return ResponseEntity.ok("User deleted successfully");
+    }
+
+    // getting all food shop
+    @GetMapping("/listFoodShops")
+    public ResponseEntity<List<FoodShopDTO>> getAllFoodShopsAdmin() {
+        System.out.print("work work work");
+        List<FoodShopDTO> shops = foodShopService.getAllFoodShops();
+        return ResponseEntity.ok(shops);
+
     }
 }
