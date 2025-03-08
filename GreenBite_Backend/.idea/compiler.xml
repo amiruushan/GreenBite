@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+<<<<<<< Updated upstream
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -15,4 +16,9 @@
       <module name="backend" options="-parameters" />
     </option>
   </component>
+=======
+      <profile default="true" name="Default" enabled="true" />
+    </annotationProcessing>
+  </component>
+>>>>>>> Stashed changes
 </project>
