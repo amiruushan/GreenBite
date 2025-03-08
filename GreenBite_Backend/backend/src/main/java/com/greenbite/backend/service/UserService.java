@@ -10,6 +10,9 @@ import com.greenbite.backend.repository.CouponManagementRepository;
 import com.greenbite.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -116,6 +119,13 @@ public class UserService {
         // Save to CouponManagement with discount
         CouponManagement couponManagement = new CouponManagement(user, coupon, couponCode, coupon.getDiscount());
         couponManagementRepository.save(couponManagement);
+    }
+
+    public List<UserDTO> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(user -> new UserDTO(user.getId(), user.getUsername(), null, null, null, null))
+                .collect(Collectors.toList());
     }
 
 }
