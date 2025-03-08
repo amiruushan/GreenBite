@@ -45,4 +45,12 @@ public class FoodShopService {
         );
     }
 
+    public void deleteFoodShopById(Long foodShopId) {
+        if (foodShopRepository.existsById(foodShopId)) {
+            foodShopRepository.deleteById(foodShopId);
+        } else {
+            throw new RuntimeException("food shop not found with ID: " + foodShopId);
+        }
+    }
+
 }
