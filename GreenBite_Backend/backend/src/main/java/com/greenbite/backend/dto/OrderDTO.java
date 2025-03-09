@@ -12,6 +12,7 @@ import java.util.List;
 public class OrderDTO {
 
     private Long customerId;
+    private Long shopId;
     private String paymentMethod;
     private List<FoodItemDTO> items;
 }

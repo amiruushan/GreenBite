@@ -8,10 +8,14 @@ import com.greenbite.backend.model.User;
 import com.greenbite.backend.repository.CouponRepository;
 import com.greenbite.backend.repository.CouponManagementRepository;
 import com.greenbite.backend.repository.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -132,5 +136,22 @@ public class UserService {
         CouponManagement couponManagement = new CouponManagement(user, coupon, couponCode, coupon.getDiscount());
         couponManagementRepository.save(couponManagement);
     }
+
+    public List<UserDTO> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(user -> new UserDTO(user.getId(), user.getUsername(), user.getEmail(), null, user.getPhoneNumber(), user.getAddress()))
+                .collect(Collectors.toList());
+    }
+
+    public void deleteUserById(Long userId) {
+        if (userRepository.existsById(userId)) {
+            userRepository.deleteById(userId);
+        } else {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
+    }
+
+
 
 }
