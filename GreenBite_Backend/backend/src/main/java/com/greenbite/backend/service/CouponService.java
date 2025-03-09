@@ -17,5 +17,9 @@ public class CouponService {
     public List<Coupon> getAllCoupons() {
         return (List<Coupon>) couponRepository.findAll();
     }
+
+    public void createCoupon(Coupon coupon) {
+        couponRepository.save(coupon);
+    }
 }
 
