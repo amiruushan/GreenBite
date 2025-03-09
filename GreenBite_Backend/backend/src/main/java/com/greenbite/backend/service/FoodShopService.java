@@ -43,20 +43,6 @@ public class FoodShopService {
         );
     }
 
-    public FoodShop updateFoodShop(Long id, FoodShop updatedShop) {
-        return foodShopRepository.findById(id)
-                .map(existingShop -> {
-                    existingShop.setName(updatedShop.getName());
-                    existingShop.setAddress(updatedShop.getAddress());
-                    existingShop.setTele_number(updatedShop.getTele_number());
-                    existingShop.setEmail(updatedShop.getEmail());
-                    existingShop.setBusinessName(updatedShop.getBusinessName());
-                    existingShop.setBusinessDescription(updatedShop.getBusinessDescription());
-                    existingShop.setPhoto(updatedShop.getPhoto());
-                    return foodShopRepository.save(existingShop);
-                })
-                .orElseThrow(() -> new RuntimeException("Shop not found"));
-    }
 
 
 }
