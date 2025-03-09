@@ -56,4 +56,11 @@ public class AdminPanelController {
         couponService.createCoupon(coupon);  // Delegate to CouponService
         return ResponseEntity.ok("Coupon created successfully");
     }
+
+    // Deleting a coupon by ID
+    @DeleteMapping("/deleteCoupon/{couponId}")
+    public ResponseEntity<String> deleteCoupon(@PathVariable Long couponId) {
+        couponService.deleteCouponById(couponId);  // Delegate to CouponService
+        return ResponseEntity.ok("Coupon deleted successfully");
+    }
 }
