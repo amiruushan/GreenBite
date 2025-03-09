@@ -9,17 +9,22 @@ import com.greenbite.backend.repository.CouponRepository;
 import com.greenbite.backend.repository.CouponManagementRepository;
 import com.greenbite.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final CouponRepository couponRepository;
     private final CouponManagementRepository couponManagementRepository;
+    private final FileStorageService fileStorageService;
 
-    public UserService(UserRepository userRepository, CouponRepository couponRepository, CouponManagementRepository couponManagementRepository) {
+    public UserService(UserRepository userRepository, CouponRepository couponRepository, CouponManagementRepository couponManagementRepository, FileStorageService fileStorageService) {
         this.userRepository = userRepository;
         this.couponRepository = couponRepository;
         this.couponManagementRepository = couponManagementRepository;
+        this.fileStorageService=fileStorageService;
     }
 
     public UserDTO getUserById(Long id) {
@@ -28,16 +33,26 @@ public class UserService {
         return convertToDTO(user);
     }
 
-    public UserDTO updateUser(UserDTO userDTO) {
-
+    public UserDTO updateUser(UserDTO userDTO, MultipartFile profilePicture) throws IOException {
         User user = userRepository.findById(userDTO.getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
-        user.setProfilePictureUrl(userDTO.getProfilePictureUrl());
         user.setPhoneNumber(userDTO.getPhoneNumber());
         user.setAddress(userDTO.getAddress());
+
+        // Handle profile picture upload
+        if (profilePicture != null && !profilePicture.isEmpty()) {
+            // Delete the old profile picture if it exists
+            if (user.getProfilePictureUrl() != null) {
+                fileStorageService.deleteFile(user.getProfilePictureUrl());
+            }
+
+            // Save the new profile picture to GCS
+            String fileUrl = fileStorageService.saveFile(profilePicture);
+            user.setProfilePictureUrl(fileUrl); // Save the GCS URL in the database
+        }
 
         user = userRepository.save(user);
         return convertToDTO(user);
