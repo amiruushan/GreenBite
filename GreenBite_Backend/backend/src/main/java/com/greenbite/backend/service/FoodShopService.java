@@ -2,9 +2,7 @@ package com.greenbite.backend.service;
 
 
 import com.greenbite.backend.dto.FoodShopDTO;
-import com.greenbite.backend.dto.UserDTO;
 import com.greenbite.backend.model.FoodShop;
-import com.greenbite.backend.model.User;
 import com.greenbite.backend.repository.FoodShopRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,7 +29,7 @@ public class FoodShopService {
     public List<FoodShopDTO> getAllFoodShopsAdmin() {
         List<FoodShop> foodShops = foodShopRepository.findAll();
         return foodShops.stream()
-                .map(shop -> new FoodShopDTO(shop.getId(), shop.getName(), shop.getPhoto(), shop.getTele_number()))
+                .map(shop -> new FoodShopDTO(shop.getId(), shop.getName(), shop.getPhoto(),shop.getAddress(), shop.getTele_number(),shop.getEmail(),shop.getBusinessName(),shop.getBusinessDescription()))
                 .collect(Collectors.toList());
     }
 
@@ -44,5 +42,21 @@ public class FoodShopService {
         return new FoodShopDTO(foodShop.getId(),foodShop.getName(),foodShop.getPhoto()
         );
     }
+
+    public FoodShop updateFoodShop(Long id, FoodShop updatedShop) {
+        return foodShopRepository.findById(id)
+                .map(existingShop -> {
+                    existingShop.setName(updatedShop.getName());
+                    existingShop.setAddress(updatedShop.getAddress());
+                    existingShop.setTele_number(updatedShop.getTele_number());
+                    existingShop.setEmail(updatedShop.getEmail());
+                    existingShop.setBusinessName(updatedShop.getBusinessName());
+                    existingShop.setBusinessDescription(updatedShop.getBusinessDescription());
+                    existingShop.setPhoto(updatedShop.getPhoto());
+                    return foodShopRepository.save(existingShop);
+                })
+                .orElseThrow(() -> new RuntimeException("Shop not found"));
+    }
+
 
 }

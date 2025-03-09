@@ -24,5 +24,14 @@ public class FoodShop {
     @Column(nullable = false, length = 20)
     private String tele_number;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String businessName;
+
+    @Column(columnDefinition = "TEXT")
+    private String businessDescription;
+
     private String photo;  // Store image URL
 }
