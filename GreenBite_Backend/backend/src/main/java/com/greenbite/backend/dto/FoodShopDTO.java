@@ -12,9 +12,12 @@ import lombok.Setter;
 public class FoodShopDTO {
     private Long shopId;
     private String name;
+    private String address;
     private String imageUrl;
-    //    private String description;
     private String tele_number;
+    private String email;
+    private String businessName;
+    private String businessDescription;
 
     public FoodShopDTO(Long shopId, String name, String imageUrl) {
         this.shopId = shopId;
