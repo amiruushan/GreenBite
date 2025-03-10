@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:greenbite_frontend/config.dart';
-import 'package:greenbite_frontend/service/auth_service';
+import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:http/http.dart' as http;
 // Import AuthService
 import 'user_profile.dart';
