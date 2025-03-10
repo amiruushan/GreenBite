@@ -52,6 +52,8 @@ class PhoneVerificationScreen extends StatelessWidget {
 }
 
 class OTPField extends StatefulWidget {
+  const OTPField({super.key});
+
   @override
   _OTPFieldState createState() => _OTPFieldState();
 }

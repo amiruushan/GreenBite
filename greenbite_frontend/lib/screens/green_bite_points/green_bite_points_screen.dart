@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class GreenBitePointsScreen extends StatefulWidget {
+  const GreenBitePointsScreen({super.key});
+
   @override
   _GreenBitePointsScreenState createState() => _GreenBitePointsScreenState();
 }

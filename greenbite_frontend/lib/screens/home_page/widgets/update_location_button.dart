@@ -3,8 +3,7 @@ import 'package:greenbite_frontend/service/location_service.dart';
 
 class UpdateLocationButton extends StatelessWidget {
   final int userId;
-  const UpdateLocationButton({Key? key, required this.userId})
-      : super(key: key);
+  const UpdateLocationButton({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context) {

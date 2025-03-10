@@ -8,6 +8,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -213,7 +215,6 @@ class _CustomTextField extends StatelessWidget {
   final IconData? prefixIcon;
 
   const _CustomTextField({
-    super.key,
     required this.controller,
     required this.label,
     this.isPassword = false,
@@ -246,7 +247,6 @@ class _CustomButton extends StatelessWidget {
   final bool shadow;
 
   const _CustomButton({
-    super.key,
     required this.text,
     required this.onPressed,
     required this.backgroundColor,

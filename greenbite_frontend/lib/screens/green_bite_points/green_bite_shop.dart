@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class GreenBiteShopScreen extends StatefulWidget {
+  const GreenBiteShopScreen({super.key});
+
   @override
   _GreenBiteShopScreenState createState() => _GreenBiteShopScreenState();
 }
