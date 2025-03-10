@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/config.dart';
-import 'package:greenbite_frontend/screens/login/email_verification_screen.dart';
+import 'package:greenbite_frontend/screens/verification/email_verification_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart'; // ✅ Animation support
 import 'dart:convert';

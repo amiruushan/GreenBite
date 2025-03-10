@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/widgets/custom_button_widget.dart';
-import 'login_screen.dart';
+import '../login/login_screen.dart';
 
 class PhoneVerificationScreen extends StatelessWidget {
   const PhoneVerificationScreen({super.key});

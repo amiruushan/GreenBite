@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../widgets/custom_button.dart';
+import '../../widgets/custom_button_widget.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -99,10 +99,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
             child: CustomButton(
-              text:
-                  _currentIndex == onboardingData.length - 1
-                      ? "Get Started"
-                      : "Next",
+              text: _currentIndex == onboardingData.length - 1
+                  ? "Get Started"
+                  : "Next",
               onPressed: _nextPage,
               backgroundColor: Colors.green,
               textColor: Colors.white,
