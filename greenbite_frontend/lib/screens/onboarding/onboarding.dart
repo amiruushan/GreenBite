@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/screens/login/login_screen.dart';
 import '../../widgets/custom_button_widget.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -39,7 +40,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
-    } else {}
+    } else {
+      // Navigate to Login screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => LoginScreen()), // Ensure Login() exists
+      );
+    }
   }
 
   @override
