@@ -70,4 +70,13 @@ public class FoodItemService {
                 foodItemDTO.getCategory() // Convert category
         );
     }
+
+    public void deleteFoodItem(FoodItemDTO foodItemDTO) {
+        Long id = foodItemDTO.getId();
+        if (foodItemRepository.existsById(id)) {
+            foodItemRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Food item not found");
+        }
+    }
 }

@@ -18,6 +18,7 @@ public class Order {
     private Long id;
 
     private Long customerId; // Foreign key to the Customer entity
+    private Long shopId;
     private String paymentMethod;
     private String status = "pending"; // Default status is "pending"
 
