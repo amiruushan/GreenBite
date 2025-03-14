@@ -15,8 +15,7 @@ class _VendorSalesPageState extends State<VendorSalesPage> {
     fetchSales();
   }
 
-  // Dummy sales data (Updated with Cancellation Time for Cancelled Orders)
-  void fetchSales() async {
+  void fetchSales() {
     setState(() {
       sales = [
         {
@@ -32,6 +31,9 @@ class _VendorSalesPageState extends State<VendorSalesPage> {
           "dispatched": "2025-03-10 14:30",
           "delivered": "2025-03-10 15:00",
           "completed": "2025-03-10 15:10",
+          "paymentMethod": "Credit Card",
+          "vendor": "Pizza Palace",
+          "contact": "+94711234567",
         },
         {
           "id": 2,
@@ -43,6 +45,9 @@ class _VendorSalesPageState extends State<VendorSalesPage> {
           "totalPrice": 15.0,
           "location": "456 Ocean Ave, Galle",
           "orderPlaced": "2025-03-10 12:00",
+          "paymentMethod": "Cash on Delivery",
+          "vendor": "Burger Haven",
+          "contact": "+94778765432",
         },
         {
           "id": 3,
@@ -55,6 +60,9 @@ class _VendorSalesPageState extends State<VendorSalesPage> {
           "location": "789 Sunset Rd, Kandy",
           "orderPlaced": "2025-03-09 18:00",
           "cancelled": "2025-03-09 18:30",
+          "paymentMethod": "Debit Card",
+          "vendor": "Pasta Paradise",
+          "contact": "+94776543210",
         },
       ];
     });
@@ -65,7 +73,7 @@ class _VendorSalesPageState extends State<VendorSalesPage> {
       case "Completed":
         return Colors.green;
       case "Ongoing":
-        return Colors.yellow;
+        return Colors.orange;
       case "Cancelled":
         return Colors.red;
       default:
@@ -76,50 +84,94 @@ class _VendorSalesPageState extends State<VendorSalesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Vendor Sales Overview")),
+      appBar: AppBar(
+        title: const Text(
+          "Sales Overview",
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: const Color.fromARGB(255, 117, 237, 123),
+      ),
       body: sales.isEmpty
-          ? Center(child: Text("No sales records available"))
+          ? const Center(child: Text("No sales records available"))
           : ListView.builder(
               itemCount: sales.length,
               itemBuilder: (context, index) {
                 var sale = sales[index];
-                return Card(
-                  margin: EdgeInsets.all(10),
-                  child: ListTile(
-                    title: Text(
-                      sale['customer'],
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Text("Total: \$${sale['totalPrice']}"),
-                    trailing: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: getStatusColor(sale['status']),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        sale['status'],
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OrderDetailsPage(order: sale),
-                        ),
-                      );
-                    },
-                  ),
-                );
+                return _buildOrderCard(sale);
               },
             ),
+    );
+  }
+
+  Widget _buildOrderCard(Map<String, dynamic> sale) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 4,
+      margin: const EdgeInsets.all(12),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Customer Name
+            Text(
+              sale['customer'],
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+
+            // Order Status
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: getStatusColor(sale['status']),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    sale['status'],
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+
+                // View Details Button
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => OrderDetailsPage(order: sale),
+                      ),
+                    );
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white, // Text color
+                    backgroundColor: Colors.blue, // Button background
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                  ),
+                  child: const Text("View Details"),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
