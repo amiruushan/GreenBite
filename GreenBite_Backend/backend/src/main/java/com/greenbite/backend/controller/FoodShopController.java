@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLOutput;
 import java.util.List;
 
 @RestController
@@ -31,5 +32,13 @@ public class FoodShopController {
     public FoodShopDTO getFoodShopById(@PathVariable Long id){
         System.out.println("work");
         return foodShopService.getFoodShopById(id);
+    }
+    @GetMapping("/nearby")
+    public List<FoodShop> findNearbyShops(
+            @RequestParam double lat,
+            @RequestParam double lon,
+            @RequestParam(defaultValue = "5") double radius) {
+        System.out.println("hhhh");
+        return foodShopService.findShopsNearby(lat, lon, radius);
     }
 }

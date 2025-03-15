@@ -25,4 +25,9 @@ public class FoodShop {
     private String tele_number;
 
     private String photo;  // Store image URL
+    @Column(nullable = false)
+    private double latitude;
+
+    @Column(nullable = false)
+    private double longitude;
 }
