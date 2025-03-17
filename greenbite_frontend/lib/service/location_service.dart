@@ -39,6 +39,7 @@ class LocationService {
       final position = await getCurrentLocation();
       final double latitude = position.latitude;
       final double longitude = position.longitude;
+      print("User location: Latitude=$latitude, Longitude=$longitude");
 
       // Build the JSON payload
       final Map<String, dynamic> payload = {

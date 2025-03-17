@@ -87,6 +87,8 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
         restaurant: '',
         shopId: 0,
         category: '',
+        latitude: 0.0,
+        longitude: 0.0,
       ),
     );
 

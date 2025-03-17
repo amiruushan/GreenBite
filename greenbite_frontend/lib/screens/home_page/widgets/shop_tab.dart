@@ -3,6 +3,7 @@ import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/home_page/models/shop_item.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/shop_details_page.dart';
 import 'package:greenbite_frontend/service/auth_service';
+import 'package:greenbite_frontend/service/location_service.dart';
 import 'dart:convert'; // For JSON parsing
 import 'package:http/http.dart' as http;
 // Import the ShopDetailsPage
@@ -32,8 +33,15 @@ class _ShopsTabState extends State<ShopsTab> {
         print("No token found");
         return;
       }
+
+      // Get the user's current location
+      final position = await LocationService.getCurrentLocation();
+      final double latitude = position.latitude;
+      final double longitude = position.longitude;
+
       final response = await http.get(
-        Uri.parse("${Config.apiBaseUrl}/api/shop/all"),
+        Uri.parse(
+            "${Config.apiBaseUrl}/api/shop/nearby?lat=$latitude&lon=$longitude&radius=5"),
         headers: {"Authorization": "Bearer $token"},
       );
 

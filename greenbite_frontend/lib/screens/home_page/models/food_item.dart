@@ -9,6 +9,8 @@ class FoodItem {
   final String restaurant;
   final int shopId; // Assuming you want to keep this field
   final String category; // New category field
+  final double latitude; // Add latitude field
+  final double longitude; // Add longitude field
 
   FoodItem({
     required this.id,
@@ -20,7 +22,9 @@ class FoodItem {
     required this.tags,
     required this.restaurant,
     required this.shopId,
-    required this.category, // Added category as a required field
+    required this.category,
+    required this.latitude, // Add latitude
+    required this.longitude, // Add longitude
   });
 
   factory FoodItem.fromJson(Map<String, dynamic> json) {
@@ -37,6 +41,8 @@ class FoodItem {
           : json['tags'].toString().split(','), // ✅ Convert string to list
       restaurant: json['restaurant'] ?? 'Unknown',
       category: json['category'] ?? 'Uncategorized',
+      latitude: json['latitude'] ?? 0.0, // Add latitude
+      longitude: json['longitude'] ?? 0.0, // Add longitude
     );
   }
 
@@ -51,7 +57,9 @@ class FoodItem {
       'tags': tags,
       'restaurant': restaurant,
       'shopId': shopId,
-      'category': category, // Added category to JSON serialization
+      'category': category,
+      'latitude': latitude, // Add latitude
+      'longitude': longitude, // Add longitude
     };
   }
 

@@ -7,6 +7,7 @@ import 'package:greenbite_frontend/screens/home_page/widgets/shop_tab.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/update_location_button.dart';
 import 'package:greenbite_frontend/screens/vendor/food_item.dart';
 import 'package:greenbite_frontend/service/auth_service';
+import 'package:greenbite_frontend/service/location_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/favorites_screen/favorites_screen.dart';
@@ -58,9 +59,16 @@ class _HomePageState extends State<HomePage> {
         return;
       }
 
-      // Fetch all food items
+      // Get the user's current location
+      final position = await LocationService.getCurrentLocation();
+      final double latitude = position.latitude;
+      final double longitude = position.longitude;
+      print("User location: Latitude=$latitude, Longitude=$longitude");
+
+      // Fetch nearby food items
       final foodResponse = await http.get(
-        Uri.parse('${Config.apiBaseUrl}/api/food-items/get'),
+        Uri.parse(
+            '${Config.apiBaseUrl}/api/food-items/nearby/$latitude/$longitude/5'),
         headers: {"Authorization": "Bearer $token"},
       );
 
