@@ -120,7 +120,7 @@ class _ShopsTabState extends State<ShopsTab> {
                         leading: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: Image.network(
-                            shop.imageUrl, // Shop's image URL
+                            shop.imageUrl, // Use imageUrl to display the shop's image
                             width: 80,
                             height: 80,
                             fit: BoxFit.cover,

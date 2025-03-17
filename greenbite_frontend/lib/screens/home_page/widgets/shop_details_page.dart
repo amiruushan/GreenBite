@@ -133,7 +133,7 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Image.network(
-                shopItem!.imageUrl,
+                shopItem!.imageUrl, // Use imageUrl to display the shop's image
                 width: double.infinity,
                 height: 200,
                 fit: BoxFit.cover,

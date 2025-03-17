@@ -22,7 +22,7 @@ public class FoodShop {
     private String address;
 
     @Column(nullable = false, length = 20)
-    private String tele_number;
+    private String phoneNumber;
 
     private String photo;  // Store image URL
     @Column(nullable = false)
@@ -30,4 +30,5 @@ public class FoodShop {
 
     @Column(nullable = false)
     private double longitude;
+
 }

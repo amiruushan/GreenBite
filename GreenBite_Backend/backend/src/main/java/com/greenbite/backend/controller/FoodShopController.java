@@ -29,8 +29,8 @@ public class FoodShopController {
         return ResponseEntity.ok(shops);
     }
     @GetMapping("/{id}")
-    public FoodShopDTO getFoodShopById(@PathVariable Long id){
-        System.out.println("work");
+    public FoodShopDTO getFoodShopById(@PathVariable Long id) {
+        System.out.println("Fetching shop with ID: " + id);
         return foodShopService.getFoodShopById(id);
     }
     @GetMapping("/nearby")

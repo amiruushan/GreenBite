@@ -31,17 +31,32 @@ public class FoodShopService {
     public List<FoodShopDTO> getAllFoodShopsAdmin() {
         List<FoodShop> foodShops = foodShopRepository.findAll();
         return foodShops.stream()
-                .map(shop -> new FoodShopDTO(shop.getId(), shop.getName(), shop.getPhoto(), shop.getTele_number()))
+                .map(shop -> new FoodShopDTO(
+                        shop.getId(),
+                        shop.getName(),
+                        shop.getPhoto(),
+                        shop.getAddress(),
+                        shop.getPhoneNumber(),
+                        shop.getLatitude(),
+                        shop.getLongitude()
+                ))
                 .collect(Collectors.toList());
     }
 
-    public FoodShopDTO getFoodShopById(Long id){
+    public FoodShopDTO getFoodShopById(Long id) {
         FoodShop foodShop = foodShopRepository.findById(id)
-                .orElseThrow(() ->new RuntimeException("Shop not found"));
+                .orElseThrow(() -> new RuntimeException("Shop not found"));
         return convertToDTO(foodShop);
     }
-    private FoodShopDTO convertToDTO(FoodShop foodShop){
-        return new FoodShopDTO(foodShop.getId(),foodShop.getName(),foodShop.getPhoto()
+    private FoodShopDTO convertToDTO(FoodShop foodShop) {
+        return new FoodShopDTO(
+                foodShop.getId(),
+                foodShop.getName(),
+                foodShop.getPhoto(),
+                foodShop.getAddress(),
+                foodShop.getPhoneNumber(),  // or getPhoneNumber() if you rename it
+                foodShop.getLatitude(),
+                foodShop.getLongitude()
         );
     }
 
