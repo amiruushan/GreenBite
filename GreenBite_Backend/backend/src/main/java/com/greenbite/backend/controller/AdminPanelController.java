@@ -67,5 +67,12 @@ public class AdminPanelController {
     public void deleteFoodItem(@RequestBody FoodItemDTO foodItemDTO){
         foodItemService.deleteFoodItem(foodItemDTO);
     }
+
+    @GetMapping("/listFoodItems/{foodShopId}")
+    public ResponseEntity<List<FoodItemDTO>> getFoodItemsByShop(@PathVariable Long foodShopId) {
+        List<FoodItemDTO> foodItems = foodItemService.getFoodItemsByShop(foodShopId);
+        return ResponseEntity.ok(foodItems);
+    }
+
 }
 
