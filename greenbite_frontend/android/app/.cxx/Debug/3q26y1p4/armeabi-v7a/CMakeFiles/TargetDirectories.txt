@@ -1,0 +1,2 @@
+/Users/ashcharya/Documents/GitHub/GreenBite/greenbite_frontend/android/app/.cxx/Debug/3q26y1p4/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/ashcharya/Documents/GitHub/GreenBite/greenbite_frontend/android/app/.cxx/Debug/3q26y1p4/armeabi-v7a/CMakeFiles/rebuild_cache.dir

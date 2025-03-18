@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/config.dart';
-import 'login_screen.dart';
+import '../login/login_screen.dart';
 import '/../widgets/custom_button_widget.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';

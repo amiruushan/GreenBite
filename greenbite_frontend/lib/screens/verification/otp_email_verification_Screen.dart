@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/widgets/custom_button_widget.dart';
 
 class OTPEmailVerificationScreen extends StatelessWidget {
+  const OTPEmailVerificationScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,6 +72,8 @@ class OTPEmailVerificationScreen extends StatelessWidget {
 
 // Placeholder for the next screen after verification
 class NextScreen extends StatelessWidget {
+  const NextScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

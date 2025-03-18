@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+
+import 'package:greenbite_frontend/screens/onboarding/onboarding.dart';
+
 import 'package:greenbite_frontend/screens/login/login_screen.dart';
+
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     // Navigate to login page with fade animation after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacement(_fadeRoute(LoginScreen()));
+      Navigator.of(context).pushReplacement(_fadeRoute(OnboardingScreen()));
     });
   }
 
