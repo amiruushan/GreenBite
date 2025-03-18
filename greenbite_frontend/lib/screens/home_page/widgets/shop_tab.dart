@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/home_page/models/shop_item.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/shop_details_page.dart';
+
+import 'package:greenbite_frontend/service/auth_service.dart';
+
 import 'package:greenbite_frontend/service/auth_service';
 import 'package:greenbite_frontend/service/location_service.dart';
+
 import 'dart:convert'; // For JSON parsing
 import 'package:http/http.dart' as http;
 // Import the ShopDetailsPage

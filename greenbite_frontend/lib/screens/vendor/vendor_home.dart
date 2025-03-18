@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:greenbite_frontend/screens/vendor/vendor_profile.dart';
+import '../../config.dart';
 import '../../widgets/vendor_nav_bar.dart';
 import 'list_food.dart';
 import 'orders.dart';
@@ -27,7 +28,7 @@ class _VendorHomeState extends State<VendorHome> {
   Future<void> fetchVendorData() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.1.3:8080/api/shop/1'),
+        Uri.parse('${Config.apiBaseUrl}/api/shop/1'),
       );
 
       if (response.statusCode == 200) {
@@ -48,7 +49,7 @@ class _VendorHomeState extends State<VendorHome> {
   Future<void> fetchFoodItems() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.1.3:8080/api/food-items/shop/1'),
+        Uri.parse('${Config.apiBaseUrl}/api/food-items/shop/1'),
       );
 
       if (response.statusCode == 200) {

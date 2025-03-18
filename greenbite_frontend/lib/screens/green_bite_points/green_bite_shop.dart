@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/config.dart';
-import 'package:greenbite_frontend/service/auth_service';
+import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:greenbite_frontend/screens/green_bite_points/inventory_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class GreenBiteShopScreen extends StatefulWidget {
+  const GreenBiteShopScreen({super.key});
+
   @override
   _GreenBiteShopScreenState createState() => _GreenBiteShopScreenState();
 }

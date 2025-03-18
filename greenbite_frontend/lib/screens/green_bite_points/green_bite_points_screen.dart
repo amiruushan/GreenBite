@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/green_bite_points/green_bite_shop.dart';
-import 'package:greenbite_frontend/service/auth_service';
+import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class GreenBitePointsScreen extends StatefulWidget {
+  const GreenBitePointsScreen({super.key});
+
   @override
   _GreenBitePointsScreenState createState() => _GreenBitePointsScreenState();
 }

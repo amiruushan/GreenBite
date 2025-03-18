@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
+import '../../config.dart';
+
 class FoodItemScreen extends StatefulWidget {
   final Map<String, dynamic> foodItem;
 
@@ -62,7 +64,7 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
 
     // Send the PUT request to the backend API
     final response = await http.put(
-      Uri.parse('http://192.168.1.3:8080/api/food-items/update'),
+      Uri.parse('${Config.apiBaseUrl}/api/food-items/update'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -198,7 +200,7 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
               ),
               items: const [
                 "pizza",
-                "Burger",
+                "Bakery",
                 "Cake",
                 "Salad",
                 "Drink",

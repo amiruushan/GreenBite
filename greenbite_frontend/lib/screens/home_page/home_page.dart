@@ -5,8 +5,12 @@ import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
 import 'package:greenbite_frontend/screens/food_detail_screen/food_detail_screen.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/shop_tab.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/update_location_button.dart';
+
+import 'package:greenbite_frontend/service/auth_service.dart';
+
 import 'package:greenbite_frontend/service/auth_service';
 import 'package:greenbite_frontend/service/location_service.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/favorites_screen/favorites_screen.dart';
@@ -160,7 +164,6 @@ class _HomePageState extends State<HomePage> {
   void _removeFavorite(FoodItem item) {
     setState(() {
       favoriteItems.removeWhere((fav) => fav.id == item.id);
-      ;
     });
   }
 
@@ -213,7 +216,7 @@ class HomePageContent extends StatefulWidget {
 }
 
 class _HomePageContentState extends State<HomePageContent> {
-  List<String> _selectedTags = []; // Track multiple selected tags
+  final List<String> _selectedTags = []; // Track multiple selected tags
   final PageController _featuredController =
       PageController(); // Controller for featured items
   int _currentFeaturedIndex = 0; // Track the current featured item index
