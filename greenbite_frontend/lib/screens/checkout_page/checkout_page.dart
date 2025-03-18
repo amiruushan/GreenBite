@@ -243,7 +243,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
   // 🛍 Order Summary Widget
   Widget _buildOrderSummary() {
     final cartProvider = Provider.of<CartProvider>(context);
-    final cartItems = cartProvider.cartItems;
 
     return Container(
       padding: const EdgeInsets.all(16),

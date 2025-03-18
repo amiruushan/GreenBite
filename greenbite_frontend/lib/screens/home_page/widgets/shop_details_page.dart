@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/config.dart';
+import 'package:greenbite_frontend/screens/food_detail_screen/food_detail_screen.dart';
 import 'package:greenbite_frontend/screens/home_page/models/shop_item.dart';
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
 import 'package:greenbite_frontend/service/auth_service.dart';
@@ -9,7 +10,7 @@ import 'package:http/http.dart' as http;
 class ShopDetailsPage extends StatefulWidget {
   final String shopId;
 
-  const ShopDetailsPage({super.key, required this.shopId});
+  const ShopDetailsPage({Key? key, required this.shopId}) : super(key: key);
 
   @override
   _ShopDetailsPageState createState() => _ShopDetailsPageState();
@@ -23,12 +24,12 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
   @override
   void initState() {
     super.initState();
-    fetchShopDetails(widget.shopId); // Fetch shop details using the shopId
+    fetchShopDetails(widget.shopId);
   }
 
   Future<void> fetchShopDetails(String shopId) async {
     try {
-      String? token = await AuthService.getToken(); // Retrieve token
+      String? token = await AuthService.getToken();
       if (token == null) {
         print("No token found");
         return;
@@ -40,14 +41,11 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
 
       if (response.statusCode == 200) {
         final dynamic data = json.decode(response.body);
-
         if (data is Map<String, dynamic>) {
-          // Fetch shop details
           setState(() {
             shopItem = ShopItem.fromJson(data);
             isLoading = false;
           });
-
           // Fetch food items for the shop
           fetchFoodItems(shopId);
         } else {
@@ -72,7 +70,7 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
 
   Future<void> fetchFoodItems(String shopId) async {
     try {
-      String? token = await AuthService.getToken(); // Retrieve token
+      String? token = await AuthService.getToken();
       if (token == null) {
         print("No token found");
         return;
@@ -89,8 +87,7 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
 
         setState(() {
           if (shopItem != null) {
-            shopItem = shopItem!
-                .copyWith(foodItems: newFoodItems); // Update food items
+            shopItem = shopItem!.copyWith(foodItems: newFoodItems);
           }
         });
       } else {
@@ -117,8 +114,9 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
       return Scaffold(
         appBar: AppBar(title: const Text("Shop Details")),
         body: Center(
-            child: Text(
-                errorMessage.isNotEmpty ? errorMessage : "Shop not found")),
+          child:
+              Text(errorMessage.isNotEmpty ? errorMessage : "Shop not found"),
+        ),
       );
     }
 
@@ -140,7 +138,6 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
               ),
             ),
             const SizedBox(height: 16),
-
             // Shop Name & Description
             Text(
               shopItem!.name,
@@ -152,7 +149,6 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
               style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 16),
-
             // Address & Contact
             Row(
               children: [
@@ -170,14 +166,12 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
               ],
             ),
             const SizedBox(height: 16),
-
             // Food Items Section
             const Text(
               "Available Food Items",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-
             shopItem!.foodItems.isEmpty
                 ? const Text("No food items available",
                     style: TextStyle(color: Colors.grey))
@@ -190,7 +184,8 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                       return Card(
                         margin: const EdgeInsets.symmetric(vertical: 8),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         child: ListTile(
                           contentPadding: const EdgeInsets.all(12),
                           leading: ClipRRect(
@@ -215,6 +210,16 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                                 fontWeight: FontWeight.bold,
                                 color: Colors.green),
                           ),
+                          // Added onTap callback to navigate to the FoodDetailScreen:
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    FoodDetailScreen(foodItem: food),
+                              ),
+                            );
+                          },
                         ),
                       );
                     },

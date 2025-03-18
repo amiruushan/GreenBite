@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart'; // Import the image_picker package
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile.dart';
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile_service.dart';
+import 'dart:io'; // For File class
 
 class EditProfileScreen extends StatefulWidget {
   final UserProfile userProfile;
@@ -17,6 +19,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _phoneController;
   late TextEditingController _addressController;
   bool _isSaving = false;
+  File? _imageFile; // To store the selected image file
 
   @override
   void initState() {
@@ -46,13 +49,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       id: widget.userProfile.id, // ✅ Keep the same ID
       username: _nameController.text.trim(),
       email: _emailController.text.trim(),
-      profilePictureUrl:
-          widget.userProfile.profilePictureUrl, // Keep existing picture
+      profilePictureUrl: _imageFile != null
+          ? _imageFile!.path
+          : widget.userProfile.profilePictureUrl, // Use new image if selected
       phoneNumber: _phoneController.text.trim(),
       address: _addressController.text.trim(),
     );
 
-    bool success = await UserProfileService.updateUserProfile(updatedProfile);
+    bool success =
+        await UserProfileService.updateUserProfile(updatedProfile, _imageFile);
 
     setState(() => _isSaving = false);
 
@@ -65,6 +70,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Failed to update profile. Try again.")),
       );
+    }
+  }
+
+  // ✅ Function to pick an image from the gallery or camera
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
     }
   }
 
@@ -87,10 +104,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               children: [
                 CircleAvatar(
                   radius: 60,
-                  backgroundImage: NetworkImage(
-                    widget.userProfile.profilePictureUrl ??
-                        UserProfile.placeholderProfilePictureUrl,
-                  ),
+                  backgroundImage: _imageFile != null
+                      ? FileImage(_imageFile!) // Use the selected image
+                      : NetworkImage(
+                          widget.userProfile.profilePictureUrl ??
+                              UserProfile.placeholderProfilePictureUrl,
+                        ) as ImageProvider,
                 ),
                 Positioned(
                   bottom: 0,
@@ -104,7 +123,37 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       icon:
                           const Icon(Icons.edit, color: Colors.white, size: 20),
                       onPressed: () {
-                        // TODO: Implement profile picture change functionality
+                        // Show a dialog to choose between gallery and camera
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text("Choose Image Source"),
+                              content: SingleChildScrollView(
+                                child: ListBody(
+                                  children: <Widget>[
+                                    ListTile(
+                                      leading: const Icon(Icons.photo_library),
+                                      title: const Text("Gallery"),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _pickImage(ImageSource.gallery);
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: const Icon(Icons.camera_alt),
+                                      title: const Text("Camera"),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _pickImage(ImageSource.camera);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
                       },
                     ),
                   ),

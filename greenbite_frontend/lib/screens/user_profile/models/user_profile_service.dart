@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:http/http.dart' as http;
@@ -36,19 +37,37 @@ class UserProfileService {
     }
   }
 
-  // ✅ Update user profile using PUT request with ID
-  static Future<bool> updateUserProfile(UserProfile updatedProfile) async {
+  static Future<bool> updateUserProfile(
+      UserProfile updatedProfile, File? imageFile) async {
     try {
       String? token = await AuthService.getToken(); // Retrieve token
       if (token == null) {
         print("No token found");
+        return false;
       }
-      final response = await http.put(
+
+      var request = http.MultipartRequest(
+        'PUT',
         Uri.parse('${Config.apiBaseUrl}/api/users/update'),
-        //headers: {"Content-Type": "application/json"},
-        headers: {"Authorization": "Bearer $token"},
-        body: json.encode(updatedProfile.toJson()),
       );
+
+      request.headers["Authorization"] = "Bearer $token";
+
+      // Convert UserProfile to JSON and add it as a field
+      final userJson = jsonEncode(updatedProfile.toJson());
+      request.fields['user'] = userJson;
+
+      // Add image file if it exists
+      if (imageFile != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'profilePicture',
+            imageFile.path,
+          ),
+        );
+      }
+
+      var response = await request.send();
 
       if (response.statusCode == 200) {
         return true;

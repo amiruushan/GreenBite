@@ -26,5 +26,10 @@ public class FoodItem {
     private Long shopId; // Use shopId instead of mapping FoodShop to simplify DTO conversion
 
     private String category; // New field for category
-}
 
+    @Column(nullable = false)
+    private double latitude; // Add latitude field
+
+    @Column(nullable = false)
+    private double longitude; // Add longitude field
+}

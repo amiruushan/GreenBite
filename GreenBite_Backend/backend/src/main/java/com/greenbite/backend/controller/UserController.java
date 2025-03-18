@@ -1,12 +1,15 @@
 package com.greenbite.backend.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greenbite.backend.dto.AddPointsDTO;
 import com.greenbite.backend.dto.LocationUpdateDTO;
 import com.greenbite.backend.dto.UserDTO;
 import com.greenbite.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +33,17 @@ public class UserController {
 
     // Update user details
     @PutMapping("/update")
-    public UserDTO updateUser(@RequestBody UserDTO userDTO) {
-        System.out.println("Update working");
-        return userService.updateUser(userDTO);
+    public ResponseEntity<UserDTO> updateUser(
+            @RequestPart("user") String userJson,
+            @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture) throws IOException {
+
+        // Convert the JSON string to a UserDTO object
+        ObjectMapper objectMapper = new ObjectMapper();
+        UserDTO userDTO = objectMapper.readValue(userJson, UserDTO.class);
+
+        // Update the user profile
+        UserDTO updatedUser = userService.updateUser(userDTO, profilePicture);
+        return ResponseEntity.ok(updatedUser);
     }
     @PostMapping("/add-points")
     public ResponseEntity<String> addPoints(@RequestBody AddPointsDTO addPointsDTO) {

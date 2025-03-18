@@ -30,6 +30,16 @@ public class FoodItemController {
         return foodItemService.getFoodItemsByShop(shopId);
     }
 
+    @GetMapping("/nearby/{lat}/{lon}/{radius}")
+    public List<FoodItemDTO> getFoodItemsNearby(
+            @PathVariable double lat,
+            @PathVariable double lon,
+            @PathVariable double radius) {
+        List<FoodItemDTO> nearbyFoodItems = foodItemService.getFoodItemsNearby(lat, lon, radius);
+        System.out.println("Nearby food items: " + nearbyFoodItems);
+        return nearbyFoodItems;
+    }
+
 
 
 //    @GetMapping("/tags/{tags}")

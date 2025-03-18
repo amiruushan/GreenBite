@@ -35,6 +35,8 @@ class CartProvider extends ChangeNotifier {
         quantity: selectedQuantity.toString(),
         shopId: item.shopId,
         tags: item.tags,
+        latitude: item.latitude,
+        longitude: item.longitude,
       ));
     }
     notifyListeners();

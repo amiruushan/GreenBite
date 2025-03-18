@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/config.dart';
+
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:provider/provider.dart';
+
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
+import 'package:greenbite_frontend/service/auth_service';
+
+import 'package:provider/provider.dart';
+import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class FoodDetailScreen extends StatefulWidget {
   final FoodItem foodItem;
 
-  const FoodDetailScreen({super.key, required this.foodItem});
+  const FoodDetailScreen({Key? key, required this.foodItem}) : super(key: key);
 
   @override
   State<FoodDetailScreen> createState() => _FoodDetailScreenState();
@@ -24,7 +31,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
     if (token == null) throw Exception("No JWT token found.");
     return {
       "Content-Type": "application/json",
-      "Authorization": "Bearer $token", // ✅ Add Authorization header
+      "Authorization": "Bearer $token",
     };
   }
 
@@ -38,7 +45,6 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
         ? 20
         : 10;
 
-    // ✅ Send API request to add normal points on successful purchase
     try {
       int? userId = await AuthService.getUserId();
       if (userId == null) throw Exception("User ID not found");
@@ -53,7 +59,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text("+$earnedPoints NP added!",
-                  style: TextStyle(color: Colors.green))),
+                  style: const TextStyle(color: Colors.green))),
         );
       } else {
         print("Failed to add points: ${response.body}");
@@ -86,6 +92,8 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
         restaurant: '',
         shopId: 0,
         category: '',
+        latitude: 0.0,
+        longitude: 0.0,
       ),
     );
 
@@ -146,7 +154,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                       widget.foodItem.tags.contains("sugar-free")
                   ? "+20 NP on purchase"
                   : "+10 NP on purchase",
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 16,
                   color: Colors.green,
                   fontWeight: FontWeight.bold),
