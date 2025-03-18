@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../../config.dart';
 import '../../widgets/vendor_nav_bar.dart';
 import 'vendor_home.dart';
 import 'list_food.dart';
@@ -31,7 +32,7 @@ class _VendorProfileState extends State<VendorProfile> {
   Future<void> _fetchVendorProfile() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.1.3:8080/api/shop/${widget.vendorId}'),
+        Uri.parse('${Config.apiBaseUrl}/api/shop/${widget.vendorId}'),
       );
 
       if (response.statusCode == 200) {
@@ -41,7 +42,7 @@ class _VendorProfileState extends State<VendorProfile> {
             "profilePictureUrl": data["photo"] ?? "",
             "username": data["name"] ?? "Unknown Vendor",
             "email": data["email"] ?? "",
-            "phoneNumber": data["tele_number"] ?? "",
+            "phoneNumber": data["phoneNumber"] ?? "",
             "address": data["address"] ?? "",
             "businessName": data["businessName"] ?? "",
             "businessDescription": data["businessDescription"] ?? "",
