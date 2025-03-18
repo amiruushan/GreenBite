@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/screens/vendor/vendor_sales.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../widgets/vendor_nav_bar.dart';
@@ -6,6 +7,7 @@ import 'vendor_home.dart';
 import 'list_food.dart';
 import 'orders.dart';
 import 'edit_profile.dart'; // Import the EditProfile screen
+import 'package:greenbite_frontend/config.dart';
 
 class VendorProfile extends StatefulWidget {
   final int vendorId;
@@ -31,7 +33,7 @@ class _VendorProfileState extends State<VendorProfile> {
   Future<void> _fetchVendorProfile() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.1.3:8080/api/shop/${widget.vendorId}'),
+        Uri.parse('${Config.apiBaseUrl}/api/shop/${widget.vendorId}'),
       );
 
       if (response.statusCode == 200) {
@@ -74,7 +76,7 @@ class _VendorProfileState extends State<VendorProfile> {
     } else if (index == 2) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const Orders()),
+        MaterialPageRoute(builder: (context) => VendorSalesPage()),
       );
     }
   }
@@ -94,13 +96,24 @@ class _VendorProfileState extends State<VendorProfile> {
     if (updatedProfile != null && updatedProfile is Map<String, dynamic>) {
       setState(() {
         _vendorProfile = {
-          "profilePictureUrl": updatedProfile["photo"] ?? _vendorProfile["profilePictureUrl"] ?? "",
-          "username": updatedProfile["name"] ?? _vendorProfile["username"] ?? "Unknown Vendor",
+          "profilePictureUrl": updatedProfile["photo"] ??
+              _vendorProfile["profilePictureUrl"] ??
+              "",
+          "username": updatedProfile["name"] ??
+              _vendorProfile["username"] ??
+              "Unknown Vendor",
           "email": updatedProfile["email"] ?? _vendorProfile["email"] ?? "",
-          "phoneNumber": updatedProfile["tele_number"] ?? _vendorProfile["phoneNumber"] ?? "",
-          "address": updatedProfile["address"] ?? _vendorProfile["address"] ?? "",
-          "businessName": updatedProfile["businessName"] ?? _vendorProfile["businessName"] ?? "",
-          "businessDescription": updatedProfile["businessDescription"] ?? _vendorProfile["businessDescription"] ?? "",
+          "phoneNumber": updatedProfile["tele_number"] ??
+              _vendorProfile["phoneNumber"] ??
+              "",
+          "address":
+              updatedProfile["address"] ?? _vendorProfile["address"] ?? "",
+          "businessName": updatedProfile["businessName"] ??
+              _vendorProfile["businessName"] ??
+              "",
+          "businessDescription": updatedProfile["businessDescription"] ??
+              _vendorProfile["businessDescription"] ??
+              "",
         };
       });
     }
@@ -130,74 +143,75 @@ class _VendorProfileState extends State<VendorProfile> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Profile Picture
-            CircleAvatar(
-              radius: 60,
-              backgroundImage: NetworkImage(
-                _vendorProfile["profilePictureUrl"] ?? "https://via.placeholder.com/150",
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Profile Picture
+                  CircleAvatar(
+                    radius: 60,
+                    backgroundImage: NetworkImage(
+                      _vendorProfile["profilePictureUrl"] ??
+                          "https://via.placeholder.com/150",
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Vendor Name
+                  Text(
+                    _vendorProfile["username"],
+                    style: const TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Email
+                  Text(
+                    _vendorProfile["email"],
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Business Name
+                  _buildInfoCard(Icons.business, "Business Name",
+                      _vendorProfile["businessName"]),
+                  // Business Description
+                  _buildInfoCard(Icons.description, "Business Description",
+                      _vendorProfile["businessDescription"]),
+                  // Phone Number
+                  _buildInfoCard(
+                      Icons.phone, "Phone", _vendorProfile["phoneNumber"]),
+                  // Address
+                  _buildInfoCard(
+                      Icons.location_on, "Address", _vendorProfile["address"]),
+
+                  const SizedBox(height: 20),
+
+                  // Edit Profile Button
+                  _buildActionButton(
+                    icon: Icons.edit,
+                    text: "Edit Profile",
+                    color: Colors.blue,
+                    onPressed: _editProfile,
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Sign Out Button
+                  _buildActionButton(
+                    icon: Icons.logout,
+                    text: "Sign Out",
+                    color: Colors.red,
+                    onPressed: _signOut,
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-
-            // Vendor Name
-            Text(
-              _vendorProfile["username"],
-              style: const TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-
-            // Email
-            Text(
-              _vendorProfile["email"],
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Business Name
-            _buildInfoCard(
-                Icons.business, "Business Name", _vendorProfile["businessName"]),
-            // Business Description
-            _buildInfoCard(Icons.description, "Business Description",
-                _vendorProfile["businessDescription"]),
-            // Phone Number
-            _buildInfoCard(
-                Icons.phone, "Phone", _vendorProfile["phoneNumber"]),
-            // Address
-            _buildInfoCard(
-                Icons.location_on, "Address", _vendorProfile["address"]),
-
-            const SizedBox(height: 20),
-
-            // Edit Profile Button
-            _buildActionButton(
-              icon: Icons.edit,
-              text: "Edit Profile",
-              color: Colors.blue,
-              onPressed: _editProfile,
-            ),
-
-            const SizedBox(height: 20),
-
-            // Sign Out Button
-            _buildActionButton(
-              icon: Icons.logout,
-              text: "Sign Out",
-              color: Colors.red,
-              onPressed: _signOut,
-            ),
-          ],
-        ),
-      ),
       bottomNavigationBar: VendorNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
@@ -240,7 +254,7 @@ class _VendorProfileState extends State<VendorProfile> {
           padding: const EdgeInsets.symmetric(vertical: 14),
           backgroundColor: color,
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
     );
