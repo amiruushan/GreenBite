@@ -5,6 +5,7 @@ import 'package:greenbite_frontend/screens/user_profile/models/user_profile_serv
 import 'package:greenbite_frontend/screens/user_profile/edit_profile_screen.dart';
 import 'package:greenbite_frontend/screens/vendor/vendor_home.dart'; // Import the VendorHome screen
 import 'package:greenbite_frontend/screens/green_bite_points/green_bite_points_screen.dart'; // Import Green Bite Points screen
+import 'package:greenbite_frontend/screens/user_profile/Customer_Orders.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -77,6 +78,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => GreenBitePointsScreen()),
+    );
+  }
+
+  void _goToCustomerOrderPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CustomerOrdersPage()),
     );
   }
 
@@ -175,6 +183,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             GreenBiteShopScreen()));
+                              },
+                            ),
+
+                            _buildSectionItem(
+                              icon: Icons.store,
+                              text: "Your Orders",
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            CustomerOrdersPage()));
                               },
                             ),
 
