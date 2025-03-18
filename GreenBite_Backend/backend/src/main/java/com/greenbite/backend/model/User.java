@@ -70,6 +70,8 @@ public class User implements UserDetails {
     @Column(name = "longitude")
     private Double longitude;
 
+    private int shopID;
+
     // Constructor for new user with required fields
     public User(String username, String email, String password, String firstName, String surname, String district, String address, String role) {
         this.username = username;
