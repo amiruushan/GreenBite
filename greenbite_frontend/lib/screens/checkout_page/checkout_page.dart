@@ -3,13 +3,12 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/screens/home_page/home_page.dart';
-import 'package:greenbite_frontend/service/auth_service';
-import 'package:provider/provider.dart';
+import 'package:greenbite_frontend/service/auth_service.dart';import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class CheckoutPage extends StatefulWidget {
-  const CheckoutPage({Key? key}) : super(key: key);
+  const CheckoutPage({super.key});
 
   @override
   _CheckoutPageState createState() => _CheckoutPageState();

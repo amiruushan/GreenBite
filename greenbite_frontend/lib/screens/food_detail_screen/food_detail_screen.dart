@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/config.dart';
+
+import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
+import 'package:greenbite_frontend/service/auth_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
 import 'package:greenbite_frontend/service/auth_service';
+
 import 'package:provider/provider.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'dart:convert';

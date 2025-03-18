@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/config.dart';
-import 'package:greenbite_frontend/screens/login/email_verification_screen.dart';
+import 'package:greenbite_frontend/screens/verification/email_verification_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
+
   @override
   _SignupScreenState createState() => _SignupScreenState();
 }
