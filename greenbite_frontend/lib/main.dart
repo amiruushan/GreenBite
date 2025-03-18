@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/screens/splash_screen/splash_screen.dart';
-import 'package:greenbite_frontend/screens/vendor/vendor_home.dart';
-import 'package:greenbite_frontend/screens/vendor/vendor_profile.dart';
 import 'package:provider/provider.dart';
 
 void main() {

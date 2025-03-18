@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/login/email_verification_screen.dart';
 import 'package:http/http.dart' as http;
-import 'package:lottie/lottie.dart'; // ✅ Animation support
 import 'dart:convert';
 
 class SignupScreen extends StatefulWidget {
@@ -249,7 +248,6 @@ class _CustomTextField extends StatelessWidget {
   final TextEditingController controller;
 
   const _CustomTextField({
-    super.key,
     required this.label,
     required this.controller,
     this.isPassword = false,
@@ -282,7 +280,6 @@ class _CustomButton extends StatelessWidget {
   final bool shadow;
 
   const _CustomButton({
-    super.key,
     required this.text,
     required this.onPressed,
     required this.backgroundColor,

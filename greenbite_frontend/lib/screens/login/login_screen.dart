@@ -4,7 +4,6 @@ import 'package:greenbite_frontend/screens/home_page/home_page.dart';
 import 'package:greenbite_frontend/screens/login/signup_screen.dart';
 import 'package:greenbite_frontend/service/auth_service';
 import 'package:http/http.dart' as http;
-import 'package:lottie/lottie.dart'; // ✅ Add Lottie for animations
 import 'dart:convert';
 
 class LoginScreen extends StatefulWidget {
@@ -197,7 +196,6 @@ class _CustomTextField extends StatelessWidget {
   final IconData? prefixIcon;
 
   const _CustomTextField({
-    super.key,
     required this.controller,
     required this.label,
     this.isPassword = false,
@@ -230,7 +228,6 @@ class _CustomButton extends StatelessWidget {
   final bool shadow;
 
   const _CustomButton({
-    super.key,
     required this.text,
     required this.onPressed,
     required this.backgroundColor,
