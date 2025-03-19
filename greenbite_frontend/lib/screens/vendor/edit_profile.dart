@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../../config.dart';
+
 class EditProfile extends StatefulWidget {
   final Map<String, dynamic> vendorProfile;
   final int vendorId;
@@ -65,7 +67,7 @@ class _EditProfileState extends State<EditProfile> {
 
     try {
       final response = await http.put(
-        Uri.parse('http://192.168.1.3:8080/api/shop/update'),
+        Uri.parse('${Config.apiBaseUrl}/api/shop/update'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },

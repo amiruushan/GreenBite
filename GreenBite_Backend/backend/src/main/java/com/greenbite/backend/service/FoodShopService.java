@@ -68,6 +68,20 @@ public class FoodShopService {
         }
     }
 
+    public FoodShop updateFoodShop(Long id, FoodShop updatedShop) {
+        return foodShopRepository.findById(id)
+                .map(existingShop -> {
+                    existingShop.setName(updatedShop.getName());
+                    existingShop.setAddress(updatedShop.getAddress());
+                    existingShop.setPhoneNumber(updatedShop.getPhoneNumber());
+                    existingShop.setEmail(updatedShop.getEmail());
+                    existingShop.setBusinessDescription(updatedShop.getBusinessDescription());
+                    existingShop.setPhoto(updatedShop.getPhoto());
+                    return foodShopRepository.save(existingShop);
+                })
+                .orElseThrow(() -> new RuntimeException("Shop not found"));
+    }
+
     // Earth's radius in kilometers
     private static final double EARTH_RADIUS = 6371;
 
