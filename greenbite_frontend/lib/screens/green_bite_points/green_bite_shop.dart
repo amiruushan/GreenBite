@@ -121,26 +121,29 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bool isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkMode
-          ? Colors.grey[900]
-          : Colors.green.shade50, // ✅ Adaptive background color
+      backgroundColor: theme.colorScheme.background, // ✅ Theme-based background
       appBar: AppBar(
         title: Text(
           "Green Bite Shop",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.green, // ✅ Keep green for AppBar
-        elevation: 0,
-        iconTheme: const IconThemeData(
-          color: Colors.white, // ✅ Keep white icons for AppBar
+        backgroundColor: Colors.transparent, // ✅ Transparent AppBar
+        elevation: 0, // ✅ Remove shadow
+        iconTheme: IconThemeData(
+          color: theme.colorScheme.onBackground, // ✅ Icons adapt to theme
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.inventory_2, color: Colors.white),
+            icon: Icon(
+              Icons.inventory_2,
+              color: theme.colorScheme.onBackground, // ✅ Action icons adapt
+            ),
             tooltip: "My Inventory",
             onPressed: () {
               Navigator.push(
@@ -151,32 +154,39 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
+            icon: Icon(
+              Icons.refresh,
+              color: theme.colorScheme.onBackground, // ✅ Action icons adapt
+            ),
             onPressed: _fetchPoints,
           ),
         ],
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator(color: Colors.green))
+          ? Center(
+              child: CircularProgressIndicator(
+                color: theme.colorScheme.primary, // ✅ Theme-based color
+              ),
+            )
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  _buildPointsCard(isDarkMode),
+                  _buildPointsCard(theme),
                   const SizedBox(height: 20),
-                  _buildDealsGrid(isDarkMode),
+                  _buildDealsGrid(theme),
                   const SizedBox(height: 20),
-                  _buildHowItWorksCard(isDarkMode),
+                  _buildHowItWorksCard(theme),
                 ],
               ),
             ),
     );
   }
 
-  Widget _buildPointsCard(bool isDarkMode) {
+  Widget _buildPointsCard(ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: _glassmorphismDecoration(isDarkMode),
+      decoration: _glassmorphismDecoration(theme),
       child: Column(
         children: [
           Text(
@@ -184,9 +194,7 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode
-                  ? Colors.white
-                  : Colors.black, // ✅ Adaptive text color
+              color: theme.colorScheme.onBackground, // ✅ Adaptive text color
             ),
           ),
           const SizedBox(height: 10),
@@ -195,7 +203,7 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: Colors.green, // ✅ Keep green for GBP text
+              color: theme.colorScheme.primary, // ✅ Theme-based color
             ),
           ),
         ],
@@ -233,7 +241,7 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
     }
   }
 
-  Widget _buildDealsGrid(bool isDarkMode) {
+  Widget _buildDealsGrid(ThemeData theme) {
     return Expanded(
       child: GridView.builder(
         itemCount: deals.length,
@@ -252,7 +260,7 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
             deal["cost"],
             deal["id"],
             deal["discount"],
-            isDarkMode,
+            theme,
           );
         },
       ),
@@ -260,12 +268,11 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
   }
 
   Widget _buildDealItem(String title, IconData icon, Color color, int cost,
-      int dealId, double discount, bool isDarkMode) {
+      int dealId, double discount, ThemeData theme) {
     return Card(
       elevation: 6,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color:
-          isDarkMode ? Colors.grey[850] : Colors.white, // ✅ Adaptive card color
+      color: theme.colorScheme.surface, // ✅ Theme-based card color
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -278,23 +285,23 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: isDarkMode
-                    ? Colors.white
-                    : Colors.black, // ✅ Adaptive text color
+                color: theme.colorScheme.onSurface, // ✅ Adaptive text color
               ),
             ),
             Text(
               "Discount: \$$discount",
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.green.shade700, // ✅ Keep green for discount text
+                color: theme.colorScheme.primary, // ✅ Theme-based color
               ),
             ),
             ElevatedButton(
               onPressed: () => _purchaseDeal(dealId, ""),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green, // ✅ Keep green for button
-                foregroundColor: Colors.white,
+                backgroundColor:
+                    theme.colorScheme.primary, // ✅ Theme-based color
+                foregroundColor:
+                    theme.colorScheme.onPrimary, // ✅ Theme-based color
               ),
               child: Text("Buy for $cost GBP"),
             ),
@@ -304,10 +311,10 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
     );
   }
 
-  Widget _buildHowItWorksCard(bool isDarkMode) {
+  Widget _buildHowItWorksCard(ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: _glassmorphismDecoration(isDarkMode),
+      decoration: _glassmorphismDecoration(theme),
       child: Column(
         children: [
           Text(
@@ -315,53 +322,51 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.green, // ✅ Keep green for title
+              color: theme.colorScheme.primary, // ✅ Theme-based color
             ),
           ),
           const SizedBox(height: 10),
+          _buildBulletPoint("Earn GBP by making eco-friendly purchases", theme),
           _buildBulletPoint(
-              "Earn GBP by making eco-friendly purchases", isDarkMode),
-          _buildBulletPoint(
-              "Use GBP to buy exclusive deals & discounts", isDarkMode),
-          _buildBulletPoint("Redeem your coupon at checkout", isDarkMode),
+              "Use GBP to buy exclusive deals & discounts", theme),
+          _buildBulletPoint("Redeem your coupon at checkout", theme),
         ],
       ),
     );
   }
 
-  Widget _buildBulletPoint(String text, bool isDarkMode) {
+  Widget _buildBulletPoint(String text, ThemeData theme) {
     return Row(
       children: [
         Icon(Icons.check_circle,
-            color: Colors.green, size: 18), // ✅ Keep green for bullet icon
+            color: theme.colorScheme.primary, size: 18), // ✅ Theme-based color
         const SizedBox(width: 8),
         Text(
           text,
           style: TextStyle(
             fontSize: 14,
-            color: isDarkMode
-                ? Colors.grey[400]
-                : Colors.grey[800], // ✅ Adaptive text color
+            color: theme.colorScheme.onSurface
+                .withOpacity(0.7), // ✅ Adaptive text color
           ),
         ),
       ],
     );
   }
 
-  BoxDecoration _glassmorphismDecoration(bool isDarkMode) {
+  BoxDecoration _glassmorphismDecoration(ThemeData theme) {
     return BoxDecoration(
       borderRadius: BorderRadius.circular(20),
       gradient: LinearGradient(
         colors: [
-          isDarkMode ? Colors.grey[850]! : Colors.white.withOpacity(0.6),
-          isDarkMode ? Colors.grey[900]! : Colors.white.withOpacity(0.3),
+          theme.colorScheme.surface.withOpacity(0.6),
+          theme.colorScheme.surface.withOpacity(0.3),
         ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
       boxShadow: [
         BoxShadow(
-          color: Colors.green.withOpacity(0.1),
+          color: theme.colorScheme.primary.withOpacity(0.1),
           blurRadius: 10,
           spreadRadius: 2,
         ),

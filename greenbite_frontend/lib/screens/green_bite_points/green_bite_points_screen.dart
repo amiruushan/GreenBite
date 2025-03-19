@@ -70,55 +70,63 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bool isDarkMode = theme.brightness == Brightness.dark;
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     double progress = (normalPoints / npGoal).clamp(0.0, 1.0);
 
     return Scaffold(
-      backgroundColor: isDarkMode
-          ? Colors.grey[900]
-          : Colors.green.shade50, // ✅ Adaptive background color
+      backgroundColor: theme.colorScheme.background, // ✅ Theme-based background
       appBar: AppBar(
         title: Text(
           "Green Bite Points",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.green, // ✅ Keep green for AppBar
-        elevation: 0,
-        iconTheme: const IconThemeData(
-          color: Colors.white, // ✅ Keep white icons for AppBar
+        backgroundColor: Colors.transparent, // ✅ Transparent AppBar
+        elevation: 0, // ✅ Remove shadow
+        iconTheme: IconThemeData(
+          color: theme.colorScheme.onBackground, // ✅ Icons adapt to theme
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
+            icon: Icon(
+              Icons.refresh,
+              color: theme.colorScheme.onBackground, // ✅ Action icons adapt
+            ),
             onPressed: _fetchPoints,
           ),
         ],
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator(color: Colors.green))
+          ? Center(
+              child: CircularProgressIndicator(
+                color: theme.colorScheme.primary, // ✅ Theme-based color
+              ),
+            )
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _buildTitle(isDarkMode),
+                  _buildTitle(theme),
                   const SizedBox(height: 20),
-                  _buildProgressCard(progress, isDarkMode),
+                  _buildProgressCard(progress, theme),
                   const SizedBox(height: 20),
-                  _buildGBPCard(isDarkMode),
+                  _buildGBPCard(theme),
                   const SizedBox(height: 30),
-                  _buildShopButton(),
+                  _buildShopButton(theme),
                   const SizedBox(height: 30),
-                  _buildHowToEarnCard(isDarkMode),
+                  _buildHowToEarnCard(theme),
                 ],
               ),
             ),
     );
   }
 
-  Widget _buildTitle(bool isDarkMode) {
+  Widget _buildTitle(ThemeData theme) {
     return Column(
       children: [
         Text(
@@ -127,9 +135,7 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: isDarkMode
-                ? Colors.white
-                : Colors.green.shade800, // ✅ Adaptive text color
+            color: theme.colorScheme.onBackground, // ✅ Adaptive text color
           ),
         ),
         const SizedBox(height: 5),
@@ -138,19 +144,18 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14,
-            color: isDarkMode
-                ? Colors.grey[400]
-                : Colors.grey[700], // ✅ Adaptive text color
+            color: theme.colorScheme.onSurface
+                .withOpacity(0.7), // ✅ Adaptive text color
           ),
         ),
       ],
     );
   }
 
-  Widget _buildProgressCard(double progress, bool isDarkMode) {
+  Widget _buildProgressCard(double progress, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: _glassmorphismDecoration(isDarkMode),
+      decoration: _glassmorphismDecoration(theme),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -167,7 +172,7 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20.0,
-                    color: Colors.green, // ✅ Keep green for progress text
+                    color: theme.colorScheme.primary, // ✅ Theme-based color
                   ),
                 ),
                 const SizedBox(height: 5),
@@ -175,17 +180,15 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
                   "Next: 1 GBP",
                   style: TextStyle(
                     fontSize: 14,
-                    color: isDarkMode
-                        ? Colors.grey[400]
-                        : Colors.grey[700], // ✅ Adaptive text color
+                    color: theme.colorScheme.onSurface
+                        .withOpacity(0.7), // ✅ Adaptive text color
                   ),
                 ),
               ],
             ),
-            progressColor: Colors.green, // ✅ Keep green for progress bar
-            backgroundColor: isDarkMode
-                ? Colors.grey[800]!
-                : Colors.grey[300]!, // ✅ Adaptive background color
+            progressColor: theme.colorScheme.primary, // ✅ Theme-based color
+            backgroundColor:
+                theme.colorScheme.surfaceVariant, // ✅ Theme-based color
             circularStrokeCap: CircularStrokeCap.round,
           ),
           const SizedBox(height: 15),
@@ -194,9 +197,7 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: isDarkMode
-                  ? Colors.white
-                  : Colors.green.shade800, // ✅ Adaptive text color
+              color: theme.colorScheme.onBackground, // ✅ Adaptive text color
             ),
           ),
         ],
@@ -204,10 +205,10 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
     );
   }
 
-  Widget _buildGBPCard(bool isDarkMode) {
+  Widget _buildGBPCard(ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: _glassmorphismDecoration(isDarkMode),
+      decoration: _glassmorphismDecoration(theme),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -216,9 +217,8 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: isDarkMode
-                  ? Colors.grey[400]
-                  : Colors.grey[700], // ✅ Adaptive text color
+              color: theme.colorScheme.onSurface
+                  .withOpacity(0.7), // ✅ Adaptive text color
             ),
           ),
           const SizedBox(height: 10),
@@ -227,7 +227,7 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: Colors.green, // ✅ Keep green for GBP text
+              color: theme.colorScheme.primary, // ✅ Theme-based color
             ),
           ),
         ],
@@ -235,13 +235,20 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
     );
   }
 
-  Widget _buildShopButton() {
+  Widget _buildShopButton(ThemeData theme) {
     return ElevatedButton.icon(
-      icon: const Icon(Icons.store, color: Colors.white),
-      label: const Text("Go to Green Bite Shop"),
+      icon: Icon(
+        Icons.store,
+        color: theme.colorScheme.onPrimary, // ✅ Theme-based color
+      ),
+      label: Text(
+        "Go to Green Bite Shop",
+        style: TextStyle(
+          color: theme.colorScheme.onPrimary, // ✅ Theme-based color
+        ),
+      ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.green, // ✅ Keep green for button
-        foregroundColor: Colors.white,
+        backgroundColor: theme.colorScheme.primary, // ✅ Theme-based color
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
         elevation: 5,
@@ -255,10 +262,10 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
     );
   }
 
-  Widget _buildHowToEarnCard(bool isDarkMode) {
+  Widget _buildHowToEarnCard(ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: _glassmorphismDecoration(isDarkMode),
+      decoration: _glassmorphismDecoration(theme),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -267,37 +274,37 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode
-                  ? Colors.white
-                  : Colors.green.shade800, // ✅ Adaptive text color
+              color: theme.colorScheme.onBackground, // ✅ Adaptive text color
             ),
           ),
           const SizedBox(height: 10),
-          _buildBulletPoint("Make eco-friendly purchases", isDarkMode),
-          _buildBulletPoint("Complete daily challenges", isDarkMode),
-          _buildBulletPoint("Refer friends & earn rewards", isDarkMode),
-          _buildBulletPoint("Redeem exclusive Green Bite deals", isDarkMode),
+          _buildBulletPoint("Make eco-friendly purchases", theme),
+          _buildBulletPoint("Complete daily challenges", theme),
+          _buildBulletPoint("Refer friends & earn rewards", theme),
+          _buildBulletPoint("Redeem exclusive Green Bite deals", theme),
         ],
       ),
     );
   }
 
-  Widget _buildBulletPoint(String text, bool isDarkMode) {
+  Widget _buildBulletPoint(String text, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.check_circle,
-              color: Colors.green, size: 18), // ✅ Keep green for bullet icon
+          Icon(
+            Icons.check_circle,
+            color: theme.colorScheme.primary, // ✅ Theme-based color
+            size: 18,
+          ),
           const SizedBox(width: 8),
           Text(
             text,
             style: TextStyle(
               fontSize: 14,
-              color: isDarkMode
-                  ? Colors.grey[400]
-                  : Colors.grey[800], // ✅ Adaptive text color
+              color: theme.colorScheme.onSurface
+                  .withOpacity(0.7), // ✅ Adaptive text color
             ),
           ),
         ],
@@ -305,20 +312,20 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
     );
   }
 
-  BoxDecoration _glassmorphismDecoration(bool isDarkMode) {
+  BoxDecoration _glassmorphismDecoration(ThemeData theme) {
     return BoxDecoration(
       borderRadius: BorderRadius.circular(20),
       gradient: LinearGradient(
         colors: [
-          isDarkMode ? Colors.grey[850]! : Colors.white.withOpacity(0.6),
-          isDarkMode ? Colors.grey[900]! : Colors.white.withOpacity(0.3),
+          theme.colorScheme.surface.withOpacity(0.6),
+          theme.colorScheme.surface.withOpacity(0.3),
         ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
       boxShadow: [
         BoxShadow(
-          color: Colors.green.withOpacity(0.1),
+          color: theme.colorScheme.primary.withOpacity(0.1),
           blurRadius: 15,
           spreadRadius: 2,
         ),

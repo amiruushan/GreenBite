@@ -65,8 +65,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.colorScheme.background, // ✅ Theme-based background
       body: Stack(
         children: [
           // PageView for onboarding screens
@@ -94,10 +97,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     // Title
                     Text(
                       onboardingData[index]["title"]!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: theme
+                            .colorScheme.onBackground, // ✅ Adaptive text color
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -109,7 +113,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         onboardingData[index]["description"]!,
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.grey.shade600,
+                          color: theme.colorScheme.onSurface
+                              .withOpacity(0.8), // ✅ Adaptive text color
                           height: 1.5,
                         ),
                         textAlign: TextAlign.center,
@@ -131,7 +136,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 "Skip",
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey.shade700,
+                  color:
+                      theme.colorScheme.onBackground, // ✅ Adaptive text color
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -154,8 +160,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   height: 8,
                   decoration: BoxDecoration(
                     color: _currentIndex == index
-                        ? Colors.green
-                        : Colors.grey.shade300,
+                        ? theme.colorScheme.primary // ✅ Adaptive color
+                        : theme.colorScheme.onSurface
+                            .withOpacity(0.3), // ✅ Adaptive color
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -171,7 +178,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: ElevatedButton(
               onPressed: _nextPage,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: theme.colorScheme.primary, // ✅ Adaptive color
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -181,10 +188,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 _currentIndex == onboardingData.length - 1
                     ? "Get Started"
                     : "Next",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: theme.colorScheme.onPrimary, // ✅ Adaptive text color
                 ),
               ),
             ),

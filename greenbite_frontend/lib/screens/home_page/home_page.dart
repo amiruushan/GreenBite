@@ -4,7 +4,6 @@ import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
 import 'package:greenbite_frontend/screens/food_detail_screen/food_detail_screen.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/shop_tab.dart';
-import 'package:greenbite_frontend/screens/home_page/widgets/update_location_button.dart';
 
 import 'package:greenbite_frontend/service/auth_service';
 import 'package:greenbite_frontend/service/location_service.dart';

@@ -115,8 +115,11 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white, // Clean background
+      backgroundColor: theme.colorScheme.background, // ✅ Theme-based background
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -132,14 +135,18 @@ class _SignupScreenState extends State<SignupScreen> {
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Colors.green,
+                color: theme.colorScheme.primary, // ✅ Theme-based color
               ),
             ),
             const SizedBox(height: 5),
             Text(
               "Sign up to start ordering delicious meals.",
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+              style: TextStyle(
+                color: theme.colorScheme.onSurface
+                    .withOpacity(0.7), // ✅ Theme-based color
+                fontSize: 16,
+              ),
             ),
             const SizedBox(height: 25),
 
@@ -192,11 +199,21 @@ class _SignupScreenState extends State<SignupScreen> {
                 labelText: "District",
                 border:
                     OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                filled: true,
+                fillColor: isDarkMode
+                    ? Colors.grey[800]
+                    : Colors.grey[200], // ✅ Adaptive color
               ),
               items: ["Colombo", "Galle", "Gampaha", "Ratnapura"]
                   .map((district) => DropdownMenuItem(
                         value: district,
-                        child: Text(district),
+                        child: Text(
+                          district,
+                          style: TextStyle(
+                            color: theme
+                                .colorScheme.onSurface, // ✅ Theme-based color
+                          ),
+                        ),
                       ))
                   .toList(),
               onChanged: (value) {
@@ -217,9 +234,19 @@ class _SignupScreenState extends State<SignupScreen> {
                       termsAccepted = value!;
                     });
                   },
+                  fillColor: MaterialStateProperty.resolveWith<Color>(
+                    (states) =>
+                        theme.colorScheme.primary, // ✅ Theme-based color
+                  ),
                 ),
-                const Expanded(
-                    child: Text("I accept all terms and conditions")),
+                Expanded(
+                  child: Text(
+                    "I accept all terms and conditions",
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface, // ✅ Theme-based color
+                    ),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 15),
@@ -230,8 +257,10 @@ class _SignupScreenState extends State<SignupScreen> {
                 : _CustomButton(
                     text: "Continue",
                     onPressed: _validateAndProceed,
-                    backgroundColor: Colors.green,
-                    textColor: Colors.white,
+                    backgroundColor:
+                        theme.colorScheme.primary, // ✅ Theme-based color
+                    textColor:
+                        theme.colorScheme.onPrimary, // ✅ Theme-based color
                     shadow: true,
                   ),
             const SizedBox(height: 15),
@@ -258,16 +287,28 @@ class _CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return TextField(
       controller: controller,
       obscureText: isPassword,
+      style:
+          TextStyle(color: theme.colorScheme.onSurface), // ✅ Theme-based color
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon:
-            prefixIcon != null ? Icon(prefixIcon, color: Colors.green) : null,
+        labelStyle: TextStyle(
+            color: theme.colorScheme.onSurface
+                .withOpacity(0.7)), // ✅ Theme-based color
+        prefixIcon: prefixIcon != null
+            ? Icon(prefixIcon,
+                color: theme.colorScheme.primary) // ✅ Theme-based color
+            : null,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: isDarkMode
+            ? Colors.grey[800]
+            : Colors.grey[200], // ✅ Adaptive color
       ),
     );
   }
@@ -304,10 +345,10 @@ class _CustomButton extends StatelessWidget {
           elevation: shadow ? 5 : 0,
         ),
         child: Text(
-          text, // Display the text here
+          text,
           style: TextStyle(
-            fontSize: 16, // Adjust the font size if needed
-            fontWeight: FontWeight.bold, // Make it bold if necessary
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
