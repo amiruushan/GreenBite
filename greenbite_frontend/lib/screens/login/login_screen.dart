@@ -3,7 +3,7 @@ import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/home_page/home_page.dart';
 import 'package:greenbite_frontend/screens/login/signup_screen.dart';
 import 'package:greenbite_frontend/screens/verification/forgot_password.dart';
-import 'package:greenbite_frontend/service/auth_service.dart';
+import 'package:greenbite_frontend/service/auth_service';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -150,8 +150,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ForgotPasswordScreen(
-                        email: emailController.text),
+                    builder: (context) =>
+                        ForgotPasswordScreen(email: emailController.text),
                   ),
                 );
               },
