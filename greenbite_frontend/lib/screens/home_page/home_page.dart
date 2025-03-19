@@ -5,7 +5,6 @@ import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
 import 'package:greenbite_frontend/screens/food_detail_screen/food_detail_screen.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/shop_tab.dart';
 
-import 'package:greenbite_frontend/service/auth_service';
 import 'package:greenbite_frontend/service/location_service.dart';
 
 import 'package:http/http.dart' as http;
