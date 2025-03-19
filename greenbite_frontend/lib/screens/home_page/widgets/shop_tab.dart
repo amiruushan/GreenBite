@@ -5,7 +5,6 @@ import 'package:greenbite_frontend/screens/home_page/widgets/shop_details_page.d
 
 import 'package:greenbite_frontend/service/auth_service';
 
-import 'package:greenbite_frontend/service/auth_service';
 import 'package:greenbite_frontend/service/location_service.dart';
 
 import 'dart:convert'; // For JSON parsing
