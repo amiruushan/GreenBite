@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/config.dart';
+
 import 'package:greenbite_frontend/service/auth_service.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
@@ -105,9 +107,24 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Favorites"),
+        title: Text(
+          "Green Bite",
+          style: TextStyle(
+            color: Theme.of(context)
+                .colorScheme
+                .onBackground, // ✅ Adaptive text color
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.transparent, // ✅ Transparent background
+        elevation: 0, // ✅ No shadow for a modern UI
+        iconTheme: IconThemeData(
+          color: Theme.of(context)
+              .colorScheme
+              .onBackground, // ✅ Icons adapt to theme
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.shopping_cart),
@@ -117,6 +134,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 MaterialPageRoute(builder: (context) => const CartScreen()),
               );
             },
+            color: Theme.of(context)
+                .colorScheme
+                .onBackground, // ✅ Action icons adapt
           ),
         ],
       ),

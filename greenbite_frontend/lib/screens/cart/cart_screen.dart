@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/screens/checkout_page/checkout_page.dart';
+
 import 'package:greenbite_frontend/service/auth_service.dart';
+
 import 'package:http/http.dart' as http;
 
 import 'dart:convert';
@@ -120,6 +122,8 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
     final cartItems = cartProvider.cartItems;
+    final theme = Theme.of(context);
+    final bool isDarkMode = theme.brightness == Brightness.dark;
 
     double totalPrice = cartProvider.totalPrice();
     double finalPrice = (totalPrice - discountAmount).clamp(0, double.infinity);
@@ -132,12 +136,21 @@ class _CartScreenState extends State<CartScreen> {
         ),
         centerTitle: true,
         elevation: 0,
+        backgroundColor: Colors.transparent, // ✅ Transparent AppBar
+        iconTheme: IconThemeData(
+          color: theme.colorScheme.onBackground, // ✅ Adaptive icon color
+        ),
       ),
       body: cartItems.isEmpty
-          ? const Center(
+          ? Center(
               child: Text(
                 "Your cart is empty!",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color:
+                      theme.colorScheme.onBackground, // ✅ Adaptive text color
+                ),
               ),
             )
           : Column(
@@ -154,6 +167,9 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                         elevation: 4,
                         margin: const EdgeInsets.symmetric(vertical: 8),
+                        color: isDarkMode
+                            ? Colors.grey[900]
+                            : Colors.white, // ✅ Adaptive card color
                         child: Padding(
                           padding: const EdgeInsets.all(12.0),
                           child: Row(
@@ -176,9 +192,11 @@ class _CartScreenState extends State<CartScreen> {
                                   children: [
                                     Text(
                                       item.name,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
+                                        color: theme.colorScheme
+                                            .onBackground, // ✅ Adaptive text color
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -186,9 +204,12 @@ class _CartScreenState extends State<CartScreen> {
                                     const SizedBox(height: 5),
                                     Text(
                                       item.restaurant,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 14,
-                                        color: Colors.grey,
+                                        color: isDarkMode
+                                            ? Colors.grey[400]
+                                            : Colors.grey[
+                                                700], // ✅ Adaptive text color
                                       ),
                                     ),
                                     const SizedBox(height: 5),
@@ -197,7 +218,8 @@ class _CartScreenState extends State<CartScreen> {
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
-                                        color: Colors.green,
+                                        color: Colors
+                                            .green, // ✅ Keep green for price
                                       ),
                                     ),
                                   ],
@@ -216,7 +238,8 @@ class _CartScreenState extends State<CartScreen> {
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.green,
+                                    color: Colors
+                                        .green, // ✅ Keep green for quantity
                                   ),
                                 ),
                               ),
@@ -241,14 +264,25 @@ class _CartScreenState extends State<CartScreen> {
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: DropdownButton<String>(
-                      hint: const Text("Select Coupon"),
+                      hint: Text(
+                        "Select Coupon",
+                        style: TextStyle(
+                          color: theme.colorScheme
+                              .onBackground, // ✅ Adaptive text color
+                        ),
+                      ),
                       value: selectedCoupon,
                       items: inventoryCoupons
                           .map<DropdownMenuItem<String>>((coupon) {
                         return DropdownMenuItem<String>(
                           value: coupon['coupon_code'],
                           child: Text(
-                              "${coupon['deal_name']} - \$${coupon['discount']}"),
+                            "${coupon['deal_name']} - \$${coupon['discount']}",
+                            style: TextStyle(
+                              color: theme.colorScheme
+                                  .onBackground, // ✅ Adaptive text color
+                            ),
+                          ),
                         );
                       }).toList(),
                       onChanged: (couponCode) {
@@ -264,7 +298,9 @@ class _CartScreenState extends State<CartScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDarkMode
+                        ? Colors.grey[900]
+                        : Colors.white, // ✅ Adaptive background color
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
@@ -279,19 +315,22 @@ class _CartScreenState extends State<CartScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             "Total:",
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
+                              color: theme.colorScheme
+                                  .onBackground, // ✅ Adaptive text color
                             ),
                           ),
                           Text(
                             "\$${totalPrice.toStringAsFixed(2)}",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black54,
+                              color: theme.colorScheme
+                                  .onBackground, // ✅ Adaptive text color
                             ),
                           ),
                         ],
@@ -306,7 +345,7 @@ class _CartScreenState extends State<CartScreen> {
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.red,
+                                color: Colors.red, // ✅ Keep red for discount
                               ),
                             ),
                             Text(
@@ -314,7 +353,7 @@ class _CartScreenState extends State<CartScreen> {
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.red,
+                                color: Colors.red, // ✅ Keep red for discount
                               ),
                             ),
                           ],
@@ -324,11 +363,13 @@ class _CartScreenState extends State<CartScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             "Final Total:",
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
+                              color: theme.colorScheme
+                                  .onBackground, // ✅ Adaptive text color
                             ),
                           ),
                           Text(
@@ -336,7 +377,8 @@ class _CartScreenState extends State<CartScreen> {
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: Colors.green,
+                              color:
+                                  Colors.green, // ✅ Keep green for final price
                             ),
                           ),
                         ],
@@ -355,7 +397,8 @@ class _CartScreenState extends State<CartScreen> {
                           },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            backgroundColor: Colors.green,
+                            backgroundColor:
+                                Colors.green, // ✅ Keep green for button
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),

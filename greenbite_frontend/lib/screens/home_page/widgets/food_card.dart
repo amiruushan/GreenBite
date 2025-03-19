@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/food_detail_screen/food_detail_screen.dart';
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
-// Import the detail screen
 
 class FoodCard extends StatelessWidget {
   final FoodItem foodItem;
@@ -17,9 +16,11 @@ class FoodCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bool isDarkMode = theme.brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: () {
-        // Navigate to the detail screen when the card is tapped
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -29,13 +30,17 @@ class FoodCard extends StatelessWidget {
       },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 4,
+        elevation: 0,
         margin: EdgeInsets.zero,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ClipRRect(
+        color: isDarkMode ? Colors.grey[950] : Colors.grey[100],
+        child: Padding(
+          padding:
+              const EdgeInsets.all(8.0), // ✅ Reduce padding for tighter layout
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min, // ✅ Ensure minimal height
+            children: [
+              ClipRRect(
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(12)),
                 child: Image.network(
@@ -45,62 +50,62 @@ class FoodCard extends StatelessWidget {
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      color: Colors.grey[200],
-                      child: const Icon(Icons.broken_image, color: Colors.grey),
+                      height: 120,
+                      color: theme.colorScheme.surface,
+                      child: Icon(
+                        Icons.broken_image,
+                        color: theme.colorScheme.onSurface,
+                      ),
                     );
                   },
-                )),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
+                ),
+              ),
+              const SizedBox(height: 8), // ✅ Less space between image & text
+              Text(
+                foodItem.name,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: isDarkMode
+                      ? Colors.white
+                      : Colors.black, // ✅ Dynamic color
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16, // ✅ Make font consistent
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                foodItem.restaurant,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: isDarkMode
+                      ? Colors.grey[400]
+                      : Colors.grey[700], // ✅ Adjust contrast
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4), // ✅ Reduce unnecessary space
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          foodItem.name,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          foodItem.restaurant,
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 14,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          "\$${foodItem.price.toStringAsFixed(2)}",
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.green,
-                          ),
-                        ),
-                      ],
+                  Text(
+                    "\$${foodItem.price.toStringAsFixed(2)}",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: theme.colorScheme.primary,
                     ),
                   ),
                   IconButton(
                     icon: Icon(
                       isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: isFavorite ? Colors.red : Colors.grey,
+                      color: isFavorite ? Colors.red : Colors.grey[400],
                     ),
                     onPressed: onFavoritePressed,
                   ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

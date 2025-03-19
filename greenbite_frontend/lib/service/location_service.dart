@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
-import 'package:greenbite_frontend/service/auth_service.dart';
+import 'package:greenbite_frontend/service/auth_service';
 import 'package:http/http.dart' as http;
 import 'package:greenbite_frontend/config.dart';
 

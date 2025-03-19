@@ -3,7 +3,9 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/screens/home_page/home_page.dart';
+
 import 'package:greenbite_frontend/service/auth_service.dart';
+
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -52,7 +54,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
       // Confirm order in backend
       final orderResponse = await http.post(
-        Uri.parse("${Config.apiBaseUrl}0/api/orders/confirm"),
+        Uri.parse("${Config.apiBaseUrl}/api/orders/confirm"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token"
@@ -146,16 +148,24 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bool isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Checkout"),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 30,
-          fontWeight: FontWeight.bold,
+        title: const Text(
+          "Checkout",
+          style: TextStyle(
+            color: Colors.white, // ✅ Keep white text for AppBar
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.green, // ✅ Keep green for AppBar
+        iconTheme: const IconThemeData(
+          color: Colors.white, // ✅ Keep white icons for AppBar
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -184,14 +194,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
               const SizedBox(height: 20),
 
               // 💳 Choose Payment Method
-              const Text(
+              Text(
                 "Choose Payment Method",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color:
+                      theme.colorScheme.onBackground, // ✅ Adaptive text color
+                ),
               ),
               const SizedBox(height: 15),
 
               // Card Payment Option
-
               const SizedBox(height: 15),
 
               // Stripe Payment Option
@@ -222,7 +236,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     _confirmOrder(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor: Colors.green, // ✅ Keep green for button
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -241,14 +255,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-  // 🛍 Order Summary Widget
+// 🛍 Order Summary Widget
   Widget _buildOrderSummary() {
     final cartProvider = Provider.of<CartProvider>(context);
+    final theme = Theme.of(context);
+    final bool isDarkMode = theme.brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode
+            ? Colors.grey[900]
+            : Colors.white, // ✅ Adaptive background color
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -262,9 +280,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Order Summary",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+            ),
           ),
           const SizedBox(height: 10),
           _buildSummaryRow(
@@ -278,8 +300,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-  // 🧾 Order Summary Row Widget
+// 🧾 Order Summary Row Widget
   Widget _buildSummaryRow(String label, String amount, {bool isTotal = false}) {
+    final theme = Theme.of(context);
+    final bool isDarkMode = theme.brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -290,6 +315,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             style: TextStyle(
               fontSize: isTotal ? 18 : 16,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+              color: theme.colorScheme.onBackground, // ✅ Adaptive text color
             ),
           ),
           Text(
@@ -297,7 +323,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
             style: TextStyle(
               fontSize: isTotal ? 18 : 16,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-              color: isTotal ? Colors.green : Colors.black,
+              color: isTotal
+                  ? Colors.green
+                  : theme.colorScheme.onBackground, // ✅ Adaptive text color
             ),
           ),
         ],
@@ -305,19 +333,26 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-  // 💳 Payment Option Tile Widget
+// 💳 Payment Option Tile Widget
   Widget _buildOptionTile({
     required String title,
     required IconData icon,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
+    final bool isDarkMode = theme.brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.green.withOpacity(0.1) : Colors.white,
+          color: isSelected
+              ? Colors.green.withOpacity(0.1)
+              : isDarkMode
+                  ? Colors.grey[900]
+                  : Colors.white, // ✅ Adaptive background color
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? Colors.green : Colors.grey.shade300,
@@ -334,15 +369,20 @@ class _CheckoutPageState extends State<CheckoutPage> {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 28, color: Colors.green),
+            Icon(icon, size: 28, color: Colors.green), // ✅ Keep green icon
             const SizedBox(width: 15),
             Text(
               title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+              ),
             ),
             const Spacer(),
             if (isSelected)
-              const Icon(Icons.check_circle, color: Colors.green, size: 26),
+              const Icon(Icons.check_circle,
+                  color: Colors.green, size: 26), // ✅ Keep green checkmark
           ],
         ),
       ),

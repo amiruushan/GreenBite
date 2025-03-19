@@ -3,7 +3,7 @@ import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/home_page/home_page.dart';
 import 'package:greenbite_frontend/screens/login/signup_screen.dart';
 import 'package:greenbite_frontend/screens/verification/forgot_password.dart';
-import 'package:greenbite_frontend/service/auth_service.dart';
+import 'package:greenbite_frontend/service/auth_service';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -52,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => const HomePage()),
       );
     } else {
       print("Login Failed: ${response.body}");
@@ -87,14 +87,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bool isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white, // Clean background
+      backgroundColor: isDarkMode
+          ? Colors.grey[900]
+          : Colors.white, // ✅ Adaptive background color
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 40), // Top spacin
+            const SizedBox(height: 40), // Top spacing
 
             const SizedBox(height: 10),
 
@@ -104,14 +109,21 @@ class _LoginScreenState extends State<LoginScreen> {
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Colors.green,
+                color: isDarkMode
+                    ? Colors.white
+                    : Colors.green, // ✅ Adaptive text color
               ),
             ),
             const SizedBox(height: 5),
             Text(
               "Login to your account and explore delicious meals.",
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+              style: TextStyle(
+                color: isDarkMode
+                    ? Colors.grey[400]
+                    : Colors.grey[600], // ✅ Adaptive text color
+                fontSize: 16,
+              ),
             ),
             const SizedBox(height: 30),
 
@@ -119,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
                 child: Image.network(
-                  "https://assets.bonappetit.com/photos/63ff8b59e1f4511cb9dc2df6/16:9/w_2560%2Cc_limit/The%2520State%2520of%2520New%2520American%2520Restaurants.jpg",
+                  "https://hungryhippo.us/wp-content/uploads/2024/03/cropped-The20of20American20Restaurants.webp",
                   height: 150,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -133,6 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
               controller: emailController,
               label: "Email",
               prefixIcon: Icons.email_outlined,
+              isDarkMode: isDarkMode,
             ),
             const SizedBox(height: 15),
 
@@ -142,6 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
               label: "Password",
               isPassword: true,
               prefixIcon: Icons.lock_outline,
+              isDarkMode: isDarkMode,
             ),
             const SizedBox(height: 25),
 
@@ -155,9 +169,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 );
               },
-              child: const Text(
+              child: Text(
                 "Forgot Password?",
-                style: TextStyle(color: Colors.blue, fontSize: 16),
+                style: TextStyle(
+                  color: isDarkMode
+                      ? Colors.blue[300]
+                      : Colors.blue, // ✅ Adaptive text color
+                  fontSize: 16,
+                ),
               ),
             ),
 
@@ -167,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 : _CustomButton(
                     text: "Continue",
                     onPressed: login,
-                    backgroundColor: Colors.green,
+                    backgroundColor: Colors.green, // ✅ Keep green for button
                     textColor: Colors.white,
                     shadow: true,
                   ),
@@ -177,21 +196,27 @@ class _LoginScreenState extends State<LoginScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   "New member? ",
-                  style: TextStyle(color: Colors.black87),
+                  style: TextStyle(
+                    color: isDarkMode
+                        ? Colors.grey[400]
+                        : Colors.black87, // ✅ Adaptive text color
+                  ),
                 ),
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SignupScreen()));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SignupScreen(),
+                      ),
+                    );
                   },
-                  child: const Text(
+                  child: Text(
                     "Register",
                     style: TextStyle(
-                      color: Colors.green,
+                      color: Colors.green, // ✅ Keep green for register link
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -213,12 +238,14 @@ class _CustomTextField extends StatelessWidget {
   final String label;
   final bool isPassword;
   final IconData? prefixIcon;
+  final bool isDarkMode;
 
   const _CustomTextField({
     required this.controller,
     required this.label,
     this.isPassword = false,
     this.prefixIcon,
+    required this.isDarkMode,
   });
 
   @override
@@ -228,11 +255,30 @@ class _CustomTextField extends StatelessWidget {
       obscureText: isPassword,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon:
-            prefixIcon != null ? Icon(prefixIcon, color: Colors.green) : null,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        labelStyle: TextStyle(
+          color: isDarkMode
+              ? Colors.grey[400]
+              : Colors.grey[700], // ✅ Adaptive label color
+        ),
+        prefixIcon: prefixIcon != null
+            ? Icon(prefixIcon, color: Colors.green) // ✅ Keep green for icon
+            : null,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: isDarkMode
+                ? Colors.grey[600]!
+                : Colors.grey[400]!, // ✅ Adaptive border color
+          ),
+        ),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: isDarkMode
+            ? Colors.grey[800]
+            : Colors.grey[100], // ✅ Adaptive background color
+      ),
+      style: TextStyle(
+        color:
+            isDarkMode ? Colors.white : Colors.black, // ✅ Adaptive text color
       ),
     );
   }

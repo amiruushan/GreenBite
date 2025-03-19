@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/config.dart';
-import 'package:greenbite_frontend/service/auth_service.dart';
+import 'package:greenbite_frontend/service/auth_service';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -102,27 +102,51 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.green.shade50,
+      backgroundColor: theme.colorScheme.background, // ✅ Theme-based background
       appBar: AppBar(
-        title:
-            Text("My Inventory", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          "My Inventory",
+          style: TextStyle(
+            color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.green,
-        elevation: 0,
+        backgroundColor: Colors.transparent, // ✅ Transparent AppBar
+        elevation: 0, // ✅ Remove shadow
+        iconTheme: IconThemeData(
+          color: theme.colorScheme.onBackground, // ✅ Icons adapt to theme
+        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh, color: Colors.white),
+            icon: Icon(
+              Icons.refresh,
+              color: theme.colorScheme.onBackground, // ✅ Action icons adapt
+            ),
             onPressed: _fetchInventory,
           ),
         ],
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator(color: Colors.green))
+          ? Center(
+              child: CircularProgressIndicator(
+                color: theme.colorScheme.primary, // ✅ Theme-based color
+              ),
+            )
           : inventoryItems.isEmpty
               ? Center(
-                  child: Text("No items in inventory",
-                      style: TextStyle(fontSize: 18)))
+                  child: Text(
+                    "No items in inventory",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: theme.colorScheme.onSurface, // ✅ Theme-based color
+                    ),
+                  ),
+                )
               : ListView.builder(
                   padding: const EdgeInsets.all(16.0),
                   itemCount: inventoryItems.length,
@@ -142,22 +166,51 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
   Widget _buildInventoryItem(String dealName, String couponCode, bool redeemed,
       String icon, String color) {
+    final theme = Theme.of(context);
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: theme.colorScheme.surface, // ✅ Theme-based card background
       child: ListTile(
-        leading: Icon(_getIcon(icon), color: _getColor(color), size: 30),
-        title: Text(dealName,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        subtitle: Text("Code: $couponCode", style: TextStyle(fontSize: 14)),
+        leading: Icon(
+          _getIcon(icon),
+          color: _getColor(color),
+          size: 30,
+        ),
+        title: Text(
+          dealName,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.onSurface, // ✅ Theme-based text color
+          ),
+        ),
+        subtitle: Text(
+          "Code: $couponCode",
+          style: TextStyle(
+            fontSize: 14,
+            color: theme.colorScheme.onSurface
+                .withOpacity(0.7), // ✅ Theme-based text color
+          ),
+        ),
         trailing: redeemed
-            ? Icon(Icons.check_circle, color: Colors.green)
+            ? Icon(
+                Icons.check_circle,
+                color: theme.colorScheme.primary, // ✅ Theme-based color
+              )
             : ElevatedButton(
                 onPressed: () => _redeemCoupon(couponCode),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      theme.colorScheme.error, // ✅ Theme-based color
+                ),
                 child: Text(
                   "Redeem",
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(
+                    color:
+                        theme.colorScheme.onError, // ✅ Theme-based text color
+                  ),
                 ),
               ),
       ),

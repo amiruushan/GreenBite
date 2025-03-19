@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/green_bite_points/green_bite_shop.dart';
-import 'package:greenbite_frontend/service/auth_service.dart';
+import 'package:greenbite_frontend/service/auth_service';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -69,69 +69,93 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     double progress = (normalPoints / npGoal).clamp(0.0, 1.0);
+
     return Scaffold(
-      backgroundColor: Colors.green.shade50,
+      backgroundColor: theme.colorScheme.background, // ✅ Theme-based background
       appBar: AppBar(
-        title: Text("Green Bite Points",
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          "Green Bite Points",
+          style: TextStyle(
+            color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.green,
-        elevation: 0,
+        backgroundColor: Colors.transparent, // ✅ Transparent AppBar
+        elevation: 0, // ✅ Remove shadow
+        iconTheme: IconThemeData(
+          color: theme.colorScheme.onBackground, // ✅ Icons adapt to theme
+        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh, color: Colors.white),
+            icon: Icon(
+              Icons.refresh,
+              color: theme.colorScheme.onBackground, // ✅ Action icons adapt
+            ),
             onPressed: _fetchPoints,
           ),
         ],
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator(color: Colors.green))
+          ? Center(
+              child: CircularProgressIndicator(
+                color: theme.colorScheme.primary, // ✅ Theme-based color
+              ),
+            )
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _buildTitle(),
-                  SizedBox(height: 20),
-                  _buildProgressCard(progress),
-                  SizedBox(height: 20),
-                  _buildGBPCard(),
-                  SizedBox(height: 30),
-                  _buildShopButton(),
-                  SizedBox(height: 30),
-                  _buildHowToEarnCard(),
+                  _buildTitle(theme),
+                  const SizedBox(height: 20),
+                  _buildProgressCard(progress, theme),
+                  const SizedBox(height: 20),
+                  _buildGBPCard(theme),
+                  const SizedBox(height: 30),
+                  _buildShopButton(theme),
+                  const SizedBox(height: 30),
+                  _buildHowToEarnCard(theme),
                 ],
               ),
             ),
     );
   }
 
-  Widget _buildTitle() {
+  Widget _buildTitle(ThemeData theme) {
     return Column(
       children: [
         Text(
           "Track Your Green Bite Points",
           textAlign: TextAlign.center,
           style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.green.shade800),
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+          ),
         ),
-        SizedBox(height: 5),
+        const SizedBox(height: 5),
         Text(
           "Earn Normal Points (NP) & Convert them to Green Bite Points (GBP)",
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+          style: TextStyle(
+            fontSize: 14,
+            color: theme.colorScheme.onSurface
+                .withOpacity(0.7), // ✅ Adaptive text color
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildProgressCard(double progress) {
+  Widget _buildProgressCard(double progress, ThemeData theme) {
     return Container(
-      padding: EdgeInsets.all(20),
-      decoration: _glassmorphismDecoration(),
+      padding: const EdgeInsets.all(20),
+      decoration: _glassmorphismDecoration(theme),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -146,128 +170,165 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
                 Text(
                   "$normalPoints / $npGoal NP",
                   style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20.0,
-                      color: Colors.green),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20.0,
+                    color: theme.colorScheme.primary, // ✅ Theme-based color
+                  ),
                 ),
-                SizedBox(height: 5),
-                Text("Next: 1 GBP",
-                    style:
-                        TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+                const SizedBox(height: 5),
+                Text(
+                  "Next: 1 GBP",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: theme.colorScheme.onSurface
+                        .withOpacity(0.7), // ✅ Adaptive text color
+                  ),
+                ),
               ],
             ),
-            progressColor: Colors.green,
-            backgroundColor: Colors.grey.shade300,
+            progressColor: theme.colorScheme.primary, // ✅ Theme-based color
+            backgroundColor:
+                theme.colorScheme.surfaceVariant, // ✅ Theme-based color
             circularStrokeCap: CircularStrokeCap.round,
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           Text(
             "Earn 100 NP to get 1 GBP",
             style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Colors.green.shade800),
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildGBPCard() {
+  Widget _buildGBPCard(ThemeData theme) {
     return Container(
-      padding: EdgeInsets.all(20),
-      decoration: _glassmorphismDecoration(),
+      padding: const EdgeInsets.all(20),
+      decoration: _glassmorphismDecoration(theme),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             "Your Green Bite Points",
             style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey.shade700),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface
+                  .withOpacity(0.7), // ✅ Adaptive text color
+            ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             "$greenBitePoints GBP",
             style: TextStyle(
-                fontSize: 32, fontWeight: FontWeight.bold, color: Colors.green),
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.primary, // ✅ Theme-based color
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildShopButton() {
+  Widget _buildShopButton(ThemeData theme) {
     return ElevatedButton.icon(
-      icon: Icon(Icons.store, color: Colors.white),
-      label: Text("Go to Green Bite Shop"),
+      icon: Icon(
+        Icons.store,
+        color: theme.colorScheme.onPrimary, // ✅ Theme-based color
+      ),
+      label: Text(
+        "Go to Green Bite Shop",
+        style: TextStyle(
+          color: theme.colorScheme.onPrimary, // ✅ Theme-based color
+        ),
+      ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
+        backgroundColor: theme.colorScheme.primary, // ✅ Theme-based color
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
         elevation: 5,
       ),
       onPressed: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => GreenBiteShopScreen()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const GreenBiteShopScreen()),
+        );
       },
     );
   }
 
-  Widget _buildHowToEarnCard() {
+  Widget _buildHowToEarnCard(ThemeData theme) {
     return Container(
-      padding: EdgeInsets.all(20),
-      decoration: _glassmorphismDecoration(),
+      padding: const EdgeInsets.all(20),
+      decoration: _glassmorphismDecoration(theme),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             "How to Earn More NP?",
             style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.green.shade800),
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+            ),
           ),
-          SizedBox(height: 10),
-          _buildBulletPoint("Make eco-friendly purchases"),
-          _buildBulletPoint("Complete daily challenges"),
-          _buildBulletPoint("Refer friends & earn rewards"),
-          _buildBulletPoint("Redeem exclusive Green Bite deals"),
+          const SizedBox(height: 10),
+          _buildBulletPoint("Make eco-friendly purchases", theme),
+          _buildBulletPoint("Complete daily challenges", theme),
+          _buildBulletPoint("Refer friends & earn rewards", theme),
+          _buildBulletPoint("Redeem exclusive Green Bite deals", theme),
         ],
       ),
     );
   }
 
-  Widget _buildBulletPoint(String text) {
+  Widget _buildBulletPoint(String text, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.check_circle, color: Colors.green, size: 18),
-          SizedBox(width: 8),
-          Text(text,
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade800)),
+          Icon(
+            Icons.check_circle,
+            color: theme.colorScheme.primary, // ✅ Theme-based color
+            size: 18,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              color: theme.colorScheme.onSurface
+                  .withOpacity(0.7), // ✅ Adaptive text color
+            ),
+          ),
         ],
       ),
     );
   }
 
-  BoxDecoration _glassmorphismDecoration() {
+  BoxDecoration _glassmorphismDecoration(ThemeData theme) {
     return BoxDecoration(
       borderRadius: BorderRadius.circular(20),
       gradient: LinearGradient(
-        colors: [Colors.white.withOpacity(0.6), Colors.white.withOpacity(0.3)],
+        colors: [
+          theme.colorScheme.surface.withOpacity(0.6),
+          theme.colorScheme.surface.withOpacity(0.3),
+        ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
       boxShadow: [
         BoxShadow(
-            color: Colors.green.withOpacity(0.1),
-            blurRadius: 15,
-            spreadRadius: 2),
+          color: theme.colorScheme.primary.withOpacity(0.1),
+          blurRadius: 15,
+          spreadRadius: 2,
+        ),
       ],
     );
   }
