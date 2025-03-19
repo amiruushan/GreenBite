@@ -69,18 +69,29 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bool isDarkMode = theme.brightness == Brightness.dark;
+
     double progress = (normalPoints / npGoal).clamp(0.0, 1.0);
+
     return Scaffold(
-      backgroundColor: Colors.green.shade50,
+      backgroundColor: isDarkMode
+          ? Colors.grey[900]
+          : Colors.green.shade50, // ✅ Adaptive background color
       appBar: AppBar(
-        title: Text("Green Bite Points",
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          "Green Bite Points",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.green, // ✅ Keep green for AppBar
         elevation: 0,
+        iconTheme: const IconThemeData(
+          color: Colors.white, // ✅ Keep white icons for AppBar
+        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh, color: Colors.white),
+            icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: _fetchPoints,
           ),
         ],
@@ -92,46 +103,54 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _buildTitle(),
-                  SizedBox(height: 20),
-                  _buildProgressCard(progress),
-                  SizedBox(height: 20),
-                  _buildGBPCard(),
-                  SizedBox(height: 30),
+                  _buildTitle(isDarkMode),
+                  const SizedBox(height: 20),
+                  _buildProgressCard(progress, isDarkMode),
+                  const SizedBox(height: 20),
+                  _buildGBPCard(isDarkMode),
+                  const SizedBox(height: 30),
                   _buildShopButton(),
-                  SizedBox(height: 30),
-                  _buildHowToEarnCard(),
+                  const SizedBox(height: 30),
+                  _buildHowToEarnCard(isDarkMode),
                 ],
               ),
             ),
     );
   }
 
-  Widget _buildTitle() {
+  Widget _buildTitle(bool isDarkMode) {
     return Column(
       children: [
         Text(
           "Track Your Green Bite Points",
           textAlign: TextAlign.center,
           style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.green.shade800),
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode
+                ? Colors.white
+                : Colors.green.shade800, // ✅ Adaptive text color
+          ),
         ),
-        SizedBox(height: 5),
+        const SizedBox(height: 5),
         Text(
           "Earn Normal Points (NP) & Convert them to Green Bite Points (GBP)",
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+          style: TextStyle(
+            fontSize: 14,
+            color: isDarkMode
+                ? Colors.grey[400]
+                : Colors.grey[700], // ✅ Adaptive text color
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildProgressCard(double progress) {
+  Widget _buildProgressCard(double progress, bool isDarkMode) {
     return Container(
-      padding: EdgeInsets.all(20),
-      decoration: _glassmorphismDecoration(),
+      padding: const EdgeInsets.all(20),
+      decoration: _glassmorphismDecoration(isDarkMode),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -146,52 +165,70 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
                 Text(
                   "$normalPoints / $npGoal NP",
                   style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20.0,
-                      color: Colors.green),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20.0,
+                    color: Colors.green, // ✅ Keep green for progress text
+                  ),
                 ),
-                SizedBox(height: 5),
-                Text("Next: 1 GBP",
-                    style:
-                        TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+                const SizedBox(height: 5),
+                Text(
+                  "Next: 1 GBP",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDarkMode
+                        ? Colors.grey[400]
+                        : Colors.grey[700], // ✅ Adaptive text color
+                  ),
+                ),
               ],
             ),
-            progressColor: Colors.green,
-            backgroundColor: Colors.grey.shade300,
+            progressColor: Colors.green, // ✅ Keep green for progress bar
+            backgroundColor: isDarkMode
+                ? Colors.grey[800]!
+                : Colors.grey[300]!, // ✅ Adaptive background color
             circularStrokeCap: CircularStrokeCap.round,
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           Text(
             "Earn 100 NP to get 1 GBP",
             style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Colors.green.shade800),
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: isDarkMode
+                  ? Colors.white
+                  : Colors.green.shade800, // ✅ Adaptive text color
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildGBPCard() {
+  Widget _buildGBPCard(bool isDarkMode) {
     return Container(
-      padding: EdgeInsets.all(20),
-      decoration: _glassmorphismDecoration(),
+      padding: const EdgeInsets.all(20),
+      decoration: _glassmorphismDecoration(isDarkMode),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             "Your Green Bite Points",
             style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey.shade700),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode
+                  ? Colors.grey[400]
+                  : Colors.grey[700], // ✅ Adaptive text color
+            ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             "$greenBitePoints GBP",
             style: TextStyle(
-                fontSize: 32, fontWeight: FontWeight.bold, color: Colors.green),
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Colors.green, // ✅ Keep green for GBP text
+            ),
           ),
         ],
       ),
@@ -200,74 +237,91 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
 
   Widget _buildShopButton() {
     return ElevatedButton.icon(
-      icon: Icon(Icons.store, color: Colors.white),
-      label: Text("Go to Green Bite Shop"),
+      icon: const Icon(Icons.store, color: Colors.white),
+      label: const Text("Go to Green Bite Shop"),
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.green, // ✅ Keep green for button
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
         elevation: 5,
       ),
       onPressed: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => GreenBiteShopScreen()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const GreenBiteShopScreen()),
+        );
       },
     );
   }
 
-  Widget _buildHowToEarnCard() {
+  Widget _buildHowToEarnCard(bool isDarkMode) {
     return Container(
-      padding: EdgeInsets.all(20),
-      decoration: _glassmorphismDecoration(),
+      padding: const EdgeInsets.all(20),
+      decoration: _glassmorphismDecoration(isDarkMode),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             "How to Earn More NP?",
             style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.green.shade800),
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode
+                  ? Colors.white
+                  : Colors.green.shade800, // ✅ Adaptive text color
+            ),
           ),
-          SizedBox(height: 10),
-          _buildBulletPoint("Make eco-friendly purchases"),
-          _buildBulletPoint("Complete daily challenges"),
-          _buildBulletPoint("Refer friends & earn rewards"),
-          _buildBulletPoint("Redeem exclusive Green Bite deals"),
+          const SizedBox(height: 10),
+          _buildBulletPoint("Make eco-friendly purchases", isDarkMode),
+          _buildBulletPoint("Complete daily challenges", isDarkMode),
+          _buildBulletPoint("Refer friends & earn rewards", isDarkMode),
+          _buildBulletPoint("Redeem exclusive Green Bite deals", isDarkMode),
         ],
       ),
     );
   }
 
-  Widget _buildBulletPoint(String text) {
+  Widget _buildBulletPoint(String text, bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.check_circle, color: Colors.green, size: 18),
-          SizedBox(width: 8),
-          Text(text,
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade800)),
+          const Icon(Icons.check_circle,
+              color: Colors.green, size: 18), // ✅ Keep green for bullet icon
+          const SizedBox(width: 8),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              color: isDarkMode
+                  ? Colors.grey[400]
+                  : Colors.grey[800], // ✅ Adaptive text color
+            ),
+          ),
         ],
       ),
     );
   }
 
-  BoxDecoration _glassmorphismDecoration() {
+  BoxDecoration _glassmorphismDecoration(bool isDarkMode) {
     return BoxDecoration(
       borderRadius: BorderRadius.circular(20),
       gradient: LinearGradient(
-        colors: [Colors.white.withOpacity(0.6), Colors.white.withOpacity(0.3)],
+        colors: [
+          isDarkMode ? Colors.grey[850]! : Colors.white.withOpacity(0.6),
+          isDarkMode ? Colors.grey[900]! : Colors.white.withOpacity(0.3),
+        ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
       boxShadow: [
         BoxShadow(
-            color: Colors.green.withOpacity(0.1),
-            blurRadius: 15,
-            spreadRadius: 2),
+          color: Colors.green.withOpacity(0.1),
+          blurRadius: 15,
+          spreadRadius: 2,
+        ),
       ],
     );
   }

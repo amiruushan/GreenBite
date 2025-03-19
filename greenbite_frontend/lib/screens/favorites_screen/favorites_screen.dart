@@ -105,9 +105,24 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Favorites"),
+        title: Text(
+          "Green Bite",
+          style: TextStyle(
+            color: Theme.of(context)
+                .colorScheme
+                .onBackground, // ✅ Adaptive text color
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.transparent, // ✅ Transparent background
+        elevation: 0, // ✅ No shadow for a modern UI
+        iconTheme: IconThemeData(
+          color: Theme.of(context)
+              .colorScheme
+              .onBackground, // ✅ Icons adapt to theme
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.shopping_cart),
@@ -117,6 +132,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 MaterialPageRoute(builder: (context) => const CartScreen()),
               );
             },
+            color: Theme.of(context)
+                .colorScheme
+                .onBackground, // ✅ Action icons adapt
           ),
         ],
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/screens/splash_screen/splash_screen.dart';
+import 'package:greenbite_frontend/theme_provider.dart'; // Import ThemeProvider
 import 'package:provider/provider.dart';
 
 void main() {
@@ -12,8 +13,12 @@ void main() {
       "pk_test_51Qsh6fBlbt78FKd8ObfV5e9AMLen2F9efKqkjQmQZwtea7KIiPSGDbPcxak2dvfkKMv9E2wXu5YV1eVVPuGm3OzA00LqEk6B3Z";
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => CartProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(
+            create: (_) => ThemeProvider()), // Add ThemeProvider
+      ],
       child: const MyApp(),
     ),
   );
@@ -24,13 +29,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Green Bite",
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        useMaterial3: true,
-      ),
+      theme: ThemeData.light(), // Light Theme
+      darkTheme: ThemeData.dark(), // Dark Theme
+      themeMode: themeProvider.themeMode, // Apply theme mode
       home: SplashScreen(),
     );
   }
