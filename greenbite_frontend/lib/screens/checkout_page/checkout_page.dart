@@ -3,7 +3,9 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/screens/home_page/home_page.dart';
+
 import 'package:greenbite_frontend/service/auth_service.dart';
+
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
