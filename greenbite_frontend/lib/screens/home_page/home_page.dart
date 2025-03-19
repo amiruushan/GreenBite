@@ -8,7 +8,6 @@ import 'package:greenbite_frontend/screens/home_page/widgets/update_location_but
 
 import 'package:greenbite_frontend/service/auth_service.dart';
 
-import 'package:greenbite_frontend/service/auth_service';
 import 'package:greenbite_frontend/service/location_service.dart';
 
 import 'package:http/http.dart' as http;
