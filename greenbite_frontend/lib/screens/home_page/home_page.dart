@@ -4,11 +4,9 @@ import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/cart/cart_screen.dart';
 import 'package:greenbite_frontend/screens/food_detail_screen/food_detail_screen.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/shop_tab.dart';
-import 'package:greenbite_frontend/screens/home_page/widgets/update_location_button.dart';
 
 import 'package:greenbite_frontend/service/auth_service.dart';
 
-import 'package:greenbite_frontend/service/auth_service';
 import 'package:greenbite_frontend/service/location_service.dart';
 
 import 'package:http/http.dart' as http;
@@ -216,33 +214,30 @@ class HomePageContent extends StatefulWidget {
 }
 
 class _HomePageContentState extends State<HomePageContent> {
-  final List<String> _selectedTags = []; // Track multiple selected tags
-  final PageController _featuredController =
-      PageController(); // Controller for featured items
-  int _currentFeaturedIndex = 0; // Track the current featured item index
-  Timer? _featuredTimer; // Timer for auto-switching featured items
+  final List<String> _selectedTags = [];
+  final PageController _featuredController = PageController();
+  int _currentFeaturedIndex = 0;
+  Timer? _featuredTimer;
 
   @override
   void initState() {
     super.initState();
-    // Start auto-switching featured items every 5 seconds
     _startFeaturedTimer();
   }
 
   @override
   void dispose() {
-    _featuredController.dispose(); // Dispose the PageController
-    _featuredTimer?.cancel(); // Cancel the timer
+    _featuredController.dispose();
+    _featuredTimer?.cancel();
     super.dispose();
   }
 
-  // Start the timer for auto-switching featured items
   void _startFeaturedTimer() {
     _featuredTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
       if (_currentFeaturedIndex < widget.foodItems.length - 1) {
         _currentFeaturedIndex++;
       } else {
-        _currentFeaturedIndex = 0; // Loop back to the first item
+        _currentFeaturedIndex = 0;
       }
       _featuredController.animateToPage(
         _currentFeaturedIndex,
@@ -252,7 +247,6 @@ class _HomePageContentState extends State<HomePageContent> {
     });
   }
 
-  // Extract unique tags from all food items
   List<String> getUniqueTags() {
     final Set<String> uniqueTags = {};
     for (var item in widget.foodItems) {
@@ -263,48 +257,55 @@ class _HomePageContentState extends State<HomePageContent> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     // Filter recommended items based on the selected tags
     List<FoodItem> recommendedItems = widget.foodItems
         .where((item) =>
-            _selectedTags.isEmpty || // Show all items if no tags are selected
-            _selectedTags.every(
-                (tag) => item.tags.contains(tag))) // Match ALL selected tags
+            _selectedTags.isEmpty ||
+            _selectedTags.every((tag) => item.tags.contains(tag)))
         .toList();
 
     return DefaultTabController(
       length: 2, // Two tabs (Food Items & Shops)
       child: Scaffold(
+        backgroundColor:
+            theme.colorScheme.background, // ✅ Theme-based background
         appBar: AppBar(
-          title: const Text("Green Bite"),
-          titleTextStyle: const TextStyle(
-            color: Colors.white,
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
+          title: Text(
+            "Green Bite",
+            style: TextStyle(
+              color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           centerTitle: true,
-          backgroundColor: const Color.fromARGB(255, 117, 237, 123),
-          leading: IconButton(
-            icon: const Icon(Icons.support_agent),
-            onPressed: () {
-              print("Support icon tapped");
-            },
+          backgroundColor: Colors.transparent, // ✅ Transparent AppBar
+          elevation: 0, // ✅ Remove shadow
+          iconTheme: IconThemeData(
+            color: theme.colorScheme.onBackground, // ✅ Icons adapt to theme
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.shopping_cart),
+              icon: Icon(
+                Icons.shopping_cart,
+                color: theme.colorScheme.onBackground, // ✅ Action icons adapt
+              ),
               onPressed: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const CartScreen()));
+                  context,
+                  MaterialPageRoute(builder: (context) => const CartScreen()),
+                );
               },
             ),
           ],
-          bottom: const TabBar(
+          bottom: TabBar(
             indicatorColor: Colors.green,
             labelColor: Colors.green,
             unselectedLabelColor: Colors.grey,
-            tabs: [
+            tabs: const [
               Tab(text: "Food Items"),
               Tab(text: "Shops"),
             ],
@@ -320,44 +321,49 @@ class _HomePageContentState extends State<HomePageContent> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        UpdateLocationButton(userId: 1),
-                        // 🔍 Search Bar
+                        // 🔍 Themed Search Bar
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: isDarkMode
+                                ? Colors.grey[900]
+                                : Colors.grey[200], // ✅ Adaptive color
                             borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 8,
-                                spreadRadius: 2,
-                                offset: const Offset(0, 2),
-                              )
-                            ],
                           ),
                           child: TextField(
                             decoration: InputDecoration(
                               hintText: "Search for food...",
-                              hintStyle: const TextStyle(color: Colors.grey),
+                              hintStyle: TextStyle(
+                                color: isDarkMode
+                                    ? Colors.grey[400]
+                                    : Colors.grey[700],
+                              ),
                               border: InputBorder.none,
-                              prefixIcon:
-                                  const Icon(Icons.search, color: Colors.green),
+                              prefixIcon: Icon(
+                                Icons.search,
+                                color: isDarkMode ? Colors.white : Colors.green,
+                              ),
                               contentPadding:
                                   const EdgeInsets.symmetric(vertical: 15),
                             ),
+                            style: TextStyle(
+                                color: theme.colorScheme.onBackground),
                           ),
                         ),
                         const SizedBox(height: 10),
 
                         // 🍽 Featured Items Section
-                        const Text(
+                        Text(
                           "Recommended For You",
                           style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold),
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme
+                                .onBackground, // ✅ Adaptive text color
+                          ),
                         ),
                         const SizedBox(height: 10),
                         SizedBox(
-                          height: 170, // Adjust height as needed
+                          height: 170,
                           child: Stack(
                             children: [
                               // PageView for Featured Items
@@ -373,7 +379,6 @@ class _HomePageContentState extends State<HomePageContent> {
                                   final item = widget.foodItems[index];
                                   return GestureDetector(
                                     onTap: () {
-                                      // Navigate to the food details page
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -492,37 +497,35 @@ class _HomePageContentState extends State<HomePageContent> {
                         const SizedBox(height: 20),
 
                         // 🍽 Recommended Section
-                        const Text(
+                        Text(
                           "Food to Suit Your Diet",
                           style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold),
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme
+                                .onBackground, // ✅ Adaptive text color
+                          ),
                         ),
                         const SizedBox(height: 10),
 
                         // 🏷 Clickable Tags for Filtering (Horizontal List)
                         SizedBox(
-                          height:
-                              50, // Set a fixed height for the horizontal tags
+                          height: 50,
                           child: ListView.separated(
-                            scrollDirection:
-                                Axis.horizontal, // Make the list horizontal
+                            scrollDirection: Axis.horizontal,
                             itemCount: getUniqueTags().length,
                             separatorBuilder: (context, index) =>
-                                const SizedBox(
-                                    width: 8), // Add spacing between tags
+                                const SizedBox(width: 8),
                             itemBuilder: (context, index) {
-                              final tag =
-                                  getUniqueTags()[index]; // Get the current tag
-                              bool isSelected = _selectedTags.contains(
-                                  tag); // Check if the tag is selected
+                              final tag = getUniqueTags()[index];
+                              bool isSelected = _selectedTags.contains(tag);
                               return GestureDetector(
                                 onTap: () {
                                   setState(() {
                                     if (isSelected) {
-                                      _selectedTags
-                                          .remove(tag); // Deselect the tag
+                                      _selectedTags.remove(tag);
                                     } else {
-                                      _selectedTags.add(tag); // Select the tag
+                                      _selectedTags.add(tag);
                                     }
                                   });
                                 },
@@ -530,11 +533,13 @@ class _HomePageContentState extends State<HomePageContent> {
                                   label: Text(tag),
                                   backgroundColor: isSelected
                                       ? Colors.green
-                                      : Colors.grey[300],
+                                      : (isDarkMode
+                                          ? Colors.grey[800]
+                                          : Colors.grey[300]),
                                   labelStyle: TextStyle(
                                     color: isSelected
                                         ? Colors.white
-                                        : Colors.black,
+                                        : theme.colorScheme.onBackground,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -548,11 +553,15 @@ class _HomePageContentState extends State<HomePageContent> {
                         SizedBox(
                           height: 250,
                           child: recommendedItems.isEmpty
-                              ? const Center(
+                              ? Center(
                                   child: Text(
                                     "No items match this filter!",
                                     style: TextStyle(
-                                        fontSize: 18, color: Colors.grey),
+                                      fontSize: 18,
+                                      color: theme.colorScheme.onBackground
+                                          .withOpacity(
+                                              0.5), // ✅ Adaptive text color
+                                    ),
                                   ),
                                 )
                               : ListView.separated(
@@ -584,10 +593,14 @@ class _HomePageContentState extends State<HomePageContent> {
                         const SizedBox(height: 20),
 
                         // 🍽 All Food Items
-                        const Text(
+                        Text(
                           "All Food Items",
                           style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold),
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme
+                                .onBackground, // ✅ Adaptive text color
+                          ),
                         ),
                         const SizedBox(height: 10),
                         ListView.builder(

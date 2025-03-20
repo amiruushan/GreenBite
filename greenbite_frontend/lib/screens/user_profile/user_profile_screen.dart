@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/green_bite_points/green_bite_shop.dart';
+import 'package:greenbite_frontend/screens/user_profile/about_us_screen.dart';
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile.dart';
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile_service.dart';
 import 'package:greenbite_frontend/screens/user_profile/edit_profile_screen.dart';
 import 'package:greenbite_frontend/screens/vendor/vendor_home.dart';
 import 'package:greenbite_frontend/screens/green_bite_points/green_bite_points_screen.dart';
+
+import 'package:provider/provider.dart';
+import 'package:greenbite_frontend/theme_provider.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -80,6 +84,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final theme = Theme.of(context); // ✅ Get theme for adaptive colors
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -99,126 +106,166 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _userProfile == null
-          ? const Center(child: Text('Failed to load user profile', style: TextStyle(fontSize: 18, color: Colors.grey)))
-          : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildProfileHeader(),
-            const SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                children: [
-                  _buildSectionItem(
-                    icon: Icons.edit,
-                    text: "Edit Profile",
-                    onPressed: _editProfile,
+              ? const Center(
+                  child: Text(
+                    'Failed to load user profile',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
                   ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  if (_userProfile!.shopId > 0)
+                )
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 50),
+                      // ✅ Profile Header
+                      _buildProfileHeader(theme),
+                      const SizedBox(height: 16),
 
-                    _buildSectionItem(
-                      icon: Icons.store,
-                      text: "Switch to Vendor",
-                      onPressed: _switchToVendor,
-                    ),
-                  if (_userProfile!.shopId <= 0)
-                    _buildSectionItem(
-                      icon: Icons.add_business,
-                      text: "Create a Shop",
-                      onPressed: () {
-                        // No logic needed for now
-                      },
-                    ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  _buildSectionItem(
-                    icon: Icons.logout,
-                    text: "Sign Out",
-                    onPressed: _signOut,
+                      // ✅ Dark Mode Toggle
+                      _buildDarkModeToggle(themeProvider, theme),
+                      const SizedBox(height: 16),
+
+                      // ✅ Main Profile Options
+                      _buildOptionsContainer(theme, [
+                        _buildSectionItem(
+                          icon: Icons.edit,
+                          text: "Edit Profile",
+                          onPressed: _editProfile,
+                        ),
+                        if (_userProfile!.shopId > 0)
+                          _buildSectionItem(
+                            icon: Icons.store,
+                            text: "Switch to Vendor",
+                            onPressed: _switchToVendor,
+                          ),
+                        if (_userProfile!.shopId <= 0)
+                          _buildSectionItem(
+                            icon: Icons.add_business,
+                            text: "Create a Shop",
+                            onPressed: () {
+                              // No logic needed for now
+                            },
+                          ),
+                        _buildSectionItem(
+                          icon: Icons.logout,
+                          text: "Sign Out",
+                          onPressed: _signOut,
+                        ),
+                      ]),
+
+                      const SizedBox(height: 16),
+
+                      // ✅ Additional Options
+                      _buildOptionsContainer(theme, [
+                        _buildSectionItem(
+                          icon: Icons.emoji_events,
+                          text: "Green Bite Points",
+                          onPressed: _goToGreenBitePoints,
+                        ),
+                        _buildSectionItem(
+                          icon: Icons.shopping_bag,
+                          text: "Green Bite Shop",
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => GreenBiteShopScreen()),
+                            );
+                          },
+                        ),
+                        _buildSectionItem(
+                          icon: Icons.info,
+                          text: "About Us",
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const AboutUsScreen()),
+                            );
+                          },
+                        ),
+                      ]),
+                    ],
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                children: [
-                  _buildSectionItem(
-                    icon: Icons.emoji_events,
-                    text: "Green Bite Points",
-                    onPressed: _goToGreenBitePoints,
-                  ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  _buildSectionItem(
-                    icon: Icons.store,
-                    text: "Green Bite Shop",
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => GreenBiteShopScreen()));
-                    },
-                  ),
-                  _buildSectionItem(
-                    icon: Icons.info,
-                    text: "About Us",
-                  ),
-                ],
-              ),
-            ),
-          ],
+                ),
+    );
+  }
+
+  // ✅ Profile Header
+  Widget _buildProfileHeader(ThemeData theme) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 50,
+          backgroundImage: NetworkImage(
+            _userProfile?.profilePictureUrl ?? UserProfile.placeholderProfilePictureUrl,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          _userProfile!.username,
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: theme.textTheme.bodyLarge?.color,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          _userProfile!.email,
+          style: TextStyle(
+            fontSize: 14,
+            color: theme.textTheme.bodySmall?.color,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ✅ Dark Mode Toggle
+  Widget _buildDarkModeToggle(ThemeProvider themeProvider, ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: SwitchListTile(
+        title: Text(
+          "Dark Mode",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: theme.textTheme.bodyLarge?.color,
+          ),
+        ),
+        value: themeProvider.themeMode == ThemeMode.dark,
+        onChanged: (value) {
+          themeProvider.toggleTheme(value);
+        },
+        secondary: Icon(
+          Icons.dark_mode,
+          color: theme.iconTheme.color,
         ),
       ),
     );
   }
 
-  Widget _buildProfileHeader() {
+  // ✅ Generalized Options Container
+  Widget _buildOptionsContainer(ThemeData theme, List<Widget> children) {
     return Container(
-      alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 50,
-            backgroundImage: NetworkImage(
-              _userProfile?.profilePictureUrl ?? UserProfile.placeholderProfilePictureUrl,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _userProfile!.username,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                _userProfile!.email,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.black54,
-                ),
-              ),
-            ],
-          ),
-        ],
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: children
+            .expand((widget) => [widget, const Divider(height: 1, indent: 16, endIndent: 16)])
+            .toList()
+            .sublist(0, children.length * 2 - 1), // Remove last divider
       ),
     );
   }
 
+  // ✅ Section Item with Icon, Text, and Divider
   Widget _buildSectionItem({
     required IconData icon,
     required String text,
@@ -226,12 +273,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }) {
     return ListTile(
       onTap: onPressed,
-      leading: Icon(icon, color: Colors.green),
+      leading: Icon(icon),
       title: Text(
         text,
-        style: const TextStyle(fontSize: 16, color: Colors.black87),
+        style: const TextStyle(fontSize: 16),
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+      trailing: const Icon(Icons.arrow_forward_ios),
     );
   }
 }

@@ -87,12 +87,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Profile",
             style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.transparent, // ✅ Transparent AppBar
+        elevation: 0, // ✅ Remove shadow
+        iconTheme: IconThemeData(
+          color: theme.colorScheme.onBackground, // ✅ Icons adapt to theme
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
@@ -115,13 +121,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   bottom: 0,
                   right: 0,
                   child: Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.green,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary, // ✅ Theme-based color
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
-                      icon:
-                          const Icon(Icons.edit, color: Colors.white, size: 20),
+                      icon: Icon(Icons.edit,
+                          color: theme.colorScheme.onPrimary,
+                          size: 20), // ✅ Theme-based color
                       onPressed: () {
                         // Show a dialog to choose between gallery and camera
                         showDialog(
@@ -163,11 +170,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             const SizedBox(height: 20),
 
             // ✅ Input Fields
-            _buildTextField("Full Name", _nameController, Icons.person),
-            _buildTextField("Email Address", _emailController, Icons.email),
-            _buildTextField("Phone Number", _phoneController, Icons.phone),
+            _buildTextField("Full Name", _nameController, Icons.person, theme),
             _buildTextField(
-                "Home Address", _addressController, Icons.location_on),
+                "Email Address", _emailController, Icons.email, theme),
+            _buildTextField(
+                "Phone Number", _phoneController, Icons.phone, theme),
+            _buildTextField(
+                "Home Address", _addressController, Icons.location_on, theme),
             const SizedBox(height: 20),
 
             // ✅ Save Button
@@ -176,12 +185,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: ElevatedButton.icon(
                 onPressed: _isSaving ? null : _saveProfile,
                 icon: _isSaving
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Icon(Icons.save, color: Colors.white),
-                label: const Text("Save Changes",
-                    style: TextStyle(fontSize: 18, color: Colors.white)),
+                    ? CircularProgressIndicator(
+                        color:
+                            theme.colorScheme.onPrimary) // ✅ Theme-based color
+                    : Icon(Icons.save,
+                        color:
+                            theme.colorScheme.onPrimary), // ✅ Theme-based color
+                label: Text("Save Changes",
+                    style: TextStyle(
+                        fontSize: 18,
+                        color: theme
+                            .colorScheme.onPrimary)), // ✅ Theme-based color
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor:
+                      theme.colorScheme.primary, // ✅ Theme-based color
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
@@ -195,18 +212,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   // ✅ Custom Text Field with Icon
-  Widget _buildTextField(
-      String label, TextEditingController controller, IconData icon) {
+  Widget _buildTextField(String label, TextEditingController controller,
+      IconData icon, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
         controller: controller,
+        style: TextStyle(
+            color: theme.colorScheme.onSurface), // ✅ Theme-based color
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Icon(icon, color: Colors.green),
+          labelStyle: TextStyle(
+              color: theme.colorScheme.onSurface
+                  .withOpacity(0.7)), // ✅ Theme-based color
+          prefixIcon: Icon(icon,
+              color: theme.colorScheme.primary), // ✅ Theme-based color
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           filled: true,
-          fillColor: Colors.grey[100],
+          fillColor: theme.colorScheme.surface, // ✅ Theme-based color
         ),
       ),
     );

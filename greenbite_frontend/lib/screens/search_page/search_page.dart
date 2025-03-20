@@ -66,98 +66,112 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: theme.colorScheme.background, // ✅ Theme-based background
       appBar: AppBar(
-        title: const Text("Green Bite"),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 30,
-          fontWeight: FontWeight.bold,
+        title: Text(
+          "Green Bite",
+          style: TextStyle(
+            color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 117, 237, 123),
-        leading: IconButton(
-          icon: const Icon(Icons.support_agent),
-          onPressed: () {
-            print("Support icon tapped");
-          },
+        backgroundColor: Colors.transparent, // ✅ Transparent AppBar
+        elevation: 0, // ✅ No shadow
+        iconTheme: IconThemeData(
+          color: theme.colorScheme.onBackground, // ✅ Icon color adapts to theme
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.shopping_cart),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const CartScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CartScreen()),
+              );
             },
+            color: theme.colorScheme.onBackground, // ✅ Action icons adapt
           ),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Search Bar
+            const SizedBox(height: 25),
+            // 🔍 Themed Search Bar
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDarkMode
+                    ? Colors.grey[900]
+                    : Colors.grey[200], // ✅ Adaptive color
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    spreadRadius: 2,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
               ),
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: "Search for food...",
-                  hintStyle: const TextStyle(color: Colors.grey),
+                  hintStyle: TextStyle(
+                    color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
+                  ),
                   border: InputBorder.none,
-                  prefixIcon: const Icon(Icons.search, color: Colors.green),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 15),
+                  prefixIcon: Icon(Icons.search,
+                      color: isDarkMode ? Colors.white : Colors.green),
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                 ),
+                style: TextStyle(color: theme.colorScheme.onBackground),
               ),
             ),
             const SizedBox(height: 15),
 
-            // Category Filters
+            // 🏷 Category Filters (Dynamically Themed)
             SizedBox(
               height: 50,
-              child: ListView(
+              child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                children: _categories.map((category) {
+                itemCount: _categories.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(width: 8), // Spacing between items
+                itemBuilder: (context, index) {
+                  final category = _categories[index];
                   final isSelected = _selectedCategory == category;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: GestureDetector(
-                      onTap: () => _onCategorySelected(category),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: isSelected ? Colors.green : Colors.grey[200],
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          category,
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  return GestureDetector(
+                    onTap: () => _onCategorySelected(category),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? theme.colorScheme.primary
+                            : (isDarkMode
+                                ? Colors.grey[800]
+                                : Colors.grey[300]),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        category,
+                        style: TextStyle(
+                          color: isSelected
+                              ? Colors.white
+                              : theme.colorScheme.onBackground,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   );
-                }).toList(),
+                },
               ),
             ),
             const SizedBox(height: 20),
 
-            // Search Results
+            // 🍽 Search Results Section
             Expanded(
               child: _filteredItems.isEmpty
                   ? const Center(
@@ -174,6 +188,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     )
                   : ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 10),
                       itemCount: _filteredItems.length,
                       itemBuilder: (context, index) {
                         final item = _filteredItems[index];

@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:greenbite_frontend/screens/onboarding/onboarding.dart';
 
-import 'package:greenbite_frontend/screens/login/login_screen.dart';
-
-
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 

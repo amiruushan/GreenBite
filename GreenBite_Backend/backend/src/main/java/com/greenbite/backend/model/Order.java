@@ -21,6 +21,7 @@ public class Order {
     private Long shopId;
     private String paymentMethod;
     private String status = "pending"; // Default status is "pending"
+    private float totalAmount;
 
     @ManyToMany
     @JoinTable(
