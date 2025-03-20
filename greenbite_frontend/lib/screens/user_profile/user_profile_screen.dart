@@ -1,5 +1,7 @@
+// user_profile_screen.dart
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/green_bite_points/green_bite_shop.dart';
+import 'package:greenbite_frontend/screens/user_profile/about_us_screen.dart';
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile.dart';
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile_service.dart';
 import 'package:greenbite_frontend/screens/user_profile/edit_profile_screen.dart';
@@ -151,6 +153,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         _buildSectionItem(
                           icon: Icons.info,
                           text: "About Us",
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const AboutUsScreen()),
+                            );
+                          },
                         ),
                       ]),
                     ],
