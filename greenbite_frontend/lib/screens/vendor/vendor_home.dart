@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/vendor/vendor_sales.dart';
 import 'package:http/http.dart' as http;
 import 'package:greenbite_frontend/screens/vendor/vendor_profile.dart';
+import '../../config.dart';
 import '../../widgets/vendor_nav_bar.dart';
 import 'list_food.dart';
 import 'orders.dart';

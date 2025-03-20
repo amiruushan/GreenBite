@@ -5,7 +5,6 @@ import 'package:greenbite_frontend/screens/user_profile/models/user_profile_serv
 import 'package:greenbite_frontend/screens/user_profile/edit_profile_screen.dart';
 import 'package:greenbite_frontend/screens/vendor/vendor_home.dart'; // Import the VendorHome screen
 import 'package:greenbite_frontend/screens/green_bite_points/green_bite_points_screen.dart'; // Import Green Bite Points screen
-import 'package:greenbite_frontend/screens/user_profile/Customer_Orders.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -49,7 +48,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       ),
     );
 
-    // ✅ If user saved changes, update UI
     if (updatedProfile != null && updatedProfile is UserProfile) {
       setState(() {
         _userProfile = updatedProfile;
@@ -90,72 +88,52 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final theme = Theme.of(context); // ✅ Get theme for adaptive colors
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.green.withOpacity(0.7), Colors.green.shade700],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
-      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _userProfile == null
               ? const Center(
-                  child: Text('Failed to load user profile',
-                      style: TextStyle(fontSize: 18, color: Colors.grey)))
-              : Padding(
+                  child: Text(
+                    'Failed to load user profile',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                )
+              : SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      // Profile Picture and Name Section
-                      _buildProfileHeader(),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 50),
+                      // ✅ Profile Header
+                      _buildProfileHeader(theme),
+                      const SizedBox(height: 16),
 
-                      // Main Container with Grey Background and Rounded Corners
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100, // Light grey background
-                          borderRadius:
-                              BorderRadius.circular(12), // Rounded corners
+                      // ✅ Dark Mode Toggle
+                      _buildDarkModeToggle(themeProvider, theme),
+                      const SizedBox(height: 16),
+
+                      // ✅ Main Profile Options
+                      _buildOptionsContainer(theme, [
+                        _buildSectionItem(
+                          icon: Icons.edit,
+                          text: "Edit Profile",
+                          onPressed: _editProfile,
                         ),
-                        child: Column(
-                          children: [
-                            // Edit Profile Section
-                            _buildSectionItem(
-                              icon: Icons.edit,
-                              text: "Edit Profile",
-                              onPressed: _editProfile,
-                            ),
-                            const Divider(height: 1, indent: 16, endIndent: 16),
-
-                            // Switch to Vendor Section
-                            _buildSectionItem(
-                              icon: Icons.store,
-                              text: "Switch to Vendor",
-                              onPressed: _switchToVendor,
-                            ),
-                            const Divider(height: 1, indent: 16, endIndent: 16),
-
-                            // Sign Out Section
-                            _buildSectionItem(
-                              icon: Icons.logout,
-                              text: "Sign Out",
-                              onPressed: _signOut,
-                            ),
-                          ],
+                        _buildSectionItem(
+                          icon: Icons.store,
+                          text: "Switch to Vendor",
+                          onPressed: _switchToVendor,
                         ),
-                      ),
-                      const SizedBox(height: 20),
+                        _buildSectionItem(
+                          icon: Icons.logout,
+                          text: "Sign Out",
+                          onPressed: _signOut,
+                        ),
+                      ]),
+
+                      const SizedBox(height: 16),
 
                       // Additional Options Container
                       Container(
@@ -186,18 +164,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               },
                             ),
 
-                            _buildSectionItem(
-                              icon: Icons.store,
-                              text: "Your Orders",
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            CustomerOrdersPage()));
-                              },
-                            ),
-
                             // About Us Section
                             _buildSectionItem(
                               icon: Icons.info,
@@ -205,62 +171,92 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             ),
                           ],
                         ),
-                      ),
+                      ]),
                     ],
                   ),
                 ),
     );
   }
 
-  // Profile Header with Profile Picture and Name
-  Widget _buildProfileHeader() {
+  // ✅ Profile Header
+  Widget _buildProfileHeader(ThemeData theme) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 50,
+          backgroundImage: NetworkImage(
+            _userProfile?.profilePictureUrl ??
+                UserProfile.placeholderProfilePictureUrl,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          _userProfile!.username,
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: theme.textTheme.bodyLarge?.color,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          _userProfile!.email,
+          style: TextStyle(
+            fontSize: 14,
+            color: theme.textTheme.bodySmall?.color,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ✅ Dark Mode Toggle
+  Widget _buildDarkModeToggle(ThemeProvider themeProvider, ThemeData theme) {
     return Container(
-      alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Row(
-        children: [
-          // Profile Picture
-          CircleAvatar(
-            radius: 50,
-            backgroundImage: NetworkImage(
-              _userProfile?.profilePictureUrl ??
-                  UserProfile
-                      .placeholderProfilePictureUrl, // Fallback to placeholder
-            ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: SwitchListTile(
+        title: Text(
+          "Dark Mode",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: theme.textTheme.bodyLarge?.color,
           ),
-          const SizedBox(width: 16), // Spacing between image and text
-
-          // User Info
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Username
-              Text(
-                _userProfile!.username,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 4),
-
-              // Email
-              Text(
-                _userProfile!.email,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.black54,
-                ),
-              ),
-            ],
-          ),
-        ],
+        ),
+        value: themeProvider.themeMode == ThemeMode.dark,
+        onChanged: (value) {
+          themeProvider.toggleTheme(value);
+        },
+        secondary: Icon(
+          Icons.dark_mode,
+          color: theme.iconTheme.color,
+        ),
       ),
     );
   }
 
-  // Section Item with Icon, Text and Divider
+  // ✅ Generalized Options Container
+  Widget _buildOptionsContainer(ThemeData theme, List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: children
+            .expand((widget) =>
+                [widget, const Divider(height: 1, indent: 16, endIndent: 16)])
+            .toList()
+            .sublist(0, children.length * 2 - 1), // Remove last divider
+      ),
+    );
+  }
+
+  // ✅ Section Item with Icon, Text, and Divider
   Widget _buildSectionItem({
     required IconData icon,
     required String text,
@@ -268,12 +264,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }) {
     return ListTile(
       onTap: onPressed,
-      leading: Icon(icon, color: Colors.green),
+      leading: Icon(icon),
       title: Text(
         text,
-        style: const TextStyle(fontSize: 16, color: Colors.black87),
+        style: const TextStyle(fontSize: 16),
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+      trailing: const Icon(Icons.arrow_forward_ios),
     );
   }
 }

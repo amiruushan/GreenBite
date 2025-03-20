@@ -10,9 +10,6 @@ import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
 import 'package:greenbite_frontend/service/auth_service.dart';
 
 import 'package:provider/provider.dart';
-import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 
 class FoodDetailScreen extends StatefulWidget {
   final FoodItem foodItem;

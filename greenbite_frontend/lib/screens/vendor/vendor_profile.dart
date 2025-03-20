@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/vendor/vendor_sales.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../../config.dart';
 import '../../widgets/vendor_nav_bar.dart';
 import 'vendor_home.dart';
 import 'list_food.dart';
@@ -42,7 +43,7 @@ class _VendorProfileState extends State<VendorProfile> {
             "profilePictureUrl": data["photo"] ?? "",
             "username": data["name"] ?? "Unknown Vendor",
             "email": data["email"] ?? "",
-            "phoneNumber": data["tele_number"] ?? "",
+            "phoneNumber": data["phoneNumber"] ?? "",
             "address": data["address"] ?? "",
             "businessName": data["businessName"] ?? "",
             "businessDescription": data["businessDescription"] ?? "",

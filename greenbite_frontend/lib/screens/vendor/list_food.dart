@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import '../../config.dart';
 import '../../widgets/vendor_nav_bar.dart';
 import 'vendor_home.dart';
 import 'orders.dart';
@@ -78,7 +79,7 @@ class _ListFoodState extends State<ListFood> {
       try {
         // Send the POST request to the backend
         final response = await http.post(
-          Uri.parse('http://192.168.1.3:8080/api/food-items'),
+          Uri.parse('${Config.apiBaseUrl}/api/food-items'),
           headers: {"Content-Type": "application/json"},
           body: json.encode(foodItem),
         );

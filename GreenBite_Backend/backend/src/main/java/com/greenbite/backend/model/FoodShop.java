@@ -24,11 +24,18 @@ public class FoodShop {
     @Column(nullable = false, length = 20)
     private String phoneNumber;
 
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String businessDescription;
+
     private String photo;  // Store image URL
     @Column(nullable = false)
     private double latitude;
 
     @Column(nullable = false)
     private double longitude;
+
 
 }

@@ -33,6 +33,13 @@ public class FoodShopController {
         System.out.println("Fetching shop with ID: " + id);
         return foodShopService.getFoodShopById(id);
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<FoodShop> updateFoodShop(@PathVariable Long id, @RequestBody FoodShop foodShop) {
+        FoodShop updatedShop = foodShopService.updateFoodShop(id, foodShop);
+        return ResponseEntity.ok(updatedShop);
+    }
+
     @GetMapping("/nearby")
     public List<FoodShop> findNearbyShops(
             @RequestParam double lat,

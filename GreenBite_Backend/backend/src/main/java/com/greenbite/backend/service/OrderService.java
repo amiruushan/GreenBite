@@ -40,7 +40,11 @@ public class OrderService {
         Order order = new Order(null, orderDTO.getCustomerId(), orderDTO.getShopId(),orderDTO.getPaymentMethod(), "pending", foodItems);
         return orderRepository.save(order);
     }
-    public List<Order> getOrdersByOrderIdAndShopId(Long orderId, Long shopId) {
-        return orderRepository.findByIdAndShopId(orderId, shopId);
+    public List<Order> getOrdersByShopId(Long shopId) {
+        return orderRepository.findByShopId(shopId);
     }
+    public List<Order> getOrdersByCustomerId(Long userId) {
+        return orderRepository.findByCustomerId(userId);
+    }
+
 }

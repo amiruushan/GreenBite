@@ -13,6 +13,8 @@ public class FoodShopDTO {
     private String photo;
     private String address;      // Add address
     private String phoneNumber;  // Rename tele_number to phoneNumber
+    private String email;
+    private String businessDescription;
     private double latitude;
     private double longitude;
 

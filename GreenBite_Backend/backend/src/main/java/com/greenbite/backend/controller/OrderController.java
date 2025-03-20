@@ -3,6 +3,7 @@ package com.greenbite.backend.controller;
 import com.greenbite.backend.dto.OrderDTO;
 import com.greenbite.backend.model.Order;
 import com.greenbite.backend.service.OrderService;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,10 +26,15 @@ public class OrderController {
         return ResponseEntity.ok(order);
     }
 
-    @GetMapping("/{orderId}/shop/{shopId}")
-    public ResponseEntity<List<Order>> getOrdersByOrderIdAndShopId(
-            @PathVariable Long orderId, @PathVariable Long shopId) {
-        List<Order> orders = orderService.getOrdersByOrderIdAndShopId(orderId, shopId);
+    @GetMapping("/shop_order/{shopId}")
+    public ResponseEntity<List<Order>> getOrdersByShopId(@PathVariable Long shopId) {
+        List<Order> orders = orderService.getOrdersByShopId(shopId);
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/user_orders/{userId}")
+    public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable Long userId) {
+        List<Order> orders = orderService.getOrdersByCustomerId(userId);
         return ResponseEntity.ok(orders);
     }
 }

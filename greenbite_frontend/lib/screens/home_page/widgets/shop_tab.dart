@@ -7,10 +7,8 @@ import 'package:greenbite_frontend/service/auth_service.dart';
 
 import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:greenbite_frontend/service/location_service.dart';
-
 import 'dart:convert'; // For JSON parsing
 import 'package:http/http.dart' as http;
-// Import the ShopDetailsPage
 
 class ShopsTab extends StatefulWidget {
   const ShopsTab({super.key});
@@ -71,12 +69,22 @@ class _ShopsTabState extends State<ShopsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bool isDarkMode = theme.brightness == Brightness.dark;
+
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
     if (errorMessage.isNotEmpty) {
-      return Center(child: Text(errorMessage));
+      return Center(
+        child: Text(
+          errorMessage,
+          style: TextStyle(
+            color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+          ),
+        ),
+      );
     }
 
     return SingleChildScrollView(
@@ -84,12 +92,12 @@ class _ShopsTabState extends State<ShopsTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Nearby Shops",
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: theme.colorScheme.onBackground, // ✅ Adaptive text color
             ),
           ),
           const SizedBox(height: 20),
@@ -106,7 +114,9 @@ class _ShopsTabState extends State<ShopsTab> {
                   borderRadius: BorderRadius.circular(16),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDarkMode
+                          ? Colors.grey[900]
+                          : Colors.white, // ✅ Adaptive background color
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: GestureDetector(
@@ -132,17 +142,20 @@ class _ShopsTabState extends State<ShopsTab> {
                         ),
                         title: Text(
                           shop.name, // Shop name
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black,
+                            color: theme.colorScheme
+                                .onBackground, // ✅ Adaptive text color
                           ),
                         ),
                         subtitle: Text(
                           shop.description, // Shop description
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey,
+                            color: isDarkMode
+                                ? Colors.grey[400]
+                                : Colors.grey[700], // ✅ Adaptive text color
                           ),
                         ),
                       ),
