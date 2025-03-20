@@ -34,6 +34,8 @@ public class UserService {
     public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        System.out.println("user id---------" + user.getId());
+        System.out.println("shop id ---------" + user.getShopId());
         return convertToDTO(user);
     }
 
@@ -45,6 +47,7 @@ public class UserService {
         user.setEmail(userDTO.getEmail());
         user.setPhoneNumber(userDTO.getPhoneNumber());
         user.setAddress(userDTO.getAddress());
+        user.setShopId(userDTO.getShopId());
 
         // Handle profile picture upload
         if (profilePicture != null && !profilePicture.isEmpty()) {
@@ -85,7 +88,8 @@ public class UserService {
                 user.getEmail(),
                 user.getProfilePictureUrl(),
                 user.getPhoneNumber(),
-                user.getAddress()
+                user.getAddress(),
+                user.getShopId()
         );
     }
 
@@ -140,7 +144,7 @@ public class UserService {
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(user -> new UserDTO(user.getId(), user.getUsername(), user.getEmail(), null, user.getPhoneNumber(), user.getAddress()))
+                .map(user -> new UserDTO(user.getId(), user.getUsername(), user.getEmail(), null, user.getPhoneNumber(), user.getAddress(), user.getShopId()))
                 .collect(Collectors.toList());
     }
 
