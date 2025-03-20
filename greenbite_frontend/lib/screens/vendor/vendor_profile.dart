@@ -5,8 +5,7 @@ import 'dart:convert';
 import '../../widgets/vendor_nav_bar.dart';
 import 'vendor_home.dart';
 import 'list_food.dart';
-import 'orders.dart';
-import 'edit_profile.dart'; // Import the EditProfile screen
+import 'edit_profile.dart';
 import 'package:greenbite_frontend/config.dart';
 
 class VendorProfile extends StatefulWidget {
