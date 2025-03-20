@@ -3,8 +3,8 @@ import 'package:greenbite_frontend/screens/green_bite_points/green_bite_shop.dar
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile.dart';
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile_service.dart';
 import 'package:greenbite_frontend/screens/user_profile/edit_profile_screen.dart';
-import 'package:greenbite_frontend/screens/vendor/vendor_home.dart'; // Import the VendorHome screen
-import 'package:greenbite_frontend/screens/green_bite_points/green_bite_points_screen.dart'; // Import Green Bite Points screen
+import 'package:greenbite_frontend/screens/vendor/vendor_home.dart';
+import 'package:greenbite_frontend/screens/green_bite_points/green_bite_points_screen.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -23,10 +23,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _fetchUserProfile();
   }
 
-  // ✅ Fetch user profile data
   Future<void> _fetchUserProfile() async {
     try {
       final userProfile = await UserProfileService.fetchUserProfile();
+      print("Fetched User Profile - shopId: ${userProfile.shopId}"); // Debug print
       setState(() {
         _userProfile = userProfile;
         _isLoading = false;
@@ -36,10 +36,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       setState(() {
         _isLoading = false;
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to load user profile: $e")),
+      );
     }
   }
 
-  // ✅ Navigate to Edit Screen & Update UI After Saving
   Future<void> _editProfile() async {
     final updatedProfile = await Navigator.push(
       context,
@@ -48,7 +50,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       ),
     );
 
-    // ✅ If user saved changes, update UI
     if (updatedProfile != null && updatedProfile is UserProfile) {
       setState(() {
         _userProfile = updatedProfile;
@@ -56,15 +57,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
-  // ✅ Sign Out (Placeholder)
   void _signOut() {
-    print("User signed out"); // TODO: Implement real sign-out logic
+    print("User signed out");
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Signed out successfully!")),
     );
   }
 
-  // ✅ Switch to Vendor View
   void _switchToVendor() {
     Navigator.pushReplacement(
       context,
@@ -72,7 +71,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  // ✅ Navigate to Green Bite Points Page
   void _goToGreenBitePoints() {
     Navigator.push(
       context,
@@ -84,8 +82,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Profile', style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -102,119 +99,103 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _userProfile == null
-              ? const Center(
-                  child: Text('Failed to load user profile',
-                      style: TextStyle(fontSize: 18, color: Colors.grey)))
-              : Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      // Profile Picture and Name Section
-                      _buildProfileHeader(),
-                      const SizedBox(height: 20),
-
-                      // Main Container with Grey Background and Rounded Corners
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100, // Light grey background
-                          borderRadius:
-                              BorderRadius.circular(12), // Rounded corners
-                        ),
-                        child: Column(
-                          children: [
-                            // Edit Profile Section
-                            _buildSectionItem(
-                              icon: Icons.edit,
-                              text: "Edit Profile",
-                              onPressed: _editProfile,
-                            ),
-                            const Divider(height: 1, indent: 16, endIndent: 16),
-
-                            // Switch to Vendor Section
-                            _buildSectionItem(
-                              icon: Icons.store,
-                              text: "Switch to Vendor",
-                              onPressed: _switchToVendor,
-                            ),
-                            const Divider(height: 1, indent: 16, endIndent: 16),
-
-                            // Sign Out Section
-                            _buildSectionItem(
-                              icon: Icons.logout,
-                              text: "Sign Out",
-                              onPressed: _signOut,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      // Additional Options Container
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100, // Light grey background
-                          borderRadius:
-                              BorderRadius.circular(12), // Rounded corners
-                        ),
-                        child: Column(
-                          children: [
-                            // Green Bite Points Section
-                            _buildSectionItem(
-                              icon: Icons.emoji_events,
-                              text: "Green Bite Points",
-                              onPressed: _goToGreenBitePoints,
-                            ),
-                            const Divider(height: 1, indent: 16, endIndent: 16),
-
-                            _buildSectionItem(
-                              icon: Icons.store,
-                              text: "Green Bite Shop",
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            GreenBiteShopScreen()));
-                              },
-                            ),
-
-                            // About Us Section
-                            _buildSectionItem(
-                              icon: Icons.info,
-                              text: "About Us",
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+          ? const Center(child: Text('Failed to load user profile', style: TextStyle(fontSize: 18, color: Colors.grey)))
+          : Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            _buildProfileHeader(),
+            const SizedBox(height: 20),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  _buildSectionItem(
+                    icon: Icons.edit,
+                    text: "Edit Profile",
+                    onPressed: _editProfile,
                   ),
-                ),
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+                  if (_userProfile!.shopId > 0)
+
+                    _buildSectionItem(
+                      icon: Icons.store,
+                      text: "Switch to Vendor",
+                      onPressed: _switchToVendor,
+                    ),
+                  if (_userProfile!.shopId <= 0)
+                    _buildSectionItem(
+                      icon: Icons.add_business,
+                      text: "Create a Shop",
+                      onPressed: () {
+                        // No logic needed for now
+                      },
+                    ),
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+                  _buildSectionItem(
+                    icon: Icons.logout,
+                    text: "Sign Out",
+                    onPressed: _signOut,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  _buildSectionItem(
+                    icon: Icons.emoji_events,
+                    text: "Green Bite Points",
+                    onPressed: _goToGreenBitePoints,
+                  ),
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+                  _buildSectionItem(
+                    icon: Icons.store,
+                    text: "Green Bite Shop",
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => GreenBiteShopScreen()));
+                    },
+                  ),
+                  _buildSectionItem(
+                    icon: Icons.info,
+                    text: "About Us",
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  // Profile Header with Profile Picture and Name
   Widget _buildProfileHeader() {
     return Container(
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Row(
         children: [
-          // Profile Picture
           CircleAvatar(
             radius: 50,
             backgroundImage: NetworkImage(
-              _userProfile?.profilePictureUrl ??
-                  UserProfile
-                      .placeholderProfilePictureUrl, // Fallback to placeholder
+              _userProfile?.profilePictureUrl ?? UserProfile.placeholderProfilePictureUrl,
             ),
           ),
-          const SizedBox(width: 16), // Spacing between image and text
-
-          // User Info
+          const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Username
               Text(
                 _userProfile!.username,
                 style: const TextStyle(
@@ -224,8 +205,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
               ),
               const SizedBox(height: 4),
-
-              // Email
               Text(
                 _userProfile!.email,
                 style: const TextStyle(
@@ -240,7 +219,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  // Section Item with Icon, Text and Divider
   Widget _buildSectionItem({
     required IconData icon,
     required String text,

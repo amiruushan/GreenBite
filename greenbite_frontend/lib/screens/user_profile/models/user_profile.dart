@@ -2,11 +2,11 @@ class UserProfile {
   final int id;
   final String username;
   final String email;
-  final String? profilePictureUrl; // Make it nullable
+  final String? profilePictureUrl;
   final String phoneNumber;
   final String address;
+  final int shopId;
 
-  // Default placeholder URL
   static const String placeholderProfilePictureUrl =
       'https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg';
 
@@ -14,21 +14,21 @@ class UserProfile {
     required this.id,
     required this.username,
     required this.email,
-    this.profilePictureUrl, // Accept null
+    this.profilePictureUrl,
     required this.phoneNumber,
     required this.address,
+    required this.shopId,
   });
 
-  // ✅ Convert JSON to UserProfile
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
       id: json['id'],
       username: json['username'],
       email: json['email'],
-      profilePictureUrl: json['profilePictureUrl'] ??
-          placeholderProfilePictureUrl, // Use placeholder if null
+      profilePictureUrl: json['profilePictureUrl'] ?? placeholderProfilePictureUrl,
       phoneNumber: json['phoneNumber'],
       address: json['address'],
+      shopId: json['shopId'],
     );
   }
 
@@ -42,6 +42,7 @@ class UserProfile {
           placeholderProfilePictureUrl, // Use placeholder if null
       "phoneNumber": phoneNumber,
       "address": address,
+      "shopID": shopId,
     };
   }
 }

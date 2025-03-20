@@ -10,34 +10,32 @@ class UserProfileService {
   // ✅ Fetch User Profile
   static Future<UserProfile> fetchUserProfile() async {
     try {
-      String? token = await AuthService.getToken(); // Retrieve token
-      if (token == null) {
-        print("No token found");
-      }
-      // Get the user ID from SharedPreferences
-      int? userId = await AuthService.getUserId();
-      if (userId == null) {
-        throw Exception('User ID not found');
-      }
-
-      // Fetch user profile using the user ID
+      // Replace with your actual API endpoint
       final response = await http.get(
-        Uri.parse('${Config.apiBaseUrl}/api/users/$userId'),
-        headers: {"Authorization": "Bearer $token"},
+        Uri.parse('${Config.apiBaseUrl}/api/users/1'),
+        headers: {
+          "Authorization": "Bearer ${await AuthService.getToken()}",
+        },
       );
+
+      print("API Response Status Code: ${response.statusCode}");
+      print("API Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         return UserProfile.fromJson(data);
       } else {
-        throw Exception('Failed to load user profile');
+        throw Exception('Failed to load user profile. Status: ${response.statusCode}');
       }
     } catch (e) {
-      throw Exception('Error fetching user profile: $e');
+      print("Error fetching user profile: $e");
+      throw Exception('Failed to load user profile: $e');
     }
   }
 
-  static Future<bool> updateUserProfile(
+
+
+static Future<bool> updateUserProfile(
       UserProfile updatedProfile, File? imageFile) async {
     try {
       String? token = await AuthService.getToken(); // Retrieve token
