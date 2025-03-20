@@ -105,14 +105,17 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Green Bite",
+          "GreenBite",
           style: TextStyle(
-            color: Theme.of(context)
-                .colorScheme
-                .onBackground, // ✅ Adaptive text color
+            color: isDarkMode
+                ? Colors.white
+                : Colors.green, // ✅ Adaptive text color
             fontSize: 30,
             fontWeight: FontWeight.bold,
           ),
@@ -143,29 +146,29 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : favoriteItems.isEmpty
-              ? const Center(
-                  child: Text(
-                    "No favorites yet!",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: favoriteItems.length,
-                  itemBuilder: (context, index) {
-                    final item = favoriteItems[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: FoodCard(
-                        foodItem: item,
-                        isFavorite: true,
-                        onFavoritePressed: () {
-                          _removeFavorite(item);
-                        },
-                      ),
-                    );
-                  },
-                ),
+          ? const Center(
+        child: Text(
+          "No favorites yet!",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+      )
+          : ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: favoriteItems.length,
+        itemBuilder: (context, index) {
+          final item = favoriteItems[index];
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: FoodCard(
+              foodItem: item,
+              isFavorite: true,
+              onFavoritePressed: () {
+                _removeFavorite(item);
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 }
