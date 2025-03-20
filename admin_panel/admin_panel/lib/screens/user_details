@@ -1,0 +1,90 @@
+import 'package:flutter/material.dart';
+
+class UserDetailPage extends StatefulWidget {
+  @override
+  _UserDetailPageState createState() => _UserDetailPageState();
+}
+
+class _UserDetailPageState extends State<UserDetailPage> {
+  Map<String, dynamic> user = {};
+
+  @override
+  void didChangeDependencies() {
+    // Get the user data passed from the previous page
+    final Map<String, dynamic> args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    user = args;
+    super.didChangeDependencies();
+  }
+
+  // Function to delete the user
+  void _deleteUser() {
+    // Logic to delete the user goes here (e.g., API call to delete the user)
+    print('User deleted: ${user['username']}');
+    Navigator.pop(context); // Go back to the user list
+  }
+
+  // Function to ban the user
+  void _banUser() {
+    // Logic to ban the user goes here (e.g., API call to ban the user)
+    print('User banned: ${user['username']}');
+  }
+
+  // Function to update user info
+  void _updateUserInfo() {
+    // Logic to update the user info goes here (e.g., API call to update user info)
+    print('User info updated for: ${user['username']}');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('User Details - ${user['username']}'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text('Username: ${user['username']}'),
+            Text('Email: ${user['email']}'),
+            Text('Status: ${user['status']}'),
+            SizedBox(height: 20),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'New Username',
+              ),
+              onChanged: (value) {
+                user['username'] = value;
+              },
+            ),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'New Email',
+              ),
+              onChanged: (value) {
+                user['email'] = value;
+              },
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _updateUserInfo,
+              child: Text('Update User Info'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _banUser,
+              child: Text('Ban User'),
+              style: ElevatedButton.styleFrom(primary: Colors.red),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _deleteUser,
+              child: Text('Delete User'),
+              style: ElevatedButton.styleFrom(primary: Colors.black),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

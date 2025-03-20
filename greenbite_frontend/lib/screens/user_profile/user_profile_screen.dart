@@ -3,10 +3,8 @@ import 'package:greenbite_frontend/screens/green_bite_points/green_bite_shop.dar
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile.dart';
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile_service.dart';
 import 'package:greenbite_frontend/screens/user_profile/edit_profile_screen.dart';
-import 'package:greenbite_frontend/screens/vendor/vendor_home.dart';
-import 'package:greenbite_frontend/screens/green_bite_points/green_bite_points_screen.dart';
-import 'package:provider/provider.dart';
-import 'package:greenbite_frontend/theme_provider.dart';
+import 'package:greenbite_frontend/screens/vendor/vendor_home.dart'; // Import the VendorHome screen
+import 'package:greenbite_frontend/screens/green_bite_points/green_bite_points_screen.dart'; // Import Green Bite Points screen
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -81,6 +79,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
+  void _goToCustomerOrderPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CustomerOrdersPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -130,27 +135,41 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
                       const SizedBox(height: 16),
 
-                      // ✅ Additional Options
-                      _buildOptionsContainer(theme, [
-                        _buildSectionItem(
-                          icon: Icons.emoji_events,
-                          text: "Green Bite Points",
-                          onPressed: _goToGreenBitePoints,
+                      // Additional Options Container
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100, // Light grey background
+                          borderRadius:
+                              BorderRadius.circular(12), // Rounded corners
                         ),
-                        _buildSectionItem(
-                          icon: Icons.shopping_bag,
-                          text: "Green Bite Shop",
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => GreenBiteShopScreen()),
-                            );
-                          },
-                        ),
-                        _buildSectionItem(
-                          icon: Icons.info,
-                          text: "About Us",
+                        child: Column(
+                          children: [
+                            // Green Bite Points Section
+                            _buildSectionItem(
+                              icon: Icons.emoji_events,
+                              text: "Green Bite Points",
+                              onPressed: _goToGreenBitePoints,
+                            ),
+                            const Divider(height: 1, indent: 16, endIndent: 16),
+
+                            _buildSectionItem(
+                              icon: Icons.store,
+                              text: "Green Bite Shop",
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            GreenBiteShopScreen()));
+                              },
+                            ),
+
+                            // About Us Section
+                            _buildSectionItem(
+                              icon: Icons.info,
+                              text: "About Us",
+                            ),
+                          ],
                         ),
                       ]),
                     ],
