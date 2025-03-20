@@ -53,7 +53,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ? _imageFile!.path
           : widget.userProfile.profilePictureUrl, // Use new image if selected
       phoneNumber: _phoneController.text.trim(),
-      address: _addressController.text.trim(),
+      address: _addressController.text.trim(), shopId: widget.userProfile.shopId
     );
 
     bool success =

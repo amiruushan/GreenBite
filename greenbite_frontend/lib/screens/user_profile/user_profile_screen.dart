@@ -1,4 +1,3 @@
-// user_profile_screen.dart
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/green_bite_points/green_bite_shop.dart';
 import 'package:greenbite_frontend/screens/user_profile/about_us_screen.dart';
@@ -7,6 +6,7 @@ import 'package:greenbite_frontend/screens/user_profile/models/user_profile_serv
 import 'package:greenbite_frontend/screens/user_profile/edit_profile_screen.dart';
 import 'package:greenbite_frontend/screens/vendor/vendor_home.dart';
 import 'package:greenbite_frontend/screens/green_bite_points/green_bite_points_screen.dart';
+
 import 'package:provider/provider.dart';
 import 'package:greenbite_frontend/theme_provider.dart';
 
@@ -27,10 +27,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _fetchUserProfile();
   }
 
-  // ✅ Fetch user profile data
   Future<void> _fetchUserProfile() async {
     try {
       final userProfile = await UserProfileService.fetchUserProfile();
+      print("Fetched User Profile - shopId: ${userProfile.shopId}"); // Debug print
       setState(() {
         _userProfile = userProfile;
         _isLoading = false;
@@ -40,10 +40,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       setState(() {
         _isLoading = false;
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to load user profile: $e")),
+      );
     }
   }
 
-  // ✅ Navigate to Edit Screen & Update UI After Saving
   Future<void> _editProfile() async {
     final updatedProfile = await Navigator.push(
       context,
@@ -59,15 +61,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
-  // ✅ Sign Out (Placeholder)
   void _signOut() {
-    print("User signed out"); // TODO: Implement real sign-out logic
+    print("User signed out");
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Signed out successfully!")),
     );
   }
 
-  // ✅ Switch to Vendor View
   void _switchToVendor() {
     Navigator.pushReplacement(
       context,
@@ -75,7 +75,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  // ✅ Navigate to Green Bite Points Page
   void _goToGreenBitePoints() {
     Navigator.push(
       context,
@@ -89,6 +88,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final theme = Theme.of(context); // ✅ Get theme for adaptive colors
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profile', style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.green.withOpacity(0.7), Colors.green.shade700],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _userProfile == null
@@ -118,11 +132,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           text: "Edit Profile",
                           onPressed: _editProfile,
                         ),
-                        _buildSectionItem(
-                          icon: Icons.store,
-                          text: "Switch to Vendor",
-                          onPressed: _switchToVendor,
-                        ),
+                        if (_userProfile!.shopId > 0)
+                          _buildSectionItem(
+                            icon: Icons.store,
+                            text: "Switch to Vendor",
+                            onPressed: _switchToVendor,
+                          ),
+                        if (_userProfile!.shopId <= 0)
+                          _buildSectionItem(
+                            icon: Icons.add_business,
+                            text: "Create a Shop",
+                            onPressed: () {
+                              // No logic needed for now
+                            },
+                          ),
                         _buildSectionItem(
                           icon: Icons.logout,
                           text: "Sign Out",
@@ -145,8 +168,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => GreenBiteShopScreen()),
+                              MaterialPageRoute(builder: (context) => GreenBiteShopScreen()),
                             );
                           },
                         ),
@@ -156,8 +178,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => const AboutUsScreen()),
+                              MaterialPageRoute(builder: (context) => const AboutUsScreen()),
                             );
                           },
                         ),
@@ -175,8 +196,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         CircleAvatar(
           radius: 50,
           backgroundImage: NetworkImage(
-            _userProfile?.profilePictureUrl ??
-                UserProfile.placeholderProfilePictureUrl,
+            _userProfile?.profilePictureUrl ?? UserProfile.placeholderProfilePictureUrl,
           ),
         ),
         const SizedBox(height: 10),
@@ -238,8 +258,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       ),
       child: Column(
         children: children
-            .expand((widget) =>
-                [widget, const Divider(height: 1, indent: 16, endIndent: 16)])
+            .expand((widget) => [widget, const Divider(height: 1, indent: 16, endIndent: 16)])
             .toList()
             .sublist(0, children.length * 2 - 1), // Remove last divider
       ),
