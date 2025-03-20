@@ -37,7 +37,7 @@ public class OrderService {
                 .collect(Collectors.toList());
 
         // Create and save the order
-        Order order = new Order(null, orderDTO.getCustomerId(), orderDTO.getShopId(),orderDTO.getPaymentMethod(), "pending", foodItems);
+        Order order = new Order(null, orderDTO.getCustomerId(), orderDTO.getShopId(),orderDTO.getPaymentMethod(), "pending",orderDTO.getTotalAmount(), foodItems);
         return orderRepository.save(order);
     }
     public List<Order> getOrdersByShopId(Long shopId) {
