@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
 class FoodDetailScreen extends StatefulWidget {
   final FoodItem foodItem;
 
-  const FoodDetailScreen({Key? key, required this.foodItem}) : super(key: key);
+  const FoodDetailScreen({super.key, required this.foodItem});
 
   @override
   State<FoodDetailScreen> createState() => _FoodDetailScreenState();

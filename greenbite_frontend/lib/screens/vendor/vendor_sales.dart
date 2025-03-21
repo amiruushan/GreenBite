@@ -5,6 +5,8 @@ import 'package:greenbite_frontend/config.dart';
 import 'order_details.dart';
 
 class VendorSalesPage extends StatefulWidget {
+  const VendorSalesPage({super.key});
+
   @override
   _VendorSalesPageState createState() => _VendorSalesPageState();
 }

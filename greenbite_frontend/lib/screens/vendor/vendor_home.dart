@@ -6,9 +6,7 @@ import 'package:greenbite_frontend/screens/vendor/vendor_profile.dart';
 import '../../config.dart';
 import '../../widgets/vendor_nav_bar.dart';
 import 'list_food.dart';
-import 'orders.dart';
 import 'food_item.dart';
-import 'package:greenbite_frontend/config.dart';
 
 class VendorHome extends StatefulWidget {
   const VendorHome({super.key});

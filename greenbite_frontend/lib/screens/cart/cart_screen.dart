@@ -139,7 +139,7 @@ class _CartScreenState extends State<CartScreen> {
         elevation: 0,
         backgroundColor: Colors.transparent, // ✅ Transparent AppBar
         iconTheme: IconThemeData(
-          color: theme.colorScheme.onBackground, // ✅ Adaptive icon color
+          color: theme.colorScheme.onSurface, // ✅ Adaptive icon color
         ),
       ),
       body: cartItems.isEmpty
@@ -150,7 +150,7 @@ class _CartScreenState extends State<CartScreen> {
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
                   color:
-                      theme.colorScheme.onBackground, // ✅ Adaptive text color
+                      theme.colorScheme.onSurface, // ✅ Adaptive text color
                 ),
               ),
             )
@@ -197,7 +197,7 @@ class _CartScreenState extends State<CartScreen> {
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: theme.colorScheme
-                                            .onBackground, // ✅ Adaptive text color
+                                            .onSurface, // ✅ Adaptive text color
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -269,7 +269,7 @@ class _CartScreenState extends State<CartScreen> {
                         "Select Coupon",
                         style: TextStyle(
                           color: theme.colorScheme
-                              .onBackground, // ✅ Adaptive text color
+                              .onSurface, // ✅ Adaptive text color
                         ),
                       ),
                       value: selectedCoupon,
@@ -281,7 +281,7 @@ class _CartScreenState extends State<CartScreen> {
                             "${coupon['deal_name']} - \$${coupon['discount']}",
                             style: TextStyle(
                               color: theme.colorScheme
-                                  .onBackground, // ✅ Adaptive text color
+                                  .onSurface, // ✅ Adaptive text color
                             ),
                           ),
                         );
@@ -322,7 +322,7 @@ class _CartScreenState extends State<CartScreen> {
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: theme.colorScheme
-                                  .onBackground, // ✅ Adaptive text color
+                                  .onSurface, // ✅ Adaptive text color
                             ),
                           ),
                           Text(
@@ -331,7 +331,7 @@ class _CartScreenState extends State<CartScreen> {
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: theme.colorScheme
-                                  .onBackground, // ✅ Adaptive text color
+                                  .onSurface, // ✅ Adaptive text color
                             ),
                           ),
                         ],
@@ -370,7 +370,7 @@ class _CartScreenState extends State<CartScreen> {
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: theme.colorScheme
-                                  .onBackground, // ✅ Adaptive text color
+                                  .onSurface, // ✅ Adaptive text color
                             ),
                           ),
                           Text(

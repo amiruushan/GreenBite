@@ -112,7 +112,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           style: TextStyle(
             color: Theme.of(context)
                 .colorScheme
-                .onBackground, // ✅ Adaptive text color
+                .onSurface, // ✅ Adaptive text color
             fontSize: 30,
             fontWeight: FontWeight.bold,
           ),
@@ -123,7 +123,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         iconTheme: IconThemeData(
           color: Theme.of(context)
               .colorScheme
-              .onBackground, // ✅ Icons adapt to theme
+              .onSurface, // ✅ Icons adapt to theme
         ),
         actions: [
           IconButton(
@@ -136,7 +136,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             },
             color: Theme.of(context)
                 .colorScheme
-                .onBackground, // ✅ Action icons adapt
+                .onSurface, // ✅ Action icons adapt
           ),
         ],
       ),

@@ -200,7 +200,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color:
-                      theme.colorScheme.onBackground, // ✅ Adaptive text color
+                      theme.colorScheme.onSurface, // ✅ Adaptive text color
                 ),
               ),
               const SizedBox(height: 15),
@@ -285,7 +285,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+              color: theme.colorScheme.onSurface, // ✅ Adaptive text color
             ),
           ),
           const SizedBox(height: 10),
@@ -315,7 +315,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             style: TextStyle(
               fontSize: isTotal ? 18 : 16,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-              color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+              color: theme.colorScheme.onSurface, // ✅ Adaptive text color
             ),
           ),
           Text(
@@ -325,7 +325,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
               color: isTotal
                   ? Colors.green
-                  : theme.colorScheme.onBackground, // ✅ Adaptive text color
+                  : theme.colorScheme.onSurface, // ✅ Adaptive text color
             ),
           ),
         ],
@@ -376,7 +376,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
-                color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+                color: theme.colorScheme.onSurface, // ✅ Adaptive text color
               ),
             ),
             const Spacer(),

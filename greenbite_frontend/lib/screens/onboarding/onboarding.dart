@@ -69,7 +69,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background, // ✅ Theme-based background
+      backgroundColor: theme.colorScheme.surface, // ✅ Theme-based background
       body: Stack(
         children: [
           // PageView for onboarding screens
@@ -101,7 +101,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: theme
-                            .colorScheme.onBackground, // ✅ Adaptive text color
+                            .colorScheme.onSurface, // ✅ Adaptive text color
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -137,7 +137,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   color:
-                      theme.colorScheme.onBackground, // ✅ Adaptive text color
+                      theme.colorScheme.onSurface, // ✅ Adaptive text color
                   fontWeight: FontWeight.bold,
                 ),
               ),

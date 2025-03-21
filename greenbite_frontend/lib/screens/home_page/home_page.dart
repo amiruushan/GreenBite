@@ -271,12 +271,12 @@ class _HomePageContentState extends State<HomePageContent> {
       length: 2, // Two tabs (Food Items & Shops)
       child: Scaffold(
         backgroundColor:
-            theme.colorScheme.background, // ✅ Theme-based background
+            theme.colorScheme.surface, // ✅ Theme-based background
         appBar: AppBar(
           title: Text(
             "Green Bite",
             style: TextStyle(
-              color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+              color: theme.colorScheme.onSurface, // ✅ Adaptive text color
               fontSize: 30,
               fontWeight: FontWeight.bold,
             ),
@@ -285,13 +285,13 @@ class _HomePageContentState extends State<HomePageContent> {
           backgroundColor: Colors.transparent, // ✅ Transparent AppBar
           elevation: 0, // ✅ Remove shadow
           iconTheme: IconThemeData(
-            color: theme.colorScheme.onBackground, // ✅ Icons adapt to theme
+            color: theme.colorScheme.onSurface, // ✅ Icons adapt to theme
           ),
           actions: [
             IconButton(
               icon: Icon(
                 Icons.shopping_cart,
-                color: theme.colorScheme.onBackground, // ✅ Action icons adapt
+                color: theme.colorScheme.onSurface, // ✅ Action icons adapt
               ),
               onPressed: () {
                 Navigator.push(
@@ -346,7 +346,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                   const EdgeInsets.symmetric(vertical: 15),
                             ),
                             style: TextStyle(
-                                color: theme.colorScheme.onBackground),
+                                color: theme.colorScheme.onSurface),
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -358,7 +358,7 @@ class _HomePageContentState extends State<HomePageContent> {
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: theme.colorScheme
-                                .onBackground, // ✅ Adaptive text color
+                                .onSurface, // ✅ Adaptive text color
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -503,7 +503,7 @@ class _HomePageContentState extends State<HomePageContent> {
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: theme.colorScheme
-                                .onBackground, // ✅ Adaptive text color
+                                .onSurface, // ✅ Adaptive text color
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -539,7 +539,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                   labelStyle: TextStyle(
                                     color: isSelected
                                         ? Colors.white
-                                        : theme.colorScheme.onBackground,
+                                        : theme.colorScheme.onSurface,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -558,7 +558,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                     "No items match this filter!",
                                     style: TextStyle(
                                       fontSize: 18,
-                                      color: theme.colorScheme.onBackground
+                                      color: theme.colorScheme.onSurface
                                           .withOpacity(
                                               0.5), // ✅ Adaptive text color
                                     ),
@@ -599,7 +599,7 @@ class _HomePageContentState extends State<HomePageContent> {
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: theme.colorScheme
-                                .onBackground, // ✅ Adaptive text color
+                                .onSurface, // ✅ Adaptive text color
                           ),
                         ),
                         const SizedBox(height: 10),

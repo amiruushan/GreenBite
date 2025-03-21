@@ -81,7 +81,7 @@ class _ShopsTabState extends State<ShopsTab> {
         child: Text(
           errorMessage,
           style: TextStyle(
-            color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+            color: theme.colorScheme.onSurface, // ✅ Adaptive text color
           ),
         ),
       );
@@ -97,7 +97,7 @@ class _ShopsTabState extends State<ShopsTab> {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+              color: theme.colorScheme.onSurface, // ✅ Adaptive text color
             ),
           ),
           const SizedBox(height: 20),
@@ -146,7 +146,7 @@ class _ShopsTabState extends State<ShopsTab> {
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: theme.colorScheme
-                                .onBackground, // ✅ Adaptive text color
+                                .onSurface, // ✅ Adaptive text color
                           ),
                         ),
                         subtitle: Text(

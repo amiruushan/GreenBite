@@ -106,12 +106,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background, // ✅ Theme-based background
+      backgroundColor: theme.colorScheme.surface, // ✅ Theme-based background
       appBar: AppBar(
         title: Text(
           "My Inventory",
           style: TextStyle(
-            color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+            color: theme.colorScheme.onSurface, // ✅ Adaptive text color
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -119,13 +119,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
         backgroundColor: Colors.transparent, // ✅ Transparent AppBar
         elevation: 0, // ✅ Remove shadow
         iconTheme: IconThemeData(
-          color: theme.colorScheme.onBackground, // ✅ Icons adapt to theme
+          color: theme.colorScheme.onSurface, // ✅ Icons adapt to theme
         ),
         actions: [
           IconButton(
             icon: Icon(
               Icons.refresh,
-              color: theme.colorScheme.onBackground, // ✅ Action icons adapt
+              color: theme.colorScheme.onSurface, // ✅ Action icons adapt
             ),
             onPressed: _fetchInventory,
           ),

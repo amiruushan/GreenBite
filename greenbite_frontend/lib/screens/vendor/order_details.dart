@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class OrderDetailsPage extends StatelessWidget {
   final Map<String, dynamic> order;
 
-  OrderDetailsPage({required this.order});
+  const OrderDetailsPage({super.key, required this.order});
 
   @override
   Widget build(BuildContext context) {

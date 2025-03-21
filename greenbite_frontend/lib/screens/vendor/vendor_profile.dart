@@ -7,7 +7,6 @@ import '../../widgets/vendor_nav_bar.dart';
 import 'vendor_home.dart';
 import 'list_food.dart';
 import 'edit_profile.dart';
-import 'package:greenbite_frontend/config.dart';
 
 class VendorProfile extends StatefulWidget {
   final int vendorId;
