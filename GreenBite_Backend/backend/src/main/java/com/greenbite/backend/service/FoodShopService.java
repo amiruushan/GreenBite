@@ -153,4 +153,10 @@ public class FoodShopService {
                 .collect(Collectors.toList());
     }
 
+    public LocalDate getFoodShopExpirationDate(Long shopId) {
+        return foodShopRepository.findById(shopId)
+                .map(FoodShop::getLicenseExpirationDate)
+                .orElseThrow(() -> new RuntimeException("Shop not found with ID: " + shopId));
+    }
+
 }

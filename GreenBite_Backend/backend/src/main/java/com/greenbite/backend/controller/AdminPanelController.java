@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -91,6 +92,12 @@ public class AdminPanelController {
     public ResponseEntity<List<FoodShopDTO>> getShopsWithNearExpiration() {
         List<FoodShopDTO> nearExpiryShops = foodShopService.getShopsWithNearExpiration();
         return ResponseEntity.ok(nearExpiryShops);
+    }
+
+    @GetMapping("/foodShopExpiration/{shopId}")
+    public ResponseEntity<LocalDate> getFoodShopExpirationDate(@PathVariable Long shopId) {
+        LocalDate expirationDate = foodShopService.getFoodShopExpirationDate(shopId);
+        return ResponseEntity.ok(expirationDate);
     }
 
 
