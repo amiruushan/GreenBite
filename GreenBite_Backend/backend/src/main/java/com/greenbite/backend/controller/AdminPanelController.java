@@ -26,6 +26,7 @@ public class AdminPanelController {
 
     @GetMapping("/listUsers")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
+        System.out.println("Wada karaanawa");
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
@@ -47,6 +48,13 @@ public class AdminPanelController {
     public ResponseEntity<String> deleteFoodShop(@PathVariable Long foodShopId) {
         foodShopService.deleteFoodShopById(foodShopId);
         return ResponseEntity.ok("Food Shop deleted successfully");
+    }
+
+    //Listing all the coupon
+    @GetMapping("/listAllCoupon")
+    public List<Coupon> getAllCoupons() {
+        System.out.println("Wada karaanawa");
+        return couponService.getAllCoupons();
     }
 
     // Creating a new coupon
