@@ -34,7 +34,7 @@ public class FoodItemController {
             @PathVariable double lat,
             @PathVariable double lon,
             @PathVariable double radius) {
-        radius=200;
+        radius=10000;
         List<FoodItemDTO> nearbyFoodItems = foodItemService.getFoodItemsNearby(lat, lon, radius);
         return nearbyFoodItems;
     }

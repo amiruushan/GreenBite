@@ -40,13 +40,12 @@ public class UserService {
     public UserDTO updateUser(UserDTO userDTO, MultipartFile profilePicture) throws IOException {
         User user = userRepository.findById(userDTO.getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         user.setPhoneNumber(userDTO.getPhoneNumber());
         user.setAddress(userDTO.getAddress());
         user.setShopId(userDTO.getShopId());
-
+        user.setShopId(userDTO.getShopId());
         // Handle profile picture upload
         if (profilePicture != null && !profilePicture.isEmpty()) {
             // Delete the old profile picture if it exists

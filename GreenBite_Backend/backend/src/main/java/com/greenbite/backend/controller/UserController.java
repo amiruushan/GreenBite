@@ -35,7 +35,6 @@ public class UserController {
     public ResponseEntity<UserDTO> updateUser(
             @RequestPart("user") String userJson,
             @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture) throws IOException {
-
         // Convert the JSON string to a UserDTO object
         ObjectMapper objectMapper = new ObjectMapper();
         UserDTO userDTO = objectMapper.readValue(userJson, UserDTO.class);

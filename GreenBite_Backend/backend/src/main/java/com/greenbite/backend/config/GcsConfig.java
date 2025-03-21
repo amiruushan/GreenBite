@@ -15,7 +15,7 @@ public class GcsConfig {
         // Load the service account key file
         GoogleCredentials credentials = GoogleCredentials.fromStream(
 
-            new FileInputStream("/Users/lohangunathilaka/Documents/GitHub/GreenBite/gleaming-orbit-453215-j2-6e0bdb8a2018.json")
+            new FileInputStream("/Users/gesithbimsara/Documents/Degree/2nd Year/GreenBite/gleaming-orbit-453215-j2-3c2c20f90023.json")
 
            
 

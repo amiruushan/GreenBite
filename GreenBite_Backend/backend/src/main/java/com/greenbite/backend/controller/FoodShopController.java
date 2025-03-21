@@ -6,7 +6,9 @@ import com.greenbite.backend.service.FoodShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.sql.SQLOutput;
 import java.util.List;
 
@@ -32,8 +34,12 @@ public class FoodShopController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<FoodShop> updateFoodShop(@PathVariable Long id, @RequestBody FoodShop foodShop) {
-        FoodShop updatedShop = foodShopService.updateFoodShop(id, foodShop);
+    public ResponseEntity<FoodShop> updateFoodShop(
+            @PathVariable Long id,
+            @RequestPart("shop") String shopJson,
+            @RequestPart(value = "photo", required = false) MultipartFile photo) throws IOException {
+
+        FoodShop updatedShop = foodShopService.updateFoodShop(id, shopJson, photo);
         return ResponseEntity.ok(updatedShop);
     }
 
@@ -42,7 +48,7 @@ public class FoodShopController {
             @RequestParam double lat,
             @RequestParam double lon,
             @RequestParam(defaultValue = "5") double radius) {
-        radius=200;
+        radius=10000;
         return foodShopService.findShopsNearby(lat, lon, radius);
     }
 }
