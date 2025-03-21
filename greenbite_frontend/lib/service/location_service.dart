@@ -67,6 +67,8 @@ class LocationService {
         return;
       }
 
+      print("Token: $token");
+
       // Send a PUT request to your backend endpoint
       final response = await http.put(
         Uri.parse('${Config.apiBaseUrl}/api/users/updateLocation'),
@@ -82,6 +84,7 @@ class LocationService {
         print("User location updated successfully");
       } else {
         print("Failed to update location. Status code: ${response.statusCode}");
+        print("Response body: ${response.body}");
       }
     } catch (e) {
       print("Error updating location: $e");
