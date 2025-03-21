@@ -11,6 +11,7 @@ import com.greenbite.backend.repository.FoodItemRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final FoodItemRepository foodItemRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
 
     public OrderService(OrderRepository orderRepository, FoodItemRepository foodItemRepository) {
         this.orderRepository = orderRepository;
@@ -33,7 +35,7 @@ public class OrderService {
             // Convert items to JSON (only saving id and quantity)
             String orderedItemsJson = objectMapper.writeValueAsString(
                     orderDTO.getItems().stream()
-                            .map(itemDTO -> Map.of("id", itemDTO.getId(), "quantity", itemDTO.getQuantity()))
+                            .map(itemDTO -> Map.of("id", itemDTO.getId(), "quantity", itemDTO.getQuantity(),"price", itemDTO.getPrice()))
                             .collect(Collectors.toList())
             );
 
@@ -49,7 +51,7 @@ public class OrderService {
             Order order = new Order(null, orderDTO.getCustomerId(), orderDTO.getShopId(),
                     orderDTO.getPaymentMethod(), "pending",
                     orderDTO.getTotalAmount(), orderDTO.getTotalCalories(),
-                    orderedItemsJson);
+                    LocalDateTime.now(),orderedItemsJson);
 
             return orderRepository.save(order);
         } catch (JsonProcessingException e) {

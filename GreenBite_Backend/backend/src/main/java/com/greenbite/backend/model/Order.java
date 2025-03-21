@@ -3,6 +3,7 @@ package com.greenbite.backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -23,6 +24,7 @@ public class Order {
     private String status = "pending"; // Default status is "pending"
     private float totalAmount;
     private float totalCalories;
+    private LocalDateTime orderDate;
 
     @Column(columnDefinition = "TEXT") // Store JSON as text
     private String orderedItemsJson;
