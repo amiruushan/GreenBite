@@ -157,28 +157,32 @@ class _LoginScreenState extends State<LoginScreen> {
               prefixIcon: Icons.lock_outline,
               isDarkMode: isDarkMode,
             ),
-            const SizedBox(height: 25),
+            const SizedBox(height: 10),
 
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ForgotPasswordScreen(email: emailController.text),
+            Align(
+              alignment: Alignment.centerLeft, // Align text to the left
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ForgotPasswordScreen(email: emailController.text),
+                    ),
+                  );
+                },
+                child: Text(
+                  "Forgot Password?",
+                  style: TextStyle(
+                    color: Colors.green, // ✅ Match "Register" color
+                    fontWeight:
+                        FontWeight.bold, // ✅ Match "Register" font weight
                   ),
-                );
-              },
-              child: Text(
-                "Forgot Password?",
-                style: TextStyle(
-                  color: isDarkMode
-                      ? Colors.blue[300]
-                      : Colors.blue, // ✅ Adaptive text color
-                  fontSize: 16,
                 ),
               ),
             ),
+
+            SizedBox(height: 25),
 
             // ✅ Login Button
             _isLoading

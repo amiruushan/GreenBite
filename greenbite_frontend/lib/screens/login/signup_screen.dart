@@ -119,15 +119,22 @@ class _SignupScreenState extends State<SignupScreen> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background, // ✅ Theme-based background
+      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
+      appBar: AppBar(
+        backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous page
+          },
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 30), // Top spacing
-
-            const SizedBox(height: 10),
+            const SizedBox(height: 30),
 
             // ✅ Title & Subtitle
             Text(
@@ -135,7 +142,7 @@ class _SignupScreenState extends State<SignupScreen> {
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: theme.colorScheme.primary, // ✅ Theme-based color
+                color: isDarkMode ? Colors.white : Colors.green,
               ),
             ),
             const SizedBox(height: 5),
@@ -143,8 +150,7 @@ class _SignupScreenState extends State<SignupScreen> {
               "Sign up to start ordering delicious meals.",
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: theme.colorScheme.onSurface
-                    .withOpacity(0.7), // ✅ Theme-based color
+                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                 fontSize: 16,
               ),
             ),
@@ -155,12 +161,14 @@ class _SignupScreenState extends State<SignupScreen> {
               label: "First Name",
               controller: _firstNameController,
               prefixIcon: Icons.person,
+              isDarkMode: isDarkMode,
             ),
             const SizedBox(height: 10),
             _CustomTextField(
               label: "Surname",
               controller: _surnameController,
               prefixIcon: Icons.person_outline,
+              isDarkMode: isDarkMode,
             ),
             const SizedBox(height: 10),
 
@@ -169,12 +177,14 @@ class _SignupScreenState extends State<SignupScreen> {
               label: "Email",
               controller: _emailController,
               prefixIcon: Icons.email_outlined,
+              isDarkMode: isDarkMode,
             ),
             const SizedBox(height: 10),
             _CustomTextField(
               label: "Username",
               controller: _usernameController,
               prefixIcon: Icons.account_circle_outlined,
+              isDarkMode: isDarkMode,
             ),
             const SizedBox(height: 10),
 
@@ -184,83 +194,18 @@ class _SignupScreenState extends State<SignupScreen> {
               isPassword: true,
               controller: _passwordController,
               prefixIcon: Icons.lock_outline,
+              isDarkMode: isDarkMode,
             ),
             const SizedBox(height: 20),
 
-            const SizedBox(height: 10),
-            _CustomTextField(
-              label: "Street Address",
-              controller: _streetAddressController,
-              prefixIcon: Icons.home_outlined,
-            ),
-            const SizedBox(height: 10),
-            DropdownButtonFormField<String>(
-              decoration: InputDecoration(
-                labelText: "District",
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                filled: true,
-                fillColor: isDarkMode
-                    ? Colors.grey[800]
-                    : Colors.grey[200], // ✅ Adaptive color
-              ),
-              items: ["Colombo", "Galle", "Gampaha", "Ratnapura"]
-                  .map((district) => DropdownMenuItem(
-                        value: district,
-                        child: Text(
-                          district,
-                          style: TextStyle(
-                            color: theme
-                                .colorScheme.onSurface, // ✅ Theme-based color
-                          ),
-                        ),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedDistrict = value;
-                });
-              },
-            ),
-            const SizedBox(height: 10),
-
-            // ✅ Terms & Conditions
-            Row(
-              children: [
-                Checkbox(
-                  value: termsAccepted,
-                  onChanged: (value) {
-                    setState(() {
-                      termsAccepted = value!;
-                    });
-                  },
-                  fillColor: MaterialStateProperty.resolveWith<Color>(
-                    (states) =>
-                        theme.colorScheme.primary, // ✅ Theme-based color
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    "I accept all terms and conditions",
-                    style: TextStyle(
-                      color: theme.colorScheme.onSurface, // ✅ Theme-based color
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 15),
-
-            // ✅ Signup Button
+            // ✅ Sign Up Button
             _isLoading
                 ? const CircularProgressIndicator()
                 : _CustomButton(
-                    text: "Continue",
+                    text: "Sign Up",
                     onPressed: _validateAndProceed,
-                    backgroundColor:
-                        theme.colorScheme.primary, // ✅ Theme-based color
-                    textColor:
-                        theme.colorScheme.onPrimary, // ✅ Theme-based color
+                    backgroundColor: Colors.green,
+                    textColor: Colors.white,
                     shadow: true,
                   ),
             const SizedBox(height: 15),
@@ -271,50 +216,51 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 }
 
-/// ✅ **Custom Text Field**
+/// ✅ **Custom Text Field Component**
 class _CustomTextField extends StatelessWidget {
+  final TextEditingController controller;
   final String label;
   final bool isPassword;
   final IconData? prefixIcon;
-  final TextEditingController controller;
+  final bool isDarkMode;
 
   const _CustomTextField({
-    required this.label,
     required this.controller,
+    required this.label,
     this.isPassword = false,
     this.prefixIcon,
+    required this.isDarkMode,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-
     return TextField(
       controller: controller,
       obscureText: isPassword,
-      style:
-          TextStyle(color: theme.colorScheme.onSurface), // ✅ Theme-based color
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(
-            color: theme.colorScheme.onSurface
-                .withOpacity(0.7)), // ✅ Theme-based color
-        prefixIcon: prefixIcon != null
-            ? Icon(prefixIcon,
-                color: theme.colorScheme.primary) // ✅ Theme-based color
-            : null,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
+        ),
+        prefixIcon:
+            prefixIcon != null ? Icon(prefixIcon, color: Colors.green) : null,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: isDarkMode ? Colors.grey[600]! : Colors.grey[400]!,
+          ),
+        ),
         filled: true,
-        fillColor: isDarkMode
-            ? Colors.grey[800]
-            : Colors.grey[200], // ✅ Adaptive color
+        fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+      ),
+      style: TextStyle(
+        color: isDarkMode ? Colors.white : Colors.black,
       ),
     );
   }
 }
 
-/// ✅ **Custom Button**
+/// ✅ **Custom Button Component**
 class _CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
@@ -340,16 +286,14 @@ class _CustomButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
           foregroundColor: textColor,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           elevation: shadow ? 5 : 0,
         ),
         child: Text(
           text,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
     );
