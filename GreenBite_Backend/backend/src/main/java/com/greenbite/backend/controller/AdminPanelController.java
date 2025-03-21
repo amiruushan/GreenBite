@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -26,7 +27,6 @@ public class AdminPanelController {
 
     @GetMapping("/listUsers")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
-        System.out.println("Wada karaanawa");
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
@@ -53,7 +53,6 @@ public class AdminPanelController {
     //Listing all the coupon
     @GetMapping("/listAllCoupon")
     public List<Coupon> getAllCoupons() {
-        System.out.println("Wada karaanawa");
         return couponService.getAllCoupons();
     }
 
@@ -81,6 +80,24 @@ public class AdminPanelController {
         List<FoodItemDTO> foodItems = foodItemService.getFoodItemsByShop(foodShopId);
         return ResponseEntity.ok(foodItems);
     }
+    @GetMapping("/expiredFoodShops")
+    public ResponseEntity<List<FoodShopDTO>> getExpiredFoodShops() {
+        List<FoodShopDTO> expiredShops = foodShopService.getExpiredLicenseShops();
+        return ResponseEntity.ok(expiredShops);
+    }
+
+    @GetMapping("/nearExpiryFoodShops")
+    public ResponseEntity<List<FoodShopDTO>> getShopsWithNearExpiration() {
+        List<FoodShopDTO> nearExpiryShops = foodShopService.getShopsWithNearExpiration();
+        return ResponseEntity.ok(nearExpiryShops);
+    }
+
+    @GetMapping("/foodShopExpiration/{shopId}")
+    public ResponseEntity<LocalDate> getFoodShopExpirationDate(@PathVariable Long shopId) {
+        LocalDate expirationDate = foodShopService.getFoodShopExpirationDate(shopId);
+        return ResponseEntity.ok(expirationDate);
+    }
+
 
 }
 

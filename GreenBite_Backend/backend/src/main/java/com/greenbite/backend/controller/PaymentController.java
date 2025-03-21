@@ -18,7 +18,6 @@ public class PaymentController {
 
     @PostMapping("/create")
     public ResponseEntity<Map<String, String>> createPayment(@RequestParam Long amount, @RequestParam String currency) {
-        System.out.println("Payment API Called");
         try {
             String clientSecret = paymentService.createPaymentIntent(amount, currency);
 

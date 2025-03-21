@@ -3,6 +3,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/screens/home_page/home_page.dart';
+import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
 
 import 'package:greenbite_frontend/service/auth_service.dart';
 
@@ -29,18 +30,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
   Future<void> _confirmOrder(BuildContext context) async {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
 
-    // Format order data
-    final orderData = {
-      "customerId": 1, // Update this dynamically if needed
-      "paymentMethod":
-          selectedOption == "Stripe Payment" ? "Credit Card" : "Self Checkout",
-      "items": cartProvider.cartItems
-          .map((item) => {
-                "id": item.id, // Ensure your CartItem model has an `id`
-                "quantity": item.quantity,
-              })
-          .toList(),
-    };
+    // Group items by shopId
+    Map<int, List<FoodItem>> shopItemsMap = {};
+    for (var item in cartProvider.cartItems) {
+      if (!shopItemsMap.containsKey(item.shopId)) {
+        shopItemsMap[item.shopId] = [];
+      }
+      shopItemsMap[item.shopId]!.add(item);
+    }
 
     try {
       String? token = await AuthService.getToken(); // Retrieve token
@@ -48,58 +45,81 @@ class _CheckoutPageState extends State<CheckoutPage> {
         print("No token found");
         return;
       }
-      if (selectedOption == "Stripe Payment") {
-        await _handleStripePayment(context);
+
+      // Process each shop's items as a separate order
+      for (var shopId in shopItemsMap.keys) {
+        final items = shopItemsMap[shopId]!;
+        final totalPrice = items.fold(
+            0.0, (sum, item) => sum + (item.price * int.parse(item.quantity)));
+
+        // Format order data
+        final orderData = {
+          "shopId": shopId,
+          "customerId": 1, // Update this dynamically if needed
+          "paymentMethod": selectedOption == "Stripe Payment"
+              ? "Credit Card"
+              : "Self Checkout",
+          "items": items
+              .map((item) => {
+                    "id": item.id,
+                    "quantity": item.quantity,
+                  })
+              .toList(),
+          "totalAmount": totalPrice,
+        };
+
+        if (selectedOption == "Stripe Payment") {
+          await _handleStripePayment(context, totalPrice);
+        }
+
+        // Confirm order in backend
+        final orderResponse = await http.post(
+          Uri.parse("${Config.apiBaseUrl}/api/orders/confirm"),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token"
+          },
+          body: jsonEncode(orderData),
+        );
+
+        if (orderResponse.statusCode != 200) {
+          throw Exception("Failed to confirm order for shop $shopId.");
+        }
       }
 
-      // Confirm order in backend
-      final orderResponse = await http.post(
-        Uri.parse("${Config.apiBaseUrl}/api/orders/confirm"),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token"
-        },
-        body: jsonEncode(orderData),
+      // Clear the cart
+      cartProvider.clearCart();
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Order Confirmed!"), backgroundColor: Colors.green),
       );
 
-      if (orderResponse.statusCode == 200) {
-        // Clear the cart
-        cartProvider.clearCart();
-
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text("Order Confirmed!"), backgroundColor: Colors.green),
-        );
-
-        // Reload the app (navigate to home)
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-          (route) => false,
-        );
-      } else {
-        throw Exception("Failed to confirm order.");
-      }
+      // Reload the app (navigate to home)
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+        (route) => false,
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("Order confirmation failed"),
+            content: Text("Order confirmation failed: $e"),
             backgroundColor: Colors.red),
       );
     }
   }
 
-  Future<void> _handleStripePayment(BuildContext context) async {
+  Future<void> _handleStripePayment(
+      BuildContext context, double totalAmount) async {
     try {
       String? token = await AuthService.getToken();
       if (token == null) {
         print("No token found");
         return;
       }
-      final cartProvider = Provider.of<CartProvider>(context, listen: false);
-      final double totalAmount =
-          cartProvider.totalPrice() + 2.50; // Include delivery fee
+
       final int amountInCents =
           (totalAmount * 100).toInt(); // Stripe requires amount in cents
 
@@ -130,19 +150,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
             content: Text("Payment successful!"),
             backgroundColor: Colors.green),
       );
-
-      // Clear the cart and navigate to the home page
-      cartProvider.clearCart();
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-        (route) => false,
-      );
     } catch (e) {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Payment failed"), backgroundColor: Colors.red),
+        SnackBar(
+            content: Text("Payment failed: $e"), backgroundColor: Colors.red),
       );
+      rethrow; // Rethrow the exception to handle it in the calling method
     }
   }
 

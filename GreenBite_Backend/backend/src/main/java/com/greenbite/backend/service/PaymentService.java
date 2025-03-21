@@ -19,7 +19,7 @@ public class PaymentService {
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                 .setAmount(amount) // Convert to cents
                 .setCurrency(currency)
-                .addPaymentMethodType("card") // ✅ Correct method
+                .addPaymentMethodType("card")
                 .build();
 
         PaymentIntent intent = PaymentIntent.create(params);

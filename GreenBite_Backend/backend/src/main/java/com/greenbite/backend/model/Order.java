@@ -24,11 +24,6 @@ public class Order {
     private float totalAmount;
     private float totalCalories;
 
-    @ManyToMany
-    @JoinTable(
-            name = "order_food_items",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "food_item_id")
-    )
-    private List<FoodItem> items; // List of FoodItems in the order
+    @Column(columnDefinition = "TEXT") // Store JSON as text
+    private String orderedItemsJson;
 }

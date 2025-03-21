@@ -9,6 +9,7 @@ import com.greenbite.backend.repository.FoodShopRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -104,6 +105,58 @@ public class FoodShopService {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         return EARTH_RADIUS * c;
+    }
+
+    public List<FoodShopDTO> getExpiredLicenseShops() {
+        LocalDate today = LocalDate.now();
+        List<FoodShop> expiredShops = foodShopRepository.findAll().stream()
+                .filter(shop -> shop.getLicenseExpirationDate().isBefore(today))
+                .collect(Collectors.toList());
+
+        return expiredShops.stream()
+                .map(shop -> new FoodShopDTO(
+                        shop.getId(),
+                        shop.getName(),
+                        shop.getPhoto(),
+                        shop.getAddress(),
+                        shop.getPhoneNumber(),
+                        shop.getLatitude(),
+                        shop.getLongitude(),
+                        shop.getLicenseExpirationDate()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<FoodShopDTO> getShopsWithNearExpiration() {
+        LocalDate today = LocalDate.now();
+        LocalDate twoWeeksLater = today.plusWeeks(2);
+
+        List<FoodShop> nearExpiryShops = foodShopRepository.findAll().stream()
+                .filter(shop ->
+                        shop.getLicenseExpirationDate() != null &&
+                                !shop.getLicenseExpirationDate().isBefore(today) &&
+                                shop.getLicenseExpirationDate().isBefore(twoWeeksLater)
+                )
+                .collect(Collectors.toList());
+
+        return nearExpiryShops.stream()
+                .map(shop -> new FoodShopDTO(
+                        shop.getId(),
+                        shop.getName(),
+                        shop.getPhoto(),
+                        shop.getAddress(),
+                        shop.getPhoneNumber(),
+                        shop.getLatitude(),
+                        shop.getLongitude(),
+                        shop.getLicenseExpirationDate()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public LocalDate getFoodShopExpirationDate(Long shopId) {
+        return foodShopRepository.findById(shopId)
+                .map(FoodShop::getLicenseExpirationDate)
+                .orElseThrow(() -> new RuntimeException("Shop not found with ID: " + shopId));
     }
 
 }

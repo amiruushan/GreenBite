@@ -24,7 +24,6 @@ public class CouponManagementController {
 
     @PostMapping("/purchase-deal")
     public ResponseEntity<String> purchaseCoupon(@RequestBody PurchaseCouponDTO purchaseCouponDTO) {
-        System.out.println("Coupon purchasing"+purchaseCouponDTO.getUserId()+"   "+purchaseCouponDTO.getCouponId());
         couponManagementService.purchaseCoupon(purchaseCouponDTO.getUserId(), purchaseCouponDTO.getCouponId(), purchaseCouponDTO.getCouponCode());
         return ResponseEntity.ok("Coupon purchased successfully!");
     }

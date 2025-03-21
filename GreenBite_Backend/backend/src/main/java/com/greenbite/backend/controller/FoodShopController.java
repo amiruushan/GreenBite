@@ -18,9 +18,7 @@ public class FoodShopController {
 
     @PostMapping("/add")
     public ResponseEntity<FoodShop> addFoodShop(@RequestBody FoodShop foodShop) {
-        System.out.println("Wada karaanawa");
         FoodShop savedShop = foodShopService.saveFoodShop(foodShop);
-        System.out.println("Wada karaanawa");
         return ResponseEntity.ok(savedShop);
     }
     @GetMapping("/all")
@@ -30,7 +28,6 @@ public class FoodShopController {
     }
     @GetMapping("/{id}")
     public FoodShopDTO getFoodShopById(@PathVariable Long id) {
-        System.out.println("Fetching shop with ID: " + id);
         return foodShopService.getFoodShopById(id);
     }
 
@@ -46,7 +43,6 @@ public class FoodShopController {
             @RequestParam double lon,
             @RequestParam(defaultValue = "5") double radius) {
         radius=200;
-        System.out.println("hhhh");
         return foodShopService.findShopsNearby(lat, lon, radius);
     }
 }

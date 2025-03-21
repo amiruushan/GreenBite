@@ -34,8 +34,6 @@ public class UserService {
     public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        System.out.println("user id---------" + user.getId());
-        System.out.println("shop id ---------" + user.getShopId());
         return convertToDTO(user);
     }
 
@@ -67,13 +65,11 @@ public class UserService {
 
     // NEW: Update the user’s location
     public UserDTO updateUserLocation(LocationUpdateDTO dto) {
-        System.out.println("HHHHHHHHHHHH");
-        System.out.println(dto.getUserId());
+
 
 
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        System.out.println("HHHHHHHHHHHH");
 
         user.setLatitude(dto.getLatitude());
         user.setLongitude(dto.getLongitude());

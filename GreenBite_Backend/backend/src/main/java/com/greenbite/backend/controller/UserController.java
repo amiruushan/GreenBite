@@ -27,7 +27,6 @@ public class UserController {
     // Get user by ID
     @GetMapping("/{id}")
     public UserDTO getUserById(@PathVariable Long id) {
-        System.out.println("Get working");
         return userService.getUserById(id);
     }
 
@@ -53,7 +52,7 @@ public class UserController {
 
     @GetMapping("/points")
     public ResponseEntity<Map<String, Integer>> getPoints(@RequestParam Long userId) {
-        System.out.println("Get Points");
+
         int normalPoints = userService.getNormalPoints(userId);
         int greenBitePoints = userService.getGreenBitePoints(userId);
 
@@ -65,12 +64,8 @@ public class UserController {
     }
     @PutMapping("/updateLocation")
     public ResponseEntity<UserDTO> updateUserLocation(@RequestBody LocationUpdateDTO locationUpdateDTO) {
-        System.out.println("LOcatio000000ekirwrwhkledhk");
         UserDTO updatedUser = userService.updateUserLocation(locationUpdateDTO);
         return ResponseEntity.ok(updatedUser);
     }
-
-
-
 }
 
