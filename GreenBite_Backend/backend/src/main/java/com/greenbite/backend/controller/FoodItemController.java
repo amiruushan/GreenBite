@@ -21,7 +21,6 @@ public class FoodItemController {
 
     @GetMapping("/get")
     public List<FoodItemDTO> getAllFoodItems() {
-        System.out.println("Workingggggggggggggg");
         return foodItemService.getAllFoodItems();
     }
 
@@ -37,7 +36,6 @@ public class FoodItemController {
             @PathVariable double radius) {
         radius=200;
         List<FoodItemDTO> nearbyFoodItems = foodItemService.getFoodItemsNearby(lat, lon, radius);
-        System.out.println("Nearby food items: " + nearbyFoodItems);
         return nearbyFoodItems;
     }
 

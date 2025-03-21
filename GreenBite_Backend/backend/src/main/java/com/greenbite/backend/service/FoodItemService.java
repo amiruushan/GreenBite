@@ -85,7 +85,6 @@ public class FoodItemService {
         return allFoodItems.stream()
                 .filter(item -> {
                     double distance = calculateDistance(lat, lon, item.getLatitude(), item.getLongitude());
-                    System.out.println("Food Item ID: " + item.getId() + ", Distance: " + distance + " km");
                     return distance <= radius;
                 })
                 .map(this::convertToDTO)

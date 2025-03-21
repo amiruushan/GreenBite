@@ -27,7 +27,6 @@ public class AdminPanelController {
 
     @GetMapping("/listUsers")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
-        System.out.println("Wada karaanawa");
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
@@ -54,7 +53,6 @@ public class AdminPanelController {
     //Listing all the coupon
     @GetMapping("/listAllCoupon")
     public List<Coupon> getAllCoupons() {
-        System.out.println("Wada karaanawa");
         return couponService.getAllCoupons();
     }
 

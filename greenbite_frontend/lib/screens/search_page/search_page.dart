@@ -73,9 +73,9 @@ class _SearchScreenState extends State<SearchScreen> {
       backgroundColor: theme.colorScheme.background, // ✅ Theme-based background
       appBar: AppBar(
         title: Text(
-          "Green Bite",
+          "GreenBite",
           style: TextStyle(
-            color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+            color: isDarkMode ? Colors.white : Colors.green,
             fontSize: 30,
             fontWeight: FontWeight.bold,
           ),

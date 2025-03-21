@@ -22,6 +22,7 @@ public class OrderController {
 
     @PostMapping("/confirm")
     public ResponseEntity<Order> confirmOrder(@RequestBody OrderDTO orderDTO) {
+        System.out.println("Order DTO: "+orderDTO);
         Order order = orderService.createOrder(orderDTO);
         return ResponseEntity.ok(order);
     }
