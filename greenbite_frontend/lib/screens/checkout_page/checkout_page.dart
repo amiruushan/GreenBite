@@ -46,6 +46,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
         return;
       }
 
+      // Get the current date and time
+      final DateTime now = DateTime.now();
+      final String orderTime = now.toIso8601String(); // ISO 8601 format
+
       // Process each shop's items as a separate order
       for (var shopId in shopItemsMap.keys) {
         final items = shopItemsMap[shopId]!;
@@ -62,10 +66,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
           "items": items
               .map((item) => {
                     "id": item.id,
+                    "name": item.name,
+                    "description": item.description,
+                    "price": item.price,
                     "quantity": item.quantity,
+                    "photo": item.photo,
+                    "tags": item.tags,
+                    "category": item.category,
+                    "latitude": item.latitude,
+                    "longitude": item.longitude,
                   })
               .toList(),
           "totalAmount": totalPrice,
+          "orderTime": orderTime, // Include the order time
         };
 
         if (selectedOption == "Stripe Payment") {
