@@ -87,6 +87,12 @@ public class AdminPanelController {
         return ResponseEntity.ok(expiredShops);
     }
 
+    @GetMapping("/nearExpiryFoodShops")
+    public ResponseEntity<List<FoodShopDTO>> getShopsWithNearExpiration() {
+        List<FoodShopDTO> nearExpiryShops = foodShopService.getShopsWithNearExpiration();
+        return ResponseEntity.ok(nearExpiryShops);
+    }
+
 
 }
 

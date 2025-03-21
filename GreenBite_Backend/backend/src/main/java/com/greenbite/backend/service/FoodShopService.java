@@ -127,4 +127,30 @@ public class FoodShopService {
                 .collect(Collectors.toList());
     }
 
+    public List<FoodShopDTO> getShopsWithNearExpiration() {
+        LocalDate today = LocalDate.now();
+        LocalDate twoWeeksLater = today.plusWeeks(2);
+
+        List<FoodShop> nearExpiryShops = foodShopRepository.findAll().stream()
+                .filter(shop ->
+                        shop.getLicenseExpirationDate() != null &&
+                                !shop.getLicenseExpirationDate().isBefore(today) &&
+                                shop.getLicenseExpirationDate().isBefore(twoWeeksLater)
+                )
+                .collect(Collectors.toList());
+
+        return nearExpiryShops.stream()
+                .map(shop -> new FoodShopDTO(
+                        shop.getId(),
+                        shop.getName(),
+                        shop.getPhoto(),
+                        shop.getAddress(),
+                        shop.getPhoneNumber(),
+                        shop.getLatitude(),
+                        shop.getLongitude(),
+                        shop.getLicenseExpirationDate()
+                ))
+                .collect(Collectors.toList());
+    }
+
 }
