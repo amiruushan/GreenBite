@@ -5,6 +5,9 @@ import 'package:greenbite_frontend/screens/user_profile/models/user_profile_serv
 import 'package:greenbite_frontend/screens/user_profile/edit_profile_screen.dart';
 import 'package:greenbite_frontend/screens/vendor/vendor_home.dart'; // Import the VendorHome screen
 import 'package:greenbite_frontend/screens/green_bite_points/green_bite_points_screen.dart'; // Import Green Bite Points screen
+import 'package:greenbite_frontend/theme_provider.dart';
+import 'package:provider/provider.dart';
+import 'Customer_Orders.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -79,6 +82,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
+  // ✅ Navigate to Customer Orders Page
   void _goToCustomerOrderPage() {
     Navigator.push(
       context,
@@ -106,6 +110,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   child: Column(
                     children: [
                       const SizedBox(height: 50),
+
                       // ✅ Profile Header
                       _buildProfileHeader(theme),
                       const SizedBox(height: 16),
@@ -135,7 +140,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
                       const SizedBox(height: 16),
 
-                      // Additional Options Container
+                      // ✅ Additional Options Container
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.grey.shade100, // Light grey background
@@ -163,15 +168,26 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                             GreenBiteShopScreen()));
                               },
                             ),
+                            _buildSectionItem(
+                              icon: Icons.store,
+                              text: "My Orders",
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            CustomerOrdersPage()));
+                              },
+                            ),
+                            const Divider(height: 1, indent: 16, endIndent: 16),
 
-                            // About Us Section
                             _buildSectionItem(
                               icon: Icons.info,
                               text: "About Us",
                             ),
                           ],
                         ),
-                      ]),
+                      ),
                     ],
                   ),
                 ),
