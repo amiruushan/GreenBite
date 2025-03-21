@@ -9,7 +9,9 @@ import 'orders.dart';
 import 'food_item.dart';
 
 class VendorHome extends StatefulWidget {
-  const VendorHome({super.key});
+  final int shopId;
+
+  const VendorHome({super.key, required this.shopId});
 
   @override
   _VendorHomeState createState() => _VendorHomeState();
@@ -19,7 +21,6 @@ class _VendorHomeState extends State<VendorHome> {
   int _selectedIndex = 0;
   List<Map<String, dynamic>> foodItems = [];
   bool isLoading = true;
-  final int vendorId = 1; // Replace with dynamic vendor ID if needed
   String vendorName = "";
   String vendorDescription = "";
   String vendorImageUrl = "";
@@ -28,7 +29,7 @@ class _VendorHomeState extends State<VendorHome> {
   Future<void> fetchVendorData() async {
     try {
       final response = await http.get(
-        Uri.parse('${Config.apiBaseUrl}/api/shop/1'),
+        Uri.parse('${Config.apiBaseUrl}/api/shop/${widget.shopId}'),
       );
 
       if (response.statusCode == 200) {
@@ -49,7 +50,7 @@ class _VendorHomeState extends State<VendorHome> {
   Future<void> fetchFoodItems() async {
     try {
       final response = await http.get(
-        Uri.parse('${Config.apiBaseUrl}/api/food-items/shop/1'),
+        Uri.parse('${Config.apiBaseUrl}/api/food-items/shop/${widget.shopId}'),
       );
 
       if (response.statusCode == 200) {
@@ -84,17 +85,23 @@ class _VendorHomeState extends State<VendorHome> {
     if (index == 1) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const ListFood()),
+        MaterialPageRoute(
+          builder: (context) => ListFood(shopId: widget.shopId), // Pass shopId
+        ),
       );
     } else if (index == 2) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const Orders()),
+        MaterialPageRoute(
+          builder: (context) => Orders(shopId: widget.shopId), // Pass shopId
+        ),
       );
     } else if (index == 3) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => VendorProfile(vendorId: vendorId),)
+        MaterialPageRoute(
+          builder: (context) => VendorProfile(vendorId: widget.shopId), // Pass shopId
+        ),
       );
     }
   }
@@ -209,6 +216,7 @@ class _VendorHomeState extends State<VendorHome> {
       bottomNavigationBar: VendorNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
+        shopId: widget.shopId, // Pass shopId to VendorNavBar
       ),
     );
   }

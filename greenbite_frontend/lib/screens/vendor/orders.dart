@@ -5,7 +5,9 @@ import 'list_food.dart';
 import 'vendor_profile.dart';
 
 class Orders extends StatefulWidget {
-  const Orders({super.key});
+  final int shopId; // Add shopId as a parameter
+
+  const Orders({super.key, required this.shopId}); // Update constructor
 
   @override
   State<Orders> createState() => _OrdersState();
@@ -19,17 +21,23 @@ class _OrdersState extends State<Orders> {
     if (index == 0) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const VendorHome()),
+        MaterialPageRoute(
+          builder: (context) => VendorHome(shopId: widget.shopId), // Pass shopId
+        ),
       );
     } else if (index == 1) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const ListFood()),
+        MaterialPageRoute(
+          builder: (context) => ListFood(shopId: widget.shopId), // Pass shopId
+        ),
       );
     } else if (index == 3) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const VendorProfile(vendorId: 1)),
+        MaterialPageRoute(
+          builder: (context) => VendorProfile(vendorId: widget.shopId), // Pass shopId
+        ),
       );
     }
   }
@@ -59,6 +67,7 @@ class _OrdersState extends State<Orders> {
       bottomNavigationBar: VendorNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
+        shopId: widget.shopId, // Pass shopId to VendorNavBar
       ),
     );
   }
