@@ -81,6 +81,12 @@ public class AdminPanelController {
         List<FoodItemDTO> foodItems = foodItemService.getFoodItemsByShop(foodShopId);
         return ResponseEntity.ok(foodItems);
     }
+    @GetMapping("/expiredFoodShops")
+    public ResponseEntity<List<FoodShopDTO>> getExpiredFoodShops() {
+        List<FoodShopDTO> expiredShops = foodShopService.getExpiredLicenseShops();
+        return ResponseEntity.ok(expiredShops);
+    }
+
 
 }
 
