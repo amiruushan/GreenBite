@@ -16,4 +16,5 @@ public class OrderDTO {
     private String paymentMethod;
     private List<FoodItemDTO> items;
     private float totalAmount;
+    private float totalCalories;
 }

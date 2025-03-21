@@ -37,4 +37,10 @@ public class OrderController {
         List<Order> orders = orderService.getOrdersByCustomerId(userId);
         return ResponseEntity.ok(orders);
     }
+
+    @GetMapping("/total_calories/{userId}")
+    public ResponseEntity<Float> getTotalCaloriesConsumed(@PathVariable Long userId) {
+        float totalCalories = orderService.getTotalCaloriesConsumed(userId);
+        return ResponseEntity.ok(totalCalories);
+    }
 }

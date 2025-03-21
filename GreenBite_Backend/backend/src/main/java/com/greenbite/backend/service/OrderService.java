@@ -37,14 +37,22 @@ public class OrderService {
                 .collect(Collectors.toList());
 
         // Create and save the order
-        Order order = new Order(null, orderDTO.getCustomerId(), orderDTO.getShopId(),orderDTO.getPaymentMethod(), "pending",orderDTO.getTotalAmount(), foodItems);
+        Order order = new Order(null, orderDTO.getCustomerId(), orderDTO.getShopId(), orderDTO.getPaymentMethod(), "pending", orderDTO.getTotalAmount(), orderDTO.getTotalCalories(), foodItems);
         return orderRepository.save(order);
     }
+
     public List<Order> getOrdersByShopId(Long shopId) {
         return orderRepository.findByShopId(shopId);
     }
+
     public List<Order> getOrdersByCustomerId(Long userId) {
         return orderRepository.findByCustomerId(userId);
     }
 
+    public float getTotalCaloriesConsumed(Long customerId) {
+        return (float) orderRepository.findByCustomerId(customerId)
+                .stream()
+                .mapToDouble(Order::getTotalCalories) // Use mapToDouble for floating-point sum
+                .sum();
+    }
 }
