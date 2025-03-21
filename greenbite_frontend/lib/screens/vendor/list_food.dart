@@ -8,7 +8,9 @@ import 'orders.dart';
 import 'vendor_profile.dart';
 
 class ListFood extends StatefulWidget {
-  const ListFood({super.key});
+  final int shopId; // Add shopId as a parameter
+
+  const ListFood({super.key, required this.shopId}); // Update constructor
 
   @override
   State<ListFood> createState() => _ListFoodState();
@@ -46,22 +48,28 @@ class _ListFoodState extends State<ListFood> {
     if (index == 0) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const VendorHome()),
+        MaterialPageRoute(
+          builder: (context) => VendorHome(shopId: widget.shopId), // Pass shopId
+        ),
       );
     } else if (index == 2) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const Orders()),
+        MaterialPageRoute(
+          builder: (context) => Orders(shopId: widget.shopId), // Pass shopId
+        ),
       );
     } else if (index == 3) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const VendorProfile(vendorId: 1)),
+        MaterialPageRoute(
+          builder: (context) => VendorProfile(vendorId: widget.shopId), // Pass shopId
+        ),
       );
     }
   }
 
-// Function to handle form submission
+  // Function to handle form submission
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       // Prepare the data in JSON format
@@ -71,7 +79,7 @@ class _ListFoodState extends State<ListFood> {
         "price": double.parse(_priceController.text),
         "quantity": int.parse(_quantityController.text),
         "photo": _imageUrl ?? "https://lh3.googleusercontent.com/p/AF1QipNhe1RTd28nuHie5MFwaU_OXuU33ZNN1rdTYhgG=s1360-w1360-h1020",
-        "shopId": 1, // Replace with dynamic shop ID if needed
+        "shopId": widget.shopId, // Use widget.shopId
         "tags": _tagsController.text.split(',').map((tag) => tag.trim()).toList(),
         "category": _selectedCategory,
       };
@@ -296,6 +304,7 @@ class _ListFoodState extends State<ListFood> {
       bottomNavigationBar: VendorNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
+        shopId: widget.shopId, // Pass shopId to VendorNavBar
       ),
     );
   }
