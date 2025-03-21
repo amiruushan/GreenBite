@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart'; // Import url_launcher
 import 'package:greenbite_frontend/screens/green_bite_points/green_bite_shop.dart';
 import 'package:greenbite_frontend/screens/user_profile/about_us_screen.dart';
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile.dart';
@@ -90,6 +91,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
+  // Function to open Google Form
+  Future<void> _openGoogleForm() async {
+    const googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLScchqRC_6TOEEjo9qwfHGWf29jetYCSFnUvom1LrVNpUHomQA/viewform?usp=sharing';
+    if (await canLaunch(googleFormUrl)) {
+      await launch(googleFormUrl);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Could not launch the form.")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -150,9 +163,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 _buildSectionItem(
                   icon: Icons.add_business,
                   text: "Create a Shop",
-                  onPressed: () {
-                    // No logic needed for now
-                  },
+                  onPressed: _openGoogleForm, // Updated to open Google Form
                 ),
               _buildSectionItem(
                 icon: Icons.logout,
