@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
+import 'package:greenbite_frontend/service/auth_service.dart';
 
 import 'package:provider/provider.dart';
 
 class FoodDetailScreen extends StatefulWidget {
   final FoodItem foodItem;
 
-  const FoodDetailScreen({Key? key, required this.foodItem}) : super(key: key);
+  const FoodDetailScreen({super.key, required this.foodItem});
 
   @override
   State<FoodDetailScreen> createState() => _FoodDetailScreenState();
