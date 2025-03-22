@@ -2,10 +2,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:greenbite_frontend/config.dart';
+import 'package:greenbite_frontend/service/auth_service.dart';
 import 'order_details.dart';
 
 class VendorSalesPage extends StatefulWidget {
-  const VendorSalesPage({super.key});
+  final int shopId; // Add shopId as a parameter
+
+  const VendorSalesPage({super.key, required this.shopId}); // Constructor
 
   @override
   _VendorSalesPageState createState() => _VendorSalesPageState();
@@ -14,23 +17,36 @@ class VendorSalesPage extends StatefulWidget {
 class _VendorSalesPageState extends State<VendorSalesPage> {
   List<Map<String, dynamic>> sales = [];
   bool isLoading = true;
-  String token = "your_auth_token"; // Replace with actual token handling
+  String? token;
 
   @override
   void initState() {
     super.initState();
-    fetchSales();
+    _fetchTokenAndSales();
+  }
+
+  Future<void> _fetchTokenAndSales() async {
+    token = await AuthService.getToken(); // Retrieve token
+
+    if (token == null) {
+      print("No token found");
+      return;
+    }
+
+    print("Token retrieved: $token"); // Print token for debugging
+    await fetchSales();
   }
 
   Future<void> fetchSales() async {
-    final String url = "${Config.apiBaseUrl}/api/orders/user_orders/1";
+    final String url =
+        "${Config.apiBaseUrl}/api/orders/shop_order/${widget.shopId}"; // Use widget.shopId
 
     try {
       final response = await http.get(
         Uri.parse(url),
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
+          "Authorization": "Bearer $token", // Use the retrieved token
         },
       );
 

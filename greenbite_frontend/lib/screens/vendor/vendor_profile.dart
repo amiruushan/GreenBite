@@ -65,7 +65,8 @@ class _VendorProfileState extends State<VendorProfile> {
     if (index == 0) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const VendorHome()),
+        MaterialPageRoute(
+            builder: (context) => VendorHome(shopId: widget.vendorId)),
       );
     } else if (index == 1) {
       Navigator.pushReplacement(
@@ -75,7 +76,10 @@ class _VendorProfileState extends State<VendorProfile> {
     } else if (index == 2) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => VendorSalesPage()),
+        MaterialPageRoute(
+          builder: (context) =>
+              VendorSalesPage(shopId: widget.vendorId), // Pass shopId
+        ),
       );
     }
   }

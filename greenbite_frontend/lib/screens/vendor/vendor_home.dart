@@ -9,7 +9,9 @@ import 'list_food.dart';
 import 'food_item.dart';
 
 class VendorHome extends StatefulWidget {
-  const VendorHome({super.key});
+  final int? shopId; // Make shopId optional
+
+  const VendorHome({super.key, this.shopId}); // Remove required keyword
 
   @override
   _VendorHomeState createState() => _VendorHomeState();
@@ -19,16 +21,21 @@ class _VendorHomeState extends State<VendorHome> {
   int _selectedIndex = 0;
   List<Map<String, dynamic>> foodItems = [];
   bool isLoading = true;
-  final int vendorId = 1; // Replace with dynamic vendor ID if needed
   String vendorName = "";
   String vendorDescription = "";
   String vendorImageUrl = "";
 
   // Fetch vendor details and food items from backend
   Future<void> fetchVendorData() async {
+    if (widget.shopId == null) {
+      print("Shop ID is null. Cannot fetch vendor details.");
+      return;
+    }
+
     try {
       final response = await http.get(
-        Uri.parse('${Config.apiBaseUrl}/api/shop/1'),
+        Uri.parse(
+            '${Config.apiBaseUrl}/api/shop/${widget.shopId}'), // Use widget.shopId
       );
 
       if (response.statusCode == 200) {
@@ -47,9 +54,15 @@ class _VendorHomeState extends State<VendorHome> {
   }
 
   Future<void> fetchFoodItems() async {
+    if (widget.shopId == null) {
+      print("Shop ID is null. Cannot fetch food items.");
+      return;
+    }
+
     try {
       final response = await http.get(
-        Uri.parse('${Config.apiBaseUrl}/api/food-items/shop/1'),
+        Uri.parse(
+            '${Config.apiBaseUrl}/api/food-items/shop/${widget.shopId}'), // Use widget.shopId
       );
 
       if (response.statusCode == 200) {
@@ -87,16 +100,29 @@ class _VendorHomeState extends State<VendorHome> {
         MaterialPageRoute(builder: (context) => const ListFood()),
       );
     } else if (index == 2) {
+      if (widget.shopId == null) {
+        print("Shop ID is null. Cannot navigate to VendorSalesPage.");
+        return;
+      }
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => VendorSalesPage()),
+        MaterialPageRoute(
+          builder: (context) =>
+              VendorSalesPage(shopId: widget.shopId!), // Pass shopId
+        ),
       );
     } else if (index == 3) {
+      if (widget.shopId == null) {
+        print("Shop ID is null. Cannot navigate to VendorProfile.");
+        return;
+      }
       Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => VendorProfile(vendorId: vendorId),
-          ));
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              VendorProfile(vendorId: widget.shopId!), // Pass shopId
+        ),
+      );
     }
   }
 
