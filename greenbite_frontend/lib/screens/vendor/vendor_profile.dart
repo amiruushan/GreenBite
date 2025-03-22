@@ -53,7 +53,7 @@ class _VendorProfileState extends State<VendorProfile> {
             "email": data["email"] ?? "",
             "phoneNumber": data["phoneNumber"] ?? "",
             "address": data["address"] ?? "",
-            "businessName": data["businessName"] ?? "",
+            "businessName": data["name"] ?? "",
             "businessDescription": data["businessDescription"] ?? "",
           };
           _isLoading = false;
