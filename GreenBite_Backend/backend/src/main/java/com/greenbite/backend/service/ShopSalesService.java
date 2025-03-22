@@ -21,4 +21,10 @@ public class ShopSalesService {
         System.out.println(orders);
         return (float) orders.stream().mapToDouble(Order::getTotalAmount).sum();
     }
+
+    public float calculateTotalSalesForAllShops(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Order> orders = orderRepository.findByOrderDateBetween(startDate, endDate);
+        System.out.println(orders);
+        return (float) orders.stream().mapToDouble(Order::getTotalAmount).sum();
+    }
 }

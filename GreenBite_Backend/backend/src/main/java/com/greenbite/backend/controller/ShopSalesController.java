@@ -25,4 +25,15 @@ public class ShopSalesController {
         LocalDateTime endDate = LocalDateTime.parse(request.get("endDate"), DateTimeFormatter.ISO_DATE_TIME);
         return shopSalesService.calculateTotalSales(shopId, startDate, endDate);
     }
+
+    @GetMapping("/total-all")
+    public float getTotalSalesForAllShops(
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+        System.out.println("total sales for all shops");
+        LocalDateTime start = LocalDateTime.parse(startDate, DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime end = LocalDateTime.parse(endDate, DateTimeFormatter.ISO_DATE_TIME);
+        return shopSalesService.calculateTotalSalesForAllShops(start, end);
+    }
+
 }
