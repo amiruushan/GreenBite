@@ -36,4 +36,13 @@ public class ShopSalesController {
         return shopSalesService.calculateTotalSalesForAllShops(start, end);
     }
 
+    @GetMapping("/itemsales-shopid")
+    public Map<Long, Double> getSalesByShop(@RequestParam Long shopId,
+                                            @RequestParam String startDate,
+                                            @RequestParam String endDate) {
+        LocalDateTime start = LocalDateTime.parse(startDate);
+        LocalDateTime end = LocalDateTime.parse(endDate);
+        return shopSalesService.getTotalSalesByShop(shopId, start, end);
+    }
+
 }
