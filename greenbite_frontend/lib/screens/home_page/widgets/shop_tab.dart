@@ -3,8 +3,6 @@ import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/home_page/models/shop_item.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/shop_details_page.dart';
 import 'package:greenbite_frontend/service/auth_service.dart';
-import 'package:greenbite_frontend/service/auth_service.dart';
-import 'package:greenbite_frontend/service/location_service.dart';
 import 'dart:convert'; // For JSON parsing
 import 'package:http/http.dart' as http;
 
@@ -182,8 +180,8 @@ class _ShopsTabState extends State<ShopsTab> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            color: theme.colorScheme
-                                .onSurface, // ✅ Adaptive text color
+                            color: theme
+                                .colorScheme.onSurface, // ✅ Adaptive text color
                           ),
                         ),
                         subtitle: Text(
