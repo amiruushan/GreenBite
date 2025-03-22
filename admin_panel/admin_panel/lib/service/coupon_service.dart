@@ -4,7 +4,7 @@ import '../model/coupon_model.dart';
 
 
 class CouponService {
-  final String baseUrl = 'http://10.190.13.69:8080/api/admin';
+  final String baseUrl = 'http://192.168.1.7:8080/api/admin';
 
   Future<List<Coupon>> getCoupons() async {
     try {
