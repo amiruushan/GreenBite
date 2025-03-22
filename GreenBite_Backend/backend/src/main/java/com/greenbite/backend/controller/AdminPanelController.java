@@ -4,6 +4,7 @@ import com.greenbite.backend.dto.FoodItemDTO;
 import com.greenbite.backend.dto.FoodShopDTO;
 import com.greenbite.backend.dto.UserDTO;
 import com.greenbite.backend.model.Coupon;
+import com.greenbite.backend.model.FoodShop;
 import com.greenbite.backend.service.FoodItemService;
 import com.greenbite.backend.service.FoodShopService;
 import com.greenbite.backend.service.UserService;
@@ -42,6 +43,13 @@ public class AdminPanelController {
     public ResponseEntity<List<FoodShopDTO>> getAllFoodShopsAdmin() {
         List<FoodShopDTO> shops = foodShopService.getAllFoodShopsAdmin();
         return ResponseEntity.ok(shops);
+    }
+
+    //add food shop
+    @PostMapping("/addFoodShop")
+    public ResponseEntity<FoodShop> addFoodShop(@RequestBody FoodShop foodShop) {
+        FoodShop savedShop = foodShopService.saveFoodShop(foodShop);
+        return ResponseEntity.ok(savedShop);
     }
 
     // Deleting food shop
