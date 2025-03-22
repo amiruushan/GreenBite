@@ -5,9 +5,9 @@ import 'list_food.dart';
 import 'vendor_profile.dart';
 
 class Orders extends StatefulWidget {
-  final int shopId; // Add shopId as a parameter
+  final int? shopId; // Make shopId optional
 
-  const Orders({super.key, required this.shopId}); // Update constructor
+  const Orders({super.key, this.shopId}); // Remove required keyword
 
   @override
   State<Orders> createState() => _OrdersState();
@@ -19,24 +19,33 @@ class _OrdersState extends State<Orders> {
   // Function to handle navigation
   void _onItemTapped(int index) {
     if (index == 0) {
+      if (widget.shopId == null) {
+        print("Shop ID is null. Cannot navigate to VendorHome.");
+        return;
+      }
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => VendorHome(shopId: widget.shopId), // Pass shopId
+          builder: (context) =>
+              VendorHome(shopId: widget.shopId!), // Pass shopId
         ),
       );
     } else if (index == 1) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => ListFood(shopId: widget.shopId), // Pass shopId
-        ),
+            builder: (context) => ListFood(shopId: widget.shopId!)),
       );
     } else if (index == 3) {
+      if (widget.shopId == null) {
+        print("Shop ID is null. Cannot navigate to VendorProfile.");
+        return;
+      }
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => VendorProfile(vendorId: widget.shopId), // Pass shopId
+          builder: (context) =>
+              VendorProfile(vendorId: widget.shopId!), // Pass shopId
         ),
       );
     }
@@ -56,7 +65,8 @@ class _OrdersState extends State<Orders> {
         backgroundColor: const Color.fromARGB(255, 117, 237, 123),
       ),
       body: Center(
-        child: Text("Orders",
+        child: Text(
+          "Orders",
           style: TextStyle(
             fontSize: 30,
             fontWeight: FontWeight.bold,
@@ -65,9 +75,9 @@ class _OrdersState extends State<Orders> {
         ),
       ),
       bottomNavigationBar: VendorNavBar(
+        shopId: widget.shopId!,
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
-        shopId: widget.shopId, // Pass shopId to VendorNavBar
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:greenbite_frontend/screens/home_page/widgets/shop_details_page.d
 
 import 'package:greenbite_frontend/service/auth_service.dart';
 
+import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:greenbite_frontend/service/location_service.dart';
 import 'dart:convert'; // For JSON parsing
 import 'package:http/http.dart' as http;
@@ -80,7 +81,7 @@ class _ShopsTabState extends State<ShopsTab> {
         child: Text(
           errorMessage,
           style: TextStyle(
-            color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+            color: theme.colorScheme.onSurface, // ✅ Adaptive text color
           ),
         ),
       );
@@ -96,7 +97,7 @@ class _ShopsTabState extends State<ShopsTab> {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+              color: theme.colorScheme.onSurface, // ✅ Adaptive text color
             ),
           ),
           const SizedBox(height: 20),
@@ -145,7 +146,7 @@ class _ShopsTabState extends State<ShopsTab> {
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: theme.colorScheme
-                                .onBackground, // ✅ Adaptive text color
+                                .onSurface, // ✅ Adaptive text color
                           ),
                         ),
                         subtitle: Text(

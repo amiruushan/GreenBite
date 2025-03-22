@@ -1,80 +1,85 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:greenbite_frontend/config.dart';
+import 'package:greenbite_frontend/service/auth_service.dart';
 import 'order_details.dart';
 
 class VendorSalesPage extends StatefulWidget {
+  final int shopId; // Add shopId as a parameter
+
+  const VendorSalesPage({super.key, required this.shopId}); // Constructor
+
   @override
   _VendorSalesPageState createState() => _VendorSalesPageState();
 }
 
 class _VendorSalesPageState extends State<VendorSalesPage> {
   List<Map<String, dynamic>> sales = [];
+  bool isLoading = true;
+  String? token;
 
   @override
   void initState() {
     super.initState();
-    fetchSales();
+    _fetchTokenAndSales();
   }
 
-  void fetchSales() {
-    setState(() {
-      sales = [
-        {
-          "id": 1,
-          "customer": "John Doe",
-          "status": "Completed",
-          "items": [
-            {"name": "Pizza", "quantity": 2, "price": 12.5},
-          ],
-          "totalPrice": 25.0,
-          "location": "123 Main St, Colombo",
-          "orderPlaced": "2025-03-10 14:00",
-          "dispatched": "2025-03-10 14:30",
-          "delivered": "2025-03-10 15:00",
-          "completed": "2025-03-10 15:10",
-          "paymentMethod": "Credit Card",
-          "vendor": "Pizza Palace",
-          "contact": "+94711234567",
+  Future<void> _fetchTokenAndSales() async {
+    token = await AuthService.getToken(); // Retrieve token
+
+    if (token == null) {
+      print("No token found");
+      return;
+    }
+
+    print("Token retrieved: $token"); // Print token for debugging
+    await fetchSales();
+  }
+
+  Future<void> fetchSales() async {
+    final String url =
+        "${Config.apiBaseUrl}/api/orders/shop_order/${widget.shopId}"; // Use widget.shopId
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token", // Use the retrieved token
         },
-        {
-          "id": 2,
-          "customer": "Jane Smith",
-          "status": "Ongoing",
-          "items": [
-            {"name": "Burger", "quantity": 1, "price": 15.0},
-          ],
-          "totalPrice": 15.0,
-          "location": "456 Ocean Ave, Galle",
-          "orderPlaced": "2025-03-10 12:00",
-          "paymentMethod": "Cash on Delivery",
-          "vendor": "Burger Haven",
-          "contact": "+94778765432",
-        },
-        {
-          "id": 3,
-          "customer": "Michael Lee",
-          "status": "Cancelled",
-          "items": [
-            {"name": "Pasta", "quantity": 3, "price": 10.0},
-          ],
-          "totalPrice": 30.0,
-          "location": "789 Sunset Rd, Kandy",
-          "orderPlaced": "2025-03-09 18:00",
-          "cancelled": "2025-03-09 18:30",
-          "paymentMethod": "Debit Card",
-          "vendor": "Pasta Paradise",
-          "contact": "+94776543210",
-        },
-      ];
-    });
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          sales = data.map((order) {
+            return {
+              "id": order["id"],
+              "customer": "Customer ID: ${order["customerId"]}",
+              "status": order["status"].toUpperCase(),
+              "items": order["items"],
+              "totalPrice": order["totalAmount"],
+              "paymentMethod": order["paymentMethod"],
+            };
+          }).toList();
+          isLoading = false;
+        });
+      } else {
+        print("Failed to load sales. Status Code: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error fetching sales: $e");
+    }
   }
 
   Color getStatusColor(String status) {
-    switch (status) {
-      case "Completed":
+    switch (status.toLowerCase()) {
+      case "completed":
         return Colors.green;
-      case "Ongoing":
+      case "pending":
         return Colors.orange;
-      case "Cancelled":
+      case "cancelled":
         return Colors.red;
       default:
         return Colors.grey;
@@ -88,23 +93,22 @@ class _VendorSalesPageState extends State<VendorSalesPage> {
         title: const Text(
           "Sales Overview",
           style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+              fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 117, 237, 123),
       ),
-      body: sales.isEmpty
-          ? const Center(child: Text("No sales records available"))
-          : ListView.builder(
-              itemCount: sales.length,
-              itemBuilder: (context, index) {
-                var sale = sales[index];
-                return _buildOrderCard(sale);
-              },
-            ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : sales.isEmpty
+              ? const Center(child: Text("No sales records available"))
+              : ListView.builder(
+                  itemCount: sales.length,
+                  itemBuilder: (context, index) {
+                    var sale = sales[index];
+                    return _buildOrderCard(sale);
+                  },
+                ),
     );
   }
 
@@ -118,22 +122,16 @@ class _VendorSalesPageState extends State<VendorSalesPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Customer Name
-            Text(
-              sale['customer'],
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
+            Text(sale['customer'],
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-
-            // Order Status
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
-                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: getStatusColor(sale['status']),
                     borderRadius: BorderRadius.circular(10),
@@ -141,29 +139,22 @@ class _VendorSalesPageState extends State<VendorSalesPage> {
                   child: Text(
                     sale['status'],
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
-
-                // View Details Button
                 TextButton(
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => OrderDetailsPage(order: sale),
-                      ),
+                          builder: (context) => OrderDetailsPage(order: sale)),
                     );
                   },
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.white, // Text color
-                    backgroundColor: Colors.blue, // Button background
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.blue,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   ),
                   child: const Text("View Details"),
                 ),

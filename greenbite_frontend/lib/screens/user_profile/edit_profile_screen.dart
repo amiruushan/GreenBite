@@ -97,7 +97,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         backgroundColor: Colors.transparent, // ✅ Transparent AppBar
         elevation: 0, // ✅ Remove shadow
         iconTheme: IconThemeData(
-          color: theme.colorScheme.onBackground, // ✅ Icons adapt to theme
+          color: theme.colorScheme.onSurface, // ✅ Icons adapt to theme
         ),
       ),
       body: SingleChildScrollView(
