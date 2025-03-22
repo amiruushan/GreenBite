@@ -58,11 +58,12 @@ public class FoodItemController {
         return foodItemService.getFoodItemsByCategory(category);
     }
 
-    @PostMapping
+    @PostMapping("/list-food-item")
     public ResponseEntity<FoodItemDTO> addFoodItem(
             @RequestPart("foodItem") String foodItemJson,
             @RequestPart(value = "foodImage", required = false) MultipartFile foodImage) throws IOException {
 
+        System.out.println("wada karanawada");
         // Convert the JSON string to a FoodItemDTO object
         FoodItemDTO foodItemDTO = objectMapper.readValue(foodItemJson, FoodItemDTO.class);
 
