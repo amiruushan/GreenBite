@@ -44,6 +44,9 @@ class FoodShopDTO {
   final String photo;
   final String address;
   final String phoneNumber;
+  final String? email; // Make email nullable
+  final String? businessDescription; // Make business description nullable
+  final DateTime? licenseExpirationDate; // Make license expiration date nullable
   final double latitude;
   final double longitude;
 
@@ -53,6 +56,9 @@ class FoodShopDTO {
     required this.photo,
     required this.address,
     required this.phoneNumber,
+    this.email, // Make email nullable
+    this.businessDescription, // Make business description nullable
+    this.licenseExpirationDate, // Make license expiration date nullable
     required this.latitude,
     required this.longitude,
   });
@@ -64,6 +70,11 @@ class FoodShopDTO {
       photo: json['photo'],
       address: json['address'],
       phoneNumber: json['phoneNumber'],
+      email: json['email'], // Handle null email
+      businessDescription: json['businessDescription'], // Handle null business description
+      licenseExpirationDate: json['licenseExpirationDate'] != null
+          ? DateTime.parse(json['licenseExpirationDate'])
+          : null, // Handle null license expiration date
       latitude: json['latitude'],
       longitude: json['longitude'],
     );

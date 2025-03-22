@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:admin_panel/widgets/common_layout.dart'; // Import the CommonLayout widget
 import '../service/food_shop_service.dart';
 
 class FoodShopScreen extends StatefulWidget {
@@ -10,11 +10,14 @@ class FoodShopScreen extends StatefulWidget {
 class _FoodShopScreenState extends State<FoodShopScreen> {
   final FoodShopService _foodShopService = FoodShopService();
   List<FoodShopDTO> _foodShops = [];
+  List<FoodShopDTO> _filteredFoodShops = []; // For search functionality
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _loadFoodShops();
+    _searchController.addListener(_onSearchChanged); // Listen for search input changes
   }
 
   Future<void> _loadFoodShops() async {
@@ -22,12 +25,22 @@ class _FoodShopScreenState extends State<FoodShopScreen> {
       List<FoodShopDTO> foodShops = await _foodShopService.getAllFoodShops();
       setState(() {
         _foodShops = foodShops;
+        _filteredFoodShops = foodShops; // Initialize filtered list
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to load food shops: $e')),
       );
     }
+  }
+
+  void _onSearchChanged() {
+    String query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredFoodShops = _foodShops
+          .where((shop) => shop.name.toLowerCase().contains(query))
+          .toList();
+    });
   }
 
   Future<void> _addFoodShop() async {
@@ -41,9 +54,9 @@ class _FoodShopScreenState extends State<FoodShopScreen> {
     }
   }
 
-  Future<void> _deleteFoodShop(int id) async {
+  Future<void> _deleteFoodShop(int shopId) async {
     try {
-      await _foodShopService.deleteFoodShop(id);
+      await _foodShopService.deleteFoodShop(shopId);
       _loadFoodShops();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -54,29 +67,92 @@ class _FoodShopScreenState extends State<FoodShopScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Food Shops'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: _addFoodShop,
+    return CommonLayout(
+      title: "Food Shops", // Pass the title for the TopNavBar
+      child: Column(
+        children: [
+          // Search Bar
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search by name...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+          // Table
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: DataTable(
+                columnSpacing: 40, // Add spacing between columns
+                dataRowHeight: 80,
+                columns: const [
+                  DataColumn(label: Text('ID')),
+                  DataColumn(label: Text('Name')),
+                  DataColumn(label: Text('Photo')),
+                  DataColumn(label: Text('Address')),
+                  DataColumn(label: Text('Phone')),
+                  DataColumn(label: Text('Email')), // Add email column
+                  DataColumn(label: Text('Description')), // Add business description column
+                  DataColumn(label: Text('Expiration Date')), // Add license expiration date column
+                  DataColumn(label: Text('Latitude')),
+                  DataColumn(label: Text('Longitude')),
+                  DataColumn(label: Text('Actions')),
+                ],
+                rows: _filteredFoodShops.map((foodShop) {
+                  return DataRow(cells: [
+                    DataCell(Text(foodShop.shopId.toString())),
+                    DataCell(Text(foodShop.name)),
+                    DataCell(
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8), // Rounded corners
+                          border: Border.all(color: Colors.grey[300]!), // Light grey border
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3), // Subtle shadow
+                              spreadRadius: 2,
+                              blurRadius: 4,
+                              offset: Offset(0, 2), // Shadow position
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8), // Match the container's border radius
+                          child: Image.network(
+                            foodShop.photo,
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataCell(Text(foodShop.address)),
+                    DataCell(Text(foodShop.phoneNumber)),
+                    DataCell(Text(foodShop.email ?? 'N/A')), // Handle null email
+                    DataCell(Text(foodShop.businessDescription ?? 'N/A')), // Handle null business description
+                    DataCell(Text(foodShop.licenseExpirationDate?.toString() ?? 'N/A')), // Handle null license expiration date
+                    DataCell(Text(foodShop.latitude.toString())),
+                    DataCell(Text(foodShop.longitude.toString())),
+                    DataCell(
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => _deleteFoodShop(foodShop.shopId),
+                      ),
+                    ),
+                  ]);
+                }).toList(),
+              ),
+            ),
           ),
         ],
-      ),
-      body: ListView.builder(
-        itemCount: _foodShops.length,
-        itemBuilder: (context, index) {
-          final foodShop = _foodShops[index];
-          return ListTile(
-            title: Text(foodShop.name),
-            subtitle: Text(foodShop.address),
-            trailing: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () => _deleteFoodShop(foodShop.shopId),
-            ),
-          );
-        },
       ),
     );
   }
@@ -103,7 +179,15 @@ class _AddFoodShopScreenState extends State<AddFoodShopScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Food Shop'),
+        title: Text(
+          'Add Food Shop',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -113,7 +197,12 @@ class _AddFoodShopScreenState extends State<AddFoodShopScreen> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(labelText: 'Name'),
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a name';
@@ -121,9 +210,15 @@ class _AddFoodShopScreenState extends State<AddFoodShopScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _addressController,
-                decoration: InputDecoration(labelText: 'Address'),
+                decoration: InputDecoration(
+                  labelText: 'Address',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter an address';
@@ -131,9 +226,15 @@ class _AddFoodShopScreenState extends State<AddFoodShopScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _phoneController,
-                decoration: InputDecoration(labelText: 'Phone Number'),
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a phone number';
@@ -141,9 +242,15 @@ class _AddFoodShopScreenState extends State<AddFoodShopScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(labelText: 'Email'),
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter an email';
@@ -151,9 +258,15 @@ class _AddFoodShopScreenState extends State<AddFoodShopScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _descriptionController,
-                decoration: InputDecoration(labelText: 'Business Description'),
+                decoration: InputDecoration(
+                  labelText: 'Business Description',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a business description';
@@ -161,9 +274,15 @@ class _AddFoodShopScreenState extends State<AddFoodShopScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _photoController,
-                decoration: InputDecoration(labelText: 'Photo URL'),
+                decoration: InputDecoration(
+                  labelText: 'Photo URL',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a photo URL';
@@ -171,9 +290,15 @@ class _AddFoodShopScreenState extends State<AddFoodShopScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _latitudeController,
-                decoration: InputDecoration(labelText: 'Latitude'),
+                decoration: InputDecoration(
+                  labelText: 'Latitude',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a latitude';
@@ -181,9 +306,15 @@ class _AddFoodShopScreenState extends State<AddFoodShopScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _longitudeController,
-                decoration: InputDecoration(labelText: 'Longitude'),
+                decoration: InputDecoration(
+                  labelText: 'Longitude',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a longitude';
@@ -191,9 +322,15 @@ class _AddFoodShopScreenState extends State<AddFoodShopScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _expirationController,
-                decoration: InputDecoration(labelText: 'License Expiration Date (YYYY-MM-DD)'),
+                decoration: InputDecoration(
+                  labelText: 'License Expiration Date (YYYY-MM-DD)',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter an expiration date';
@@ -206,7 +343,7 @@ class _AddFoodShopScreenState extends State<AddFoodShopScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
@@ -232,7 +369,21 @@ class _AddFoodShopScreenState extends State<AddFoodShopScreen> {
                     }
                   }
                 },
-                child: Text('Add Food Shop'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'Add Food Shop',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ],
           ),
