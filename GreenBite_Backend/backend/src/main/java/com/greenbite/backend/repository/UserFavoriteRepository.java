@@ -12,4 +12,5 @@ public interface UserFavoriteRepository extends JpaRepository<UserFavorite, Long
     List<UserFavorite> findByUser(User user);
     Optional<UserFavorite> findByUserAndFoodItem(User user, FoodItem foodItem);
     void deleteByUserAndFoodItem(User user, FoodItem foodItem);
+    List<UserFavorite> findByFoodItemId(Long foodItemId);
 }
