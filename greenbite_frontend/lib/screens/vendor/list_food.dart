@@ -9,32 +9,24 @@ import 'orders.dart';
 import 'vendor_profile.dart';
 
 class ListFood extends StatefulWidget {
-  final int shopId; // Add shopId as a parameter
+  final int shopId;
 
-  const ListFood({super.key, required this.shopId}); // Update constructor
+  const ListFood({super.key, required this.shopId});
 
   @override
   State<ListFood> createState() => _ListFoodState();
 }
 
 class _ListFoodState extends State<ListFood> {
-  final int _selectedIndex = 1; // Set to 1 for Add screen
-
-  // Form key for validation
+  int _selectedIndex = 1; // Remove the 'final' keyword
   final _formKey = GlobalKey<FormState>();
-
-  // Controllers for form fields
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
   final _quantityController = TextEditingController();
   final _tagsController = TextEditingController();
-
-  // Variables for image and category
   String? _imageUrl;
   String? _selectedCategory;
-
-  // Dummy categories for dropdown
   final List<String> _categories = [
     "Pizza",
     "Burger",
@@ -44,42 +36,41 @@ class _ListFoodState extends State<ListFood> {
     "Dessert",
   ];
 
-  // Function to handle navigation
   void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
     if (index == 0) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              VendorHome(shopId: widget.shopId), // Pass shopId
+          builder: (context) => VendorHome(shopId: widget.shopId),
         ),
       );
     } else if (index == 2) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => Orders(shopId: widget.shopId), // Pass shopId
+          builder: (context) => Orders(shopId: widget.shopId),
         ),
       );
     } else if (index == 3) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              VendorProfile(vendorId: widget.shopId), // Pass shopId
+          builder: (context) => VendorProfile(vendorId: widget.shopId),
         ),
       );
     }
   }
 
-  // Function to handle form submission
   void _submitForm() async {
     String? token = await AuthService.getToken();
     if (token == null) {
       throw Exception("No authentication token found");
     }
     if (_formKey.currentState!.validate()) {
-      // Prepare the data in JSON format
       final foodItem = {
         "name": _nameController.text,
         "description": _descriptionController.text,
@@ -87,14 +78,12 @@ class _ListFoodState extends State<ListFood> {
         "quantity": int.parse(_quantityController.text),
         "photo": _imageUrl ??
             "https://lh3.googleusercontent.com/p/AF1QipNhe1RTd28nuHie5MFwaU_OXuU33ZNN1rdTYhgG=s1360-w1360-h1020",
-        "shopId": widget.shopId, // Use widget.shopId
-        "tags":
-            _tagsController.text.split(',').map((tag) => tag.trim()).toList(),
+        "shopId": widget.shopId,
+        "tags": _tagsController.text.split(',').map((tag) => tag.trim()).toList(),
         "category": _selectedCategory,
       };
 
       try {
-        // Send the POST request to the backend
         final response = await http.post(
           Uri.parse('${Config.apiBaseUrl}/api/food-items'),
           headers: {
@@ -105,26 +94,20 @@ class _ListFoodState extends State<ListFood> {
         );
 
         if (response.statusCode == 200) {
-          // Show a success message
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Food item added successfully!")),
           );
-
-          // Clear the form
           _formKey.currentState!.reset();
           setState(() {
             _imageUrl = null;
             _selectedCategory = null;
           });
         } else {
-          // Handle error
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text("Failed to add food item. Please try again.")),
+            const SnackBar(content: Text("Failed to add food item. Please try again.")),
           );
         }
       } catch (e) {
-        // Handle network or other errors
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("An error occurred: $e")),
         );
@@ -134,14 +117,19 @@ class _ListFoodState extends State<ListFood> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Add Product",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-            )),
+        title: const Text(
+          "Add Product",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 117, 237, 123),
       ),
@@ -152,10 +140,8 @@ class _ListFoodState extends State<ListFood> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Image Upload (Placeholder)
               GestureDetector(
                 onTap: () {
-                  // TODO: Implement image upload logic
                   setState(() {
                     _imageUrl = "https://example.com/placeholder.jpg";
                   });
@@ -169,18 +155,17 @@ class _ListFoodState extends State<ListFood> {
                   ),
                   child: _imageUrl == null
                       ? const Center(
-                          child: Icon(Icons.add_a_photo_rounded,
-                              size: 50, color: Colors.grey),
-                        )
+                    child: Icon(Icons.add_a_photo_rounded,
+                        size: 50, color: Colors.grey),
+                  )
                       : ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.network(_imageUrl!, fit: BoxFit.cover),
-                        ),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(_imageUrl!, fit: BoxFit.cover),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
 
-              // Food Name
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
@@ -196,7 +181,6 @@ class _ListFoodState extends State<ListFood> {
               ),
               const SizedBox(height: 16),
 
-              // Description
               TextFormField(
                 controller: _descriptionController,
                 decoration: const InputDecoration(
@@ -213,7 +197,6 @@ class _ListFoodState extends State<ListFood> {
               ),
               const SizedBox(height: 16),
 
-              // Price
               TextFormField(
                 controller: _priceController,
                 decoration: const InputDecoration(
@@ -233,7 +216,6 @@ class _ListFoodState extends State<ListFood> {
               ),
               const SizedBox(height: 16),
 
-              // Quantity
               TextFormField(
                 controller: _quantityController,
                 decoration: const InputDecoration(
@@ -253,7 +235,6 @@ class _ListFoodState extends State<ListFood> {
               ),
               const SizedBox(height: 16),
 
-              // Tags (Keywords)
               TextFormField(
                 controller: _tagsController,
                 decoration: const InputDecoration(
@@ -269,7 +250,6 @@ class _ListFoodState extends State<ListFood> {
               ),
               const SizedBox(height: 16),
 
-              // Category Dropdown
               DropdownButtonFormField<String>(
                 value: _selectedCategory,
                 decoration: const InputDecoration(
@@ -296,7 +276,6 @@ class _ListFoodState extends State<ListFood> {
               ),
               const SizedBox(height: 20),
 
-              // Submit Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -318,7 +297,7 @@ class _ListFoodState extends State<ListFood> {
       bottomNavigationBar: VendorNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
-        shopId: widget.shopId, // Pass shopId to VendorNavBar
+        shopId: widget.shopId,
       ),
     );
   }

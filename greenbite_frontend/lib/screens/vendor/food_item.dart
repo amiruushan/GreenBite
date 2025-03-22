@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-
 import '../../config.dart';
 
 class FoodItemScreen extends StatefulWidget {
@@ -15,7 +14,6 @@ class FoodItemScreen extends StatefulWidget {
 }
 
 class _FoodItemScreenState extends State<FoodItemScreen> {
-  // Controllers for form fields
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
   late TextEditingController _priceController;
@@ -26,7 +24,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize controllers with the food item data
     _nameController = TextEditingController(text: widget.foodItem["name"]);
     _descriptionController =
         TextEditingController(text: widget.foodItem["description"]);
@@ -41,7 +38,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
 
   @override
   void dispose() {
-    // Dispose controllers
     _nameController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
@@ -50,7 +46,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
     super.dispose();
   }
 
-  // Function to handle form submission (Update)
   void _updateFoodItem() async {
     String? token = await AuthService.getToken();
     if (token == null) {
@@ -69,10 +64,8 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
       "category": _selectedCategory,
     };
 
-    // Convert the updated food item to JSON
     final jsonBody = jsonEncode(updatedFoodItem);
 
-    // Send the PUT request to the backend API
     final response = await http.put(
       Uri.parse('${Config.apiBaseUrl}/api/food-items/update'),
       headers: {
@@ -82,47 +75,59 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
       body: jsonBody,
     );
 
-    // Check the response status
     if (response.statusCode == 200) {
-      // Show a success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Food item updated successfully!")),
       );
-
-      // Optionally, you can navigate back to the previous screen
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     } else {
-      // Show an error message if the update failed
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Failed to update food item!")),
       );
     }
   }
 
-  // Function to handle delete
-  void _deleteFoodItem() {
-    // Print the deleted item (for demonstration)
-    print("Deleted Food Item: ${widget.foodItem["name"]}");
+  void _deleteFoodItem() async {
+    String? token = await AuthService.getToken();
+    if (token == null) {
+      throw Exception("No authentication token found");
+    }
 
-    // Show a success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Food item deleted successfully!")),
+    final response = await http.delete(
+      Uri.parse('${Config.apiBaseUrl}/api/food-items/${widget.foodItem["id"]}'),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token"
+      },
     );
 
-    // Navigate back to the home screen
-    Navigator.pop(context);
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Food item deleted successfully!")),
+      );
+      Navigator.pop(context, true);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to delete food item!")),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Manage Food Item",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-            )),
+        title: const Text(
+          "Manage Food Item",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 117, 237, 123),
         actions: [
@@ -137,7 +142,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Food Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
@@ -149,7 +153,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Food Name
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(
@@ -159,7 +162,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Description
             TextFormField(
               controller: _descriptionController,
               decoration: const InputDecoration(
@@ -170,7 +172,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Price
             TextFormField(
               controller: _priceController,
               decoration: const InputDecoration(
@@ -181,7 +182,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Quantity
             TextFormField(
               controller: _quantityController,
               decoration: const InputDecoration(
@@ -192,7 +192,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Tags (Keywords)
             TextFormField(
               controller: _tagsController,
               decoration: const InputDecoration(
@@ -202,7 +201,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Category Dropdown
             DropdownButtonFormField<String>(
               value: _selectedCategory,
               decoration: const InputDecoration(
@@ -210,10 +208,10 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
                 border: OutlineInputBorder(),
               ),
               items: const [
-                "pizza",
-                "Bakery",
-                "Cake",
-                "Salad",
+                "Fast Food",
+                "Beverage",
+                "Dessert",
+                "Healthy",
                 "Drink",
                 "Dessert",
                 "Fruit",
@@ -231,7 +229,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Update Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

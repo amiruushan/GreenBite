@@ -1,16 +1,17 @@
+
 package com.greenbite.backend.service;
+
 import com.greenbite.backend.dto.FoodItemDTO;
 import com.greenbite.backend.model.FoodItem;
-import com.greenbite.backend.model.FoodShop;
+import com.greenbite.backend.model.UserFavorite;
 import com.greenbite.backend.repository.FoodItemRepository;
-import com.greenbite.backend.repository.FoodShopRepository;
+import com.greenbite.backend.repository.UserFavoriteRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,12 +19,15 @@ public class FoodItemService {
 
     private static final double EARTH_RADIUS = 6371; // Earth's radius in km
     private final FoodItemRepository foodItemRepository;
-    private final FoodShopRepository foodShopRepository;
+    private final UserFavoriteRepository userFavoriteRepository;
     private final FileStorageService fileStorageService;
 
-    public FoodItemService(FoodItemRepository foodItemRepository, FoodShopRepository foodShopRepository,FileStorageService fileStorageService) {
+    public FoodItemService(
+            FoodItemRepository foodItemRepository,
+            UserFavoriteRepository userFavoriteRepository,
+            FileStorageService fileStorageService) {
         this.foodItemRepository = foodItemRepository;
-        this.foodShopRepository = foodShopRepository;
+        this.userFavoriteRepository = userFavoriteRepository;
         this.fileStorageService = fileStorageService;
     }
 
@@ -118,14 +122,16 @@ public class FoodItemService {
         return EARTH_RADIUS * c;
     }
 
-    public void deleteFoodItem(FoodItemDTO foodItemDTO) {
-        Long id = foodItemDTO.getId();
-        if (foodItemRepository.existsById(id)) {
-            foodItemRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Food item not found");
-        }
+    public void deleteFoodItem(Long id) {
+        // Find the food item by ID
+        FoodItem foodItem = foodItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Food item not found"));
+
+        // Delete all related UserFavorite entries
+        List<UserFavorite> userFavorites = userFavoriteRepository.findByFoodItemId(id);
+        userFavoriteRepository.deleteAll(userFavorites);
+
+        // Delete the food item
+        foodItemRepository.delete(foodItem);
     }
-
-
 }

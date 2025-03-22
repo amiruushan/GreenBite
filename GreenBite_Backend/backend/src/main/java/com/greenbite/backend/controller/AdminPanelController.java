@@ -81,7 +81,7 @@ public class AdminPanelController {
 
     @DeleteMapping("/delete")
     public void deleteFoodItem(@RequestBody FoodItemDTO foodItemDTO){
-        foodItemService.deleteFoodItem(foodItemDTO);
+        foodItemService.deleteFoodItem(foodItemDTO.getId());
     }
 
     @GetMapping("/listFoodItems/{foodShopId}")

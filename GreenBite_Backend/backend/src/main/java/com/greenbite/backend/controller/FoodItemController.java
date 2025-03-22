@@ -71,8 +71,9 @@ public class FoodItemController {
         return ResponseEntity.ok(savedFoodItem);
     }
 
-    @DeleteMapping("/delete")
-    public void deleteFoodItem(@RequestBody FoodItemDTO foodItemDTO){
-        foodItemService.deleteFoodItem(foodItemDTO);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFoodItem(@PathVariable Long id) {
+        foodItemService.deleteFoodItem(id);
+        return ResponseEntity.ok().build();
     }
 }
