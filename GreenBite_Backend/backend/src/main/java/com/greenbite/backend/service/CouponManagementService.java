@@ -41,13 +41,13 @@ public class CouponManagementService {
     }
 
     public void purchaseCoupon(Long userId, Long couponId, String couponCode) {
-        System.out.println("IDDDD : "+userId);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        System.out.println("Coupon IDDDD : "+couponId);
+
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new RuntimeException("Coupon not found"));
-        System.out.println("IDDDD : "+userId);
+
         if (user.getGreenBitePoints() < coupon.getCost()) {
             throw new RuntimeException("Not enough Green Bite Points");
         }

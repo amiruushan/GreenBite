@@ -1,10 +1,10 @@
-import 'package:admin_panel/screens/customer_management.dart';
+import 'package:admin_panel/screens/coupons_screen.dart';
 import 'package:admin_panel/screens/customer_screen.dart';
+import 'package:admin_panel/screens/food_shop_screen.dart';
 import 'package:admin_panel/screens/orders_screen.dart';
 import 'package:admin_panel/screens/products_screen.dart';
 import 'package:admin_panel/screens/settings_screen.dart';
 import 'package:admin_panel/screens/trials_screen.dart';
-import 'package:admin_panel/screens/vendor_management.dart';
 import 'package:flutter/material.dart';
 
 class SideBar extends StatelessWidget {
@@ -21,14 +21,13 @@ class SideBar extends StatelessWidget {
             child: Text("GreenBite",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
           ),
-          _buildMenuItem(
-              context, "Customers", Icons.people, CustomerManagement()),
-          _buildMenuItem(
-              context, "Customers", Icons.people, VendorManagement()),
+          _buildMenuItem(context, "Customers", Icons.people, CustomersScreen()),
           _buildMenuItem(
               context, "Orders", Icons.shopping_cart, OrdersScreen()),
           _buildMenuItem(context, "Products", Icons.store, ProductsScreen()),
-          _buildMenuItem(context, "Trials", Icons.list, TrialsScreen()),
+          _buildMenuItem(context, "Food Shops", Icons.list, FoodShopScreen()),
+          _buildMenuItem(
+              context, "Coupons", Icons.card_giftcard, CouponsScreen()),
           _buildMenuItem(context, "Settings", Icons.settings, SettingsScreen()),
         ],
       ),

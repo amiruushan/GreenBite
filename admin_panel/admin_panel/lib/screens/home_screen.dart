@@ -12,7 +12,7 @@ class HomeScreen extends StatelessWidget {
           Expanded(
             child: Column(
               children: [
-                TopNavBar(),
+                TopNavBar(title: '',),
                 Expanded(
                   child: Center(child: Text("Home Page")),
                 ),

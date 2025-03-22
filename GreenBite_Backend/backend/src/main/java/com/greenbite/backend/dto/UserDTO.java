@@ -13,5 +13,6 @@ public class UserDTO {
     private String profilePictureUrl;
     private String phoneNumber;
     private String address;
+    private int shopId;
 }
 

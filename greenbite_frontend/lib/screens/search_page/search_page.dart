@@ -70,12 +70,12 @@ class _SearchScreenState extends State<SearchScreen> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface, // ✅ Theme-based background
+      backgroundColor: theme.colorScheme.background, // ✅ Theme-based background
       appBar: AppBar(
         title: Text(
-          "Green Bite",
+          "GreenBite",
           style: TextStyle(
-            color: theme.colorScheme.onSurface, // ✅ Adaptive text color
+            color: isDarkMode ? Colors.white : Colors.green,
             fontSize: 30,
             fontWeight: FontWeight.bold,
           ),
@@ -84,7 +84,7 @@ class _SearchScreenState extends State<SearchScreen> {
         backgroundColor: Colors.transparent, // ✅ Transparent AppBar
         elevation: 0, // ✅ No shadow
         iconTheme: IconThemeData(
-          color: theme.colorScheme.onSurface, // ✅ Icon color adapts to theme
+          color: theme.colorScheme.onBackground, // ✅ Icon color adapts to theme
         ),
         actions: [
           IconButton(
@@ -95,7 +95,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 MaterialPageRoute(builder: (context) => const CartScreen()),
               );
             },
-            color: theme.colorScheme.onSurface, // ✅ Action icons adapt
+            color: theme.colorScheme.onBackground, // ✅ Action icons adapt
           ),
         ],
       ),
@@ -126,7 +126,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   contentPadding:
                       const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                 ),
-                style: TextStyle(color: theme.colorScheme.onSurface),
+                style: TextStyle(color: theme.colorScheme.onBackground),
               ),
             ),
             const SizedBox(height: 15),
@@ -160,7 +160,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         style: TextStyle(
                           color: isSelected
                               ? Colors.white
-                              : theme.colorScheme.onSurface,
+                              : theme.colorScheme.onBackground,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

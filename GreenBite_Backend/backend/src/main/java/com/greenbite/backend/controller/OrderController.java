@@ -22,6 +22,7 @@ public class OrderController {
 
     @PostMapping("/confirm")
     public ResponseEntity<Order> confirmOrder(@RequestBody OrderDTO orderDTO) {
+        System.out.println("Order DTO: "+orderDTO);
         Order order = orderService.createOrder(orderDTO);
         return ResponseEntity.ok(order);
     }
@@ -36,5 +37,11 @@ public class OrderController {
     public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable Long userId) {
         List<Order> orders = orderService.getOrdersByCustomerId(userId);
         return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/total_calories/{userId}")
+    public ResponseEntity<Float> getTotalCaloriesConsumed(@PathVariable Long userId) {
+        float totalCalories = orderService.getTotalCaloriesConsumed(userId);
+        return ResponseEntity.ok(totalCalories);
     }
 }

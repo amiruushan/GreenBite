@@ -40,12 +40,12 @@ public class UserService {
     public UserDTO updateUser(UserDTO userDTO, MultipartFile profilePicture) throws IOException {
         User user = userRepository.findById(userDTO.getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         user.setPhoneNumber(userDTO.getPhoneNumber());
         user.setAddress(userDTO.getAddress());
-
+        user.setShopId(userDTO.getShopId());
+        user.setShopId(userDTO.getShopId());
         // Handle profile picture upload
         if (profilePicture != null && !profilePicture.isEmpty()) {
             // Delete the old profile picture if it exists
@@ -64,13 +64,11 @@ public class UserService {
 
     // NEW: Update the user’s location
     public UserDTO updateUserLocation(LocationUpdateDTO dto) {
-        System.out.println("HHHHHHHHHHHH");
-        System.out.println(dto.getUserId());
+
 
 
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        System.out.println("HHHHHHHHHHHH");
 
         user.setLatitude(dto.getLatitude());
         user.setLongitude(dto.getLongitude());
@@ -85,7 +83,8 @@ public class UserService {
                 user.getEmail(),
                 user.getProfilePictureUrl(),
                 user.getPhoneNumber(),
-                user.getAddress()
+                user.getAddress(),
+                user.getShopId()
         );
     }
 
@@ -140,7 +139,7 @@ public class UserService {
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(user -> new UserDTO(user.getId(), user.getUsername(), user.getEmail(), null, user.getPhoneNumber(), user.getAddress()))
+                .map(user -> new UserDTO(user.getId(), user.getUsername(), user.getEmail(), null, user.getPhoneNumber(), user.getAddress(), user.getShopId()))
                 .collect(Collectors.toList());
     }
 

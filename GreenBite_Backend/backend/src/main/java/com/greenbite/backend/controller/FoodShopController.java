@@ -6,7 +6,9 @@ import com.greenbite.backend.service.FoodShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.sql.SQLOutput;
 import java.util.List;
 
@@ -18,9 +20,7 @@ public class FoodShopController {
 
     @PostMapping("/add")
     public ResponseEntity<FoodShop> addFoodShop(@RequestBody FoodShop foodShop) {
-        System.out.println("Wada karaanawa");
         FoodShop savedShop = foodShopService.saveFoodShop(foodShop);
-        System.out.println("Wada karaanawa");
         return ResponseEntity.ok(savedShop);
     }
     @GetMapping("/all")
@@ -30,13 +30,16 @@ public class FoodShopController {
     }
     @GetMapping("/{id}")
     public FoodShopDTO getFoodShopById(@PathVariable Long id) {
-        System.out.println("Fetching shop with ID: " + id);
         return foodShopService.getFoodShopById(id);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<FoodShop> updateFoodShop(@PathVariable Long id, @RequestBody FoodShop foodShop) {
-        FoodShop updatedShop = foodShopService.updateFoodShop(id, foodShop);
+    public ResponseEntity<FoodShop> updateFoodShop(
+            @PathVariable Long id,
+            @RequestPart("shop") String shopJson,
+            @RequestPart(value = "photo", required = false) MultipartFile photo) throws IOException {
+
+        FoodShop updatedShop = foodShopService.updateFoodShop(id, shopJson, photo);
         return ResponseEntity.ok(updatedShop);
     }
 
@@ -45,7 +48,17 @@ public class FoodShopController {
             @RequestParam double lat,
             @RequestParam double lon,
             @RequestParam(defaultValue = "5") double radius) {
-        System.out.println("hhhh");
-        return foodShopService.findShopsNearby(lat, lon, radius);
+        System.out.println("Lattitude: "+lat+" Longtitude: "+lon);
+        radius = 5000000;
+        //lat=6.032894799999999;
+        //lon=80.2167912;
+        System.out.println("nearby food shops");
+
+        List<FoodShop> nearbyShops = foodShopService.findShopsNearby(lat, lon, radius);
+
+        // Print the returned values
+        System.out.println("Found shops: " + nearbyShops);
+
+        return nearbyShops;
     }
 }

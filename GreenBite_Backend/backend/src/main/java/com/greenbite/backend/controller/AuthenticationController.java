@@ -31,7 +31,6 @@ public class AuthenticationController {
         return ResponseEntity.ok(registeredUser);
     }
 
-
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto) {
         try {
@@ -44,7 +43,6 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
-
 
     @PostMapping("/verify")
     public ResponseEntity<?> verifyUser(@RequestBody VerifyUserDto verifyUserDto) {

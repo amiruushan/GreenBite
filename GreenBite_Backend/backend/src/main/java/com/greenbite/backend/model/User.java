@@ -70,7 +70,6 @@ public class User implements UserDetails {
     @Column(name = "longitude")
     private Double longitude;
 
-    @Column(nullable = false)
     private int shopId;
 
     // Constructor for new user with required fields

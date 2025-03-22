@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "food_shops")
 @Data
@@ -36,6 +38,9 @@ public class FoodShop {
 
     @Column(nullable = false)
     private double longitude;
+
+    @Column(nullable = false)
+    private LocalDate licenseExpirationDate;
 
 
 }

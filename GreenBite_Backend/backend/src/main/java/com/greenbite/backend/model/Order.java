@@ -3,6 +3,7 @@ package com.greenbite.backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -21,12 +22,10 @@ public class Order {
     private Long shopId;
     private String paymentMethod;
     private String status = "pending"; // Default status is "pending"
+    private float totalAmount;
+    private float totalCalories;
+    private LocalDateTime orderDate;
 
-    @ManyToMany
-    @JoinTable(
-            name = "order_food_items",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "food_item_id")
-    )
-    private List<FoodItem> items; // List of FoodItems in the order
+    @Column(columnDefinition = "TEXT") // Store JSON as text
+    private String orderedItemsJson;
 }

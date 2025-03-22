@@ -34,11 +34,23 @@ class LocationService {
   }
 
   // Call the backend API to update the user location
-  static Future<void> updateUserLocation(int userId) async {
+  static Future<void> updateUserLocation(int userId,
+      [double? lat, double? lng]) async {
     try {
-      final position = await getCurrentLocation();
-      final double latitude = position.latitude;
-      final double longitude = position.longitude;
+      double latitude;
+      double longitude;
+
+      // If latitude and longitude are provided, use them
+      if (lat != null && lng != null) {
+        latitude = lat;
+        longitude = lng;
+      } else {
+        // Otherwise, fetch the current location
+        final position = await getCurrentLocation();
+        latitude = position.latitude;
+        longitude = position.longitude;
+      }
+
       print("User location: Latitude=$latitude, Longitude=$longitude");
 
       // Build the JSON payload
@@ -47,25 +59,32 @@ class LocationService {
         "latitude": latitude,
         "longitude": longitude,
       };
-      String? token = await AuthService.getToken(); // Retrieve token
+
+      // Retrieve the authentication token
+      String? token = await AuthService.getToken();
       if (token == null) {
         print("No token found");
         return;
       }
+
+      print("Token: $token");
+
       // Send a PUT request to your backend endpoint
       final response = await http.put(
         Uri.parse('${Config.apiBaseUrl}/api/users/updateLocation'),
         headers: {
           "Authorization": "Bearer $token",
-          "Content-Type": "application/json", // Add this line
+          "Content-Type": "application/json",
         },
         body: jsonEncode(payload),
       );
 
+      // Handle the response
       if (response.statusCode == 200) {
         print("User location updated successfully");
       } else {
         print("Failed to update location. Status code: ${response.statusCode}");
+        print("Response body: ${response.body}");
       }
     } catch (e) {
       print("Error updating location: $e");

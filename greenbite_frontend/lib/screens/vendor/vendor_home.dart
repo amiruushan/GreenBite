@@ -1,17 +1,18 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:greenbite_frontend/screens/vendor/vendor_sales.dart';
+import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:http/http.dart' as http;
-import 'package:greenbite_frontend/screens/vendor/vendor_profile.dart';
-import '../../config.dart';
-import '../../widgets/vendor_nav_bar.dart';
+import 'package:greenbite_frontend/config.dart';
+import 'package:greenbite_frontend/widgets/vendor_nav_bar.dart';
 import 'list_food.dart';
+import 'orders.dart';
+import 'vendor_profile.dart';
 import 'food_item.dart';
 
 class VendorHome extends StatefulWidget {
-  final int? shopId; // Make shopId optional
+  final int shopId;
 
-  const VendorHome({super.key, this.shopId}); // Remove required keyword
+  const VendorHome({super.key, required this.shopId});
 
   @override
   _VendorHomeState createState() => _VendorHomeState();
@@ -27,15 +28,17 @@ class _VendorHomeState extends State<VendorHome> {
 
   // Fetch vendor details and food items from backend
   Future<void> fetchVendorData() async {
-    if (widget.shopId == null) {
-      print("Shop ID is null. Cannot fetch vendor details.");
-      return;
+    String? token = await AuthService.getToken();
+    if (token == null) {
+      throw Exception("No authentication token found");
     }
-
     try {
       final response = await http.get(
-        Uri.parse(
-            '${Config.apiBaseUrl}/api/shop/${widget.shopId}'), // Use widget.shopId
+        Uri.parse('${Config.apiBaseUrl}/api/shop/${widget.shopId}'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token"
+        },
       );
 
       if (response.statusCode == 200) {
@@ -54,15 +57,17 @@ class _VendorHomeState extends State<VendorHome> {
   }
 
   Future<void> fetchFoodItems() async {
-    if (widget.shopId == null) {
-      print("Shop ID is null. Cannot fetch food items.");
-      return;
+    String? token = await AuthService.getToken();
+    if (token == null) {
+      throw Exception("No authentication token found");
     }
-
     try {
       final response = await http.get(
-        Uri.parse(
-            '${Config.apiBaseUrl}/api/food-items/shop/${widget.shopId}'), // Use widget.shopId
+        Uri.parse('${Config.apiBaseUrl}/api/food-items/shop/${widget.shopId}'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token"
+        },
       );
 
       if (response.statusCode == 200) {
@@ -85,8 +90,9 @@ class _VendorHomeState extends State<VendorHome> {
   @override
   void initState() {
     super.initState();
-    fetchVendorData(); // Fetch vendor details
-    fetchFoodItems(); // Fetch food items
+    print("Shop ID: ${widget.shopId}"); // Debugging
+    fetchVendorData();
+    fetchFoodItems();
   }
 
   void _onItemTapped(int index) {
@@ -97,30 +103,23 @@ class _VendorHomeState extends State<VendorHome> {
     if (index == 1) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const ListFood()),
+        MaterialPageRoute(
+          builder: (context) => ListFood(shopId: widget.shopId), // Pass shopId
+        ),
       );
     } else if (index == 2) {
-      if (widget.shopId == null) {
-        print("Shop ID is null. Cannot navigate to VendorSalesPage.");
-        return;
-      }
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              VendorSalesPage(shopId: widget.shopId!), // Pass shopId
+          builder: (context) => Orders(shopId: widget.shopId), // Pass shopId
         ),
       );
     } else if (index == 3) {
-      if (widget.shopId == null) {
-        print("Shop ID is null. Cannot navigate to VendorProfile.");
-        return;
-      }
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) =>
-              VendorProfile(vendorId: widget.shopId!), // Pass shopId
+              VendorProfile(vendorId: widget.shopId), // Pass shopId
         ),
       );
     }
@@ -141,103 +140,110 @@ class _VendorHomeState extends State<VendorHome> {
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator()) // Show loader
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                vendorImageUrl.isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: Image.network(
-                          vendorImageUrl,
-                          width: double.infinity,
-                          height: 200,
-                          fit: BoxFit.cover,
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Vendor Image
+                  vendorImageUrl.isNotEmpty
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.network(
+                            vendorImageUrl,
+                            width: double.infinity,
+                            height: 200,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : const SizedBox(height: 200),
+                  const SizedBox(height: 16),
+
+                  // Vendor Name and Description
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          vendorName,
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
                         ),
-                      )
-                    : const SizedBox(height: 200),
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        vendorName,
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        vendorDescription,
-                        style:
-                            const TextStyle(fontSize: 16, color: Colors.grey),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        "Available Food Items",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
+                        const SizedBox(height: 8),
+                        Text(
+                          vendorDescription,
+                          style:
+                              const TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          "Available Food Items",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: foodItems.isEmpty
-                      ? const Center(child: Text("No food items available"))
-                      : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: foodItems.length,
-                          itemBuilder: (context, index) {
-                            final food = foodItems[index];
-                            return Card(
-                              margin: const EdgeInsets.symmetric(vertical: 8),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)),
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.all(12),
-                                leading: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.network(
-                                    food["photo"],
-                                    width: 60,
-                                    height: 60,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                title: Text(
-                                  food["name"],
-                                  style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Text(food["description"]),
-                                trailing: Text(
-                                  "\$${food["price"].toStringAsFixed(2)}",
-                                  style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.green),
-                                ),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          FoodItemScreen(foodItem: food),
-                                    ),
-                                  );
-                                },
+
+                  // Food Items List
+                  ListView.builder(
+                    shrinkWrap: true, // Prevent infinite height
+                    physics:
+                        const NeverScrollableScrollPhysics(), // Disable scrolling
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: foodItems.length,
+                    itemBuilder: (context, index) {
+                      final food = foodItems[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.all(12),
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              food["photo"],
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          title: Text(
+                            food["name"],
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(food["description"]),
+                          trailing: Text(
+                            "\$${food["price"].toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green),
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    FoodItemScreen(foodItem: food),
                               ),
                             );
                           },
                         ),
-                ),
-              ],
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
       bottomNavigationBar: VendorNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
+        shopId: widget.shopId, // Pass shopId to VendorNavBar
       ),
     );
   }

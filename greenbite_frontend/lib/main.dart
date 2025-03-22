@@ -5,19 +5,26 @@ import 'package:greenbite_frontend/screens/splash_screen/splash_screen.dart';
 import 'package:greenbite_frontend/theme_provider.dart'; // Import ThemeProvider
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ✅ Set your Stripe publishable key
-  Stripe.publishableKey =
-      "pk_test_51Qsh6fBlbt78FKd8ObfV5e9AMLen2F9efKqkjQmQZwtea7KIiPSGDbPcxak2dvfkKMv9E2wXu5YV1eVVPuGm3OzA00LqEk6B3Z";
+  try {
+    // ✅ Set your Stripe publishable key
+    Stripe.publishableKey =
+    "pk_test_51Qsh6fBlbt78FKd8ObfV5e9AMLen2F9efKqkjQmQZwtea7KIiPSGDbPcxak2dvfkKMv9E2wXu5YV1eVVPuGm3OzA00LqEk6B3Z";
+
+    // ✅ Apply Stripe settings
+    await Stripe.instance.applySettings();
+    print("Stripe initialized successfully");
+  } catch (e) {
+    print("Failed to initialize Stripe: $e");
+  }
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CartProvider()),
-        ChangeNotifierProvider(
-            create: (_) => ThemeProvider()), // Add ThemeProvider
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const MyApp(),
     ),

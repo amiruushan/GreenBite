@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:greenbite_frontend/screens/vendor/vendor_sales.dart';
+import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../config.dart';
 import '../../widgets/vendor_nav_bar.dart';
 import 'vendor_home.dart';
 import 'list_food.dart';
-import 'edit_profile.dart';
+import 'orders.dart';
+import 'edit_profile.dart'; // Import the EditProfile screen
 
 class VendorProfile extends StatefulWidget {
   final int vendorId;
@@ -30,9 +31,17 @@ class _VendorProfileState extends State<VendorProfile> {
 
   // Fetch vendor profile data from backend
   Future<void> _fetchVendorProfile() async {
+    String? token = await AuthService.getToken();
+    if (token == null) {
+      throw Exception("No authentication token found");
+    }
     try {
       final response = await http.get(
         Uri.parse('${Config.apiBaseUrl}/api/shop/${widget.vendorId}'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token"
+        },
       );
 
       if (response.statusCode == 200) {
@@ -66,19 +75,23 @@ class _VendorProfileState extends State<VendorProfile> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => VendorHome(shopId: widget.vendorId)),
+          builder: (context) =>
+              VendorHome(shopId: widget.vendorId), // Pass shopId
+        ),
       );
     } else if (index == 1) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const ListFood()),
+        MaterialPageRoute(
+          builder: (context) =>
+              ListFood(shopId: widget.vendorId), // Pass shopId
+        ),
       );
     } else if (index == 2) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              VendorSalesPage(shopId: widget.vendorId), // Pass shopId
+          builder: (context) => Orders(shopId: widget.vendorId), // Pass shopId
         ),
       );
     }
@@ -218,6 +231,7 @@ class _VendorProfileState extends State<VendorProfile> {
       bottomNavigationBar: VendorNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
+        shopId: widget.vendorId, // Pass shopId to VendorNavBar
       ),
     );
   }
