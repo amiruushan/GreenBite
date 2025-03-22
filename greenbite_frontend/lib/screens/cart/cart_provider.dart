@@ -3,11 +3,27 @@ import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
 
 class CartProvider extends ChangeNotifier {
   final List<FoodItem> _cartItems = [];
+  double discountAmount = 0.0;
+  String? selectedCoupon;
 
   List<FoodItem> get cartItems => _cartItems;
 
   void clearCart() {
     _cartItems.clear();
+    notifyListeners();
+  }
+
+  void applyCoupon(String coupon, double discount) {
+    print("Applying coupon: $coupon with discount: $discount");
+    selectedCoupon = coupon;
+    discountAmount = discount;
+    notifyListeners();
+  }
+
+  void clearCoupon() {
+    print("Clearing coupon");
+    selectedCoupon = null;
+    discountAmount = 0.0;
     notifyListeners();
   }
 
