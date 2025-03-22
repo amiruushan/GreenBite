@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart'; // Import url_launcher
 import 'package:greenbite_frontend/screens/green_bite_points/green_bite_shop.dart';
 import 'package:greenbite_frontend/screens/user_profile/about_us_screen.dart';
 import 'package:greenbite_frontend/screens/user_profile/models/user_profile.dart';
@@ -69,10 +70,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   void _switchToVendor() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const VendorHome()),
-    );
+    if (_userProfile != null && _userProfile!.shopId > 0) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VendorHome(shopId: _userProfile!.shopId),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No shop associated with this account!")),
+      );
+    }
   }
 
   void _goToGreenBitePoints() {
@@ -80,6 +89,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       context,
       MaterialPageRoute(builder: (context) => GreenBitePointsScreen()),
     );
+  }
+
+  // Function to open Google Form
+  Future<void> _openGoogleForm() async {
+    const googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLScchqRC_6TOEEjo9qwfHGWf29jetYCSFnUvom1LrVNpUHomQA/viewform?usp=sharing';
+    if (await canLaunch(googleFormUrl)) {
+      await launch(googleFormUrl);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Could not launch the form.")),
+      );
+    }
   }
 
   @override
@@ -106,86 +127,84 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _userProfile == null
-              ? const Center(
-                  child: Text(
-                    'Failed to load user profile',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
-                  ),
-                )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 50),
-                      // ✅ Profile Header
-                      _buildProfileHeader(theme),
-                      const SizedBox(height: 16),
+          ? const Center(
+        child: Text(
+          'Failed to load user profile',
+          style: TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+      )
+          : SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 50),
+            // ✅ Profile Header
+            _buildProfileHeader(theme),
+            const SizedBox(height: 16),
 
-                      // ✅ Dark Mode Toggle
-                      _buildDarkModeToggle(themeProvider, theme),
-                      const SizedBox(height: 16),
+            // ✅ Dark Mode Toggle
+            _buildDarkModeToggle(themeProvider, theme),
+            const SizedBox(height: 16),
 
-                      // ✅ Main Profile Options
-                      _buildOptionsContainer(theme, [
-                        _buildSectionItem(
-                          icon: Icons.edit,
-                          text: "Edit Profile",
-                          onPressed: _editProfile,
-                        ),
-                        if (_userProfile!.shopId > 0)
-                          _buildSectionItem(
-                            icon: Icons.store,
-                            text: "Switch to Vendor",
-                            onPressed: _switchToVendor,
-                          ),
-                        if (_userProfile!.shopId <= 0)
-                          _buildSectionItem(
-                            icon: Icons.add_business,
-                            text: "Create a Shop",
-                            onPressed: () {
-                              // No logic needed for now
-                            },
-                          ),
-                        _buildSectionItem(
-                          icon: Icons.logout,
-                          text: "Sign Out",
-                          onPressed: _signOut,
-                        ),
-                      ]),
-
-                      const SizedBox(height: 16),
-
-                      // ✅ Additional Options
-                      _buildOptionsContainer(theme, [
-                        _buildSectionItem(
-                          icon: Icons.emoji_events,
-                          text: "Green Bite Points",
-                          onPressed: _goToGreenBitePoints,
-                        ),
-                        _buildSectionItem(
-                          icon: Icons.shopping_bag,
-                          text: "Green Bite Shop",
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => GreenBiteShopScreen()),
-                            );
-                          },
-                        ),
-                        _buildSectionItem(
-                          icon: Icons.info,
-                          text: "About Us",
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const AboutUsScreen()),
-                            );
-                          },
-                        ),
-                      ]),
-                    ],
-                  ),
+            // ✅ Main Profile Options
+            _buildOptionsContainer(theme, [
+              _buildSectionItem(
+                icon: Icons.edit,
+                text: "Edit Profile",
+                onPressed: _editProfile,
+              ),
+              if (_userProfile!.shopId > 0)
+                _buildSectionItem(
+                  icon: Icons.store,
+                  text: "Switch to Vendor",
+                  onPressed: _switchToVendor,
                 ),
+              if (_userProfile!.shopId <= 0)
+                _buildSectionItem(
+                  icon: Icons.add_business,
+                  text: "Create a Shop",
+                  onPressed: _openGoogleForm, // Updated to open Google Form
+                ),
+              _buildSectionItem(
+                icon: Icons.logout,
+                text: "Sign Out",
+                onPressed: _signOut,
+              ),
+            ]),
+
+            const SizedBox(height: 16),
+
+            // ✅ Additional Options
+            _buildOptionsContainer(theme, [
+              _buildSectionItem(
+                icon: Icons.emoji_events,
+                text: "Green Bite Points",
+                onPressed: _goToGreenBitePoints,
+              ),
+              _buildSectionItem(
+                icon: Icons.shopping_bag,
+                text: "Green Bite Shop",
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => GreenBiteShopScreen()),
+                  );
+                },
+              ),
+              _buildSectionItem(
+                icon: Icons.info,
+                text: "About Us",
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AboutUsScreen()),
+                  );
+                },
+              ),
+            ]),
+          ],
+        ),
+      ),
     );
   }
 

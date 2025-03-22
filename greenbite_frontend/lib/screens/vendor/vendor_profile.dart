@@ -65,17 +65,23 @@ class _VendorProfileState extends State<VendorProfile> {
     if (index == 0) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const VendorHome()),
+        MaterialPageRoute(
+          builder: (context) => VendorHome(shopId: widget.vendorId), // Pass shopId
+        ),
       );
     } else if (index == 1) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const ListFood()),
+        MaterialPageRoute(
+          builder: (context) => ListFood(shopId: widget.vendorId), // Pass shopId
+        ),
       );
     } else if (index == 2) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const Orders()),
+        MaterialPageRoute(
+          builder: (context) => Orders(shopId: widget.vendorId), // Pass shopId
+        ),
       );
     }
   }
@@ -202,6 +208,7 @@ class _VendorProfileState extends State<VendorProfile> {
       bottomNavigationBar: VendorNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
+        shopId: widget.vendorId, // Pass shopId to VendorNavBar
       ),
     );
   }

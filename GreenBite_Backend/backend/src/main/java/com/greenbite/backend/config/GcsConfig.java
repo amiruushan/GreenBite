@@ -16,9 +16,7 @@ public class GcsConfig {
         GoogleCredentials credentials = GoogleCredentials.fromStream(
 
             new FileInputStream("D:/IIT Second Year/Green Bite/GreenBite/gleaming-orbit-453215-j2-6e0bdb8a2018.json")
-
            
-
         );
 
         return StorageOptions.newBuilder()

@@ -25,7 +25,8 @@ class UserProfile {
       id: json['id'],
       username: json['username'],
       email: json['email'],
-      profilePictureUrl: json['profilePictureUrl'] ?? placeholderProfilePictureUrl,
+      profilePictureUrl:
+          json['profilePictureUrl'] ?? placeholderProfilePictureUrl,
       phoneNumber: json['phoneNumber'],
       address: json['address'],
       shopId: json['shopId'],
@@ -42,7 +43,7 @@ class UserProfile {
           placeholderProfilePictureUrl, // Use placeholder if null
       "phoneNumber": phoneNumber,
       "address": address,
-      "shopID": shopId,
+      "shopId": shopId,
     };
   }
 }

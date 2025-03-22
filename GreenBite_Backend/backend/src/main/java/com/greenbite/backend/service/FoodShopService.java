@@ -1,6 +1,7 @@
 package com.greenbite.backend.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greenbite.backend.dto.FoodShopDTO;
 import com.greenbite.backend.dto.UserDTO;
 import com.greenbite.backend.model.FoodShop;
@@ -8,7 +9,9 @@ import com.greenbite.backend.model.User;
 import com.greenbite.backend.repository.FoodShopRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +20,10 @@ import java.util.stream.Collectors;
 public class FoodShopService {
     @Autowired
     private FoodShopRepository foodShopRepository;
+
+    @Autowired
+    private FileStorageService fileStorageService;
+
 
     public FoodShop saveFoodShop(FoodShop foodShop) {
         return foodShopRepository.save(foodShop);
@@ -69,7 +76,10 @@ public class FoodShopService {
         }
     }
 
-    public FoodShop updateFoodShop(Long id, FoodShop updatedShop) {
+    public FoodShop updateFoodShop(Long id, String shopJson, MultipartFile photo) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        FoodShop updatedShop = objectMapper.readValue(shopJson, FoodShop.class);
+
         return foodShopRepository.findById(id)
                 .map(existingShop -> {
                     existingShop.setName(updatedShop.getName());
@@ -77,7 +87,28 @@ public class FoodShopService {
                     existingShop.setPhoneNumber(updatedShop.getPhoneNumber());
                     existingShop.setEmail(updatedShop.getEmail());
                     existingShop.setBusinessDescription(updatedShop.getBusinessDescription());
-                    existingShop.setPhoto(updatedShop.getPhoto());
+
+                    // Handle photo upload
+                    if (photo != null && !photo.isEmpty()) {
+                        // Delete the old photo if it exists
+                        if (existingShop.getPhoto() != null) {
+                            try {
+                                fileStorageService.deleteFile(existingShop.getPhoto());
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+
+                        // Save the new photo to GCS
+                        String fileUrl = null;
+                        try {
+                            fileUrl = fileStorageService.saveFile(photo);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        existingShop.setPhoto(fileUrl); // Save the GCS URL in the database
+                    }
+
                     return foodShopRepository.save(existingShop);
                 })
                 .orElseThrow(() -> new RuntimeException("Shop not found"));
