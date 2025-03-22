@@ -13,8 +13,9 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void applyCoupon(String coupon, double discount) {
-    print("Applying coupon: $coupon with discount: $discount");
+  void applyCoupon(String coupon, double discount, String dealName) {
+    print(
+        "Applying coupon: $coupon with discount: $discount and deal name: $dealName");
     selectedCoupon = coupon;
     discountAmount = discount;
     notifyListeners();
