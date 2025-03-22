@@ -10,7 +10,7 @@ import 'package:http/http.dart' as http;
 class ShopDetailsPage extends StatefulWidget {
   final String shopId;
 
-  const ShopDetailsPage({Key? key, required this.shopId}) : super(key: key);
+  const ShopDetailsPage({super.key, required this.shopId});
 
   @override
   _ShopDetailsPageState createState() => _ShopDetailsPageState();

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'phone_verification_screen.dart';
 import 'email_verification_screen.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
@@ -9,32 +8,46 @@ class ForgotPasswordScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: BackButton(color: Colors.black),
+        leading: BackButton(
+          color:
+              isDarkMode ? Colors.white : Colors.black, // Adaptive icon color
+        ),
       ),
-      backgroundColor: Colors.grey[200],
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Forgot password?",
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+              "Forgot Password?",
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode
+                    ? Colors.white
+                    : Colors.black, // Adaptive text color
+              ),
             ),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             Text(
-              "Select which contact detail should be used to reset password.",
-              style: TextStyle(color: Colors.black54),
+              "Enter your email to reset your password.",
+              style: TextStyle(
+                color: isDarkMode
+                    ? Colors.grey[400]
+                    : Colors.black54, // Adaptive text color
+              ),
             ),
-            SizedBox(height: 20),
-            ContactOptionCard(
-              title: "Email",
-              subtitle: "Send link to my email",
-              icon: Icons.email,
+            const SizedBox(height: 20),
+
+            // ✅ Email Reset Option
+            GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
@@ -45,76 +58,62 @@ class ForgotPasswordScreen extends StatelessWidget {
                   ),
                 );
               },
-            ),
-            SizedBox(height: 15),
-            ContactOptionCard(
-              title: "Phone Number",
-              subtitle: "Send link to my phone number",
-              icon: Icons.phone,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PhoneVerificationScreen(),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ContactOptionCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const ContactOptionCard({
-    super.key,
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(15),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 5,
-              offset: Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 30, color: Colors.green),
-            SizedBox(width: 15),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              child: Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: isDarkMode
+                      ? Colors.grey[800]
+                      : Colors.white, // Adaptive container color
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    if (!isDarkMode)
+                      const BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 5,
+                        offset: Offset(0, 3),
+                      ),
+                  ],
                 ),
-                SizedBox(height: 3),
-                Text(subtitle, style: TextStyle(color: Colors.black54)),
-              ],
+                child: Row(
+                  children: [
+                    const Icon(Icons.email, size: 30, color: Colors.green),
+                    const SizedBox(width: 15),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Email",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode
+                                ? Colors.white
+                                : Colors.black, // Adaptive text color
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          "Send reset link to email",
+                          style: TextStyle(
+                            color: isDarkMode
+                                ? Colors.grey[400]
+                                : Colors.black54, // Adaptive text color
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 18,
+                      color: isDarkMode
+                          ? Colors.grey[400]
+                          : Colors.black54, // Adaptive icon color
+                    ),
+                  ],
+                ),
+              ),
             ),
-            Spacer(),
-            Icon(Icons.arrow_forward_ios, size: 18, color: Colors.black54),
           ],
         ),
       ),

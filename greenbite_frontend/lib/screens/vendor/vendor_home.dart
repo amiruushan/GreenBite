@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/screens/vendor/vendor_sales.dart';
 import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:greenbite_frontend/config.dart';
@@ -111,7 +112,8 @@ class _VendorHomeState extends State<VendorHome> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => Orders(shopId: widget.shopId), // Pass shopId
+          builder: (context) =>
+              VendorSalesPage(shopId: widget.shopId), // Pass shopId
         ),
       );
     } else if (index == 3) {
