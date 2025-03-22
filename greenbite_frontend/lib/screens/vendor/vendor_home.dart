@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/widgets/vendor_nav_bar.dart';
 import 'list_food.dart';
-import 'orders.dart';
 import 'vendor_profile.dart';
 import 'food_item.dart';
 

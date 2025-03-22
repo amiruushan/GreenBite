@@ -23,8 +23,7 @@ class SideBar extends StatelessWidget {
           ),
           _buildMenuItem(
               context, "Customers", Icons.people, CustomerManagement()),
-          _buildMenuItem(
-              context, "Customers", Icons.people, VendorManagement()),
+          _buildMenuItem(context, "Shops", Icons.people, VendorManagement()),
           _buildMenuItem(
               context, "Orders", Icons.shopping_cart, OrdersScreen()),
           _buildMenuItem(context, "Products", Icons.store, ProductsScreen()),

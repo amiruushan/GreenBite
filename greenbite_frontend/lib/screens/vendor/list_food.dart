@@ -143,7 +143,8 @@ class _ListFoodState extends State<ListFood> {
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Failed to add food item. Please try again.")),
+          const SnackBar(
+              content: Text("Failed to add food item. Please try again.")),
         );
       }
     } catch (e) {
@@ -157,8 +158,7 @@ class _ListFoodState extends State<ListFood> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -224,13 +224,13 @@ class _ListFoodState extends State<ListFood> {
                   ),
                   child: _imageFile != null
                       ? ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(_imageFile!, fit: BoxFit.cover),
-                  )
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.file(_imageFile!, fit: BoxFit.cover),
+                        )
                       : const Center(
-                    child: Icon(Icons.add_a_photo_rounded,
-                        size: 50, color: Colors.grey),
-                  ),
+                          child: Icon(Icons.add_a_photo_rounded,
+                              size: 50, color: Colors.grey),
+                        ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -363,9 +363,9 @@ class _ListFoodState extends State<ListFood> {
                   child: _isSaving
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text(
-                    "Add Food Item",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
+                          "Add Food Item",
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        ),
                 ),
               ),
             ],

@@ -7,7 +7,6 @@ import '../../config.dart';
 import '../../widgets/vendor_nav_bar.dart';
 import 'vendor_home.dart';
 import 'list_food.dart';
-import 'orders.dart';
 import 'edit_profile.dart'; // Import the EditProfile screen
 
 class VendorProfile extends StatefulWidget {
