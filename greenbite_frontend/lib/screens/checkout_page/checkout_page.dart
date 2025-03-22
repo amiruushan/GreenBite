@@ -223,7 +223,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bool isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
