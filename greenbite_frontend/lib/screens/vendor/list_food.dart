@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import '../../config.dart';
@@ -49,7 +50,8 @@ class _ListFoodState extends State<ListFood> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => VendorHome(shopId: widget.shopId), // Pass shopId
+          builder: (context) =>
+              VendorHome(shopId: widget.shopId), // Pass shopId
         ),
       );
     } else if (index == 2) {
@@ -63,7 +65,8 @@ class _ListFoodState extends State<ListFood> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => VendorProfile(vendorId: widget.shopId), // Pass shopId
+          builder: (context) =>
+              VendorProfile(vendorId: widget.shopId), // Pass shopId
         ),
       );
     }
@@ -71,6 +74,10 @@ class _ListFoodState extends State<ListFood> {
 
   // Function to handle form submission
   void _submitForm() async {
+    String? token = await AuthService.getToken();
+    if (token == null) {
+      throw Exception("No authentication token found");
+    }
     if (_formKey.currentState!.validate()) {
       // Prepare the data in JSON format
       final foodItem = {
@@ -78,9 +85,11 @@ class _ListFoodState extends State<ListFood> {
         "description": _descriptionController.text,
         "price": double.parse(_priceController.text),
         "quantity": int.parse(_quantityController.text),
-        "photo": _imageUrl ?? "https://lh3.googleusercontent.com/p/AF1QipNhe1RTd28nuHie5MFwaU_OXuU33ZNN1rdTYhgG=s1360-w1360-h1020",
+        "photo": _imageUrl ??
+            "https://lh3.googleusercontent.com/p/AF1QipNhe1RTd28nuHie5MFwaU_OXuU33ZNN1rdTYhgG=s1360-w1360-h1020",
         "shopId": widget.shopId, // Use widget.shopId
-        "tags": _tagsController.text.split(',').map((tag) => tag.trim()).toList(),
+        "tags":
+            _tagsController.text.split(',').map((tag) => tag.trim()).toList(),
         "category": _selectedCategory,
       };
 
@@ -88,7 +97,10 @@ class _ListFoodState extends State<ListFood> {
         // Send the POST request to the backend
         final response = await http.post(
           Uri.parse('${Config.apiBaseUrl}/api/food-items'),
-          headers: {"Content-Type": "application/json"},
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token"
+          },
           body: json.encode(foodItem),
         );
 
@@ -107,7 +119,8 @@ class _ListFoodState extends State<ListFood> {
         } else {
           // Handle error
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Failed to add food item. Please try again.")),
+            const SnackBar(
+                content: Text("Failed to add food item. Please try again.")),
           );
         }
       } catch (e) {
@@ -156,12 +169,13 @@ class _ListFoodState extends State<ListFood> {
                   ),
                   child: _imageUrl == null
                       ? const Center(
-                    child: Icon(Icons.add_a_photo_rounded, size: 50, color: Colors.grey),
-                  )
+                          child: Icon(Icons.add_a_photo_rounded,
+                              size: 50, color: Colors.grey),
+                        )
                       : ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(_imageUrl!, fit: BoxFit.cover),
-                  ),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(_imageUrl!, fit: BoxFit.cover),
+                        ),
                 ),
               ),
               const SizedBox(height: 20),
