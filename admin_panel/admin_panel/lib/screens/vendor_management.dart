@@ -42,13 +42,16 @@ class _VendorManagementState extends State<VendorManagement> {
   @override
   Widget build(BuildContext context) {
     final filteredVendors = _vendors.where((vendor) {
-      final businessName = vendor['businessName']?.toLowerCase() ?? '';
+      final name = vendor['name']?.toLowerCase() ?? '';
+      final address = vendor['address']?.toLowerCase() ?? '';
       final email = vendor['email']?.toLowerCase() ?? '';
-      final contactName = vendor['contactName']?.toLowerCase() ?? '';
+      final businessDescription =
+          vendor['businessDescription']?.toLowerCase() ?? '';
 
-      return businessName.contains(_searchQuery.toLowerCase()) ||
+      return name.contains(_searchQuery.toLowerCase()) ||
+          address.contains(_searchQuery.toLowerCase()) ||
           email.contains(_searchQuery.toLowerCase()) ||
-          contactName.contains(_searchQuery.toLowerCase());
+          businessDescription.contains(_searchQuery.toLowerCase());
     }).toList();
 
     return Scaffold(
@@ -127,14 +130,13 @@ class _VendorManagementState extends State<VendorManagement> {
       child: DataTable(
         headingRowColor: MaterialStateProperty.all(Colors.grey.shade200),
         columns: const [
-          DataColumn(label: Text("SL")),
-          DataColumn(label: Text("Business Name")),
-          DataColumn(label: Text("Contact Name")),
+          DataColumn(label: Text("Shop ID")),
+          DataColumn(label: Text("Profile Photo")),
+          DataColumn(label: Text("Name")),
+          DataColumn(label: Text("Address")),
           DataColumn(label: Text("Email")),
-          DataColumn(label: Text("Mobile")),
-          DataColumn(label: Text("Status")),
-          DataColumn(label: Text("Created")),
-          DataColumn(label: Text("Actions")),
+          DataColumn(label: Text("Business Description")),
+          DataColumn(label: Text("Actions")), // Add Actions column
         ],
         rows: vendors
             .take(_entriesPerPage)
@@ -146,41 +148,31 @@ class _VendorManagementState extends State<VendorManagement> {
 
   DataRow _buildDataRow(Map<String, dynamic> vendor) {
     return DataRow(cells: [
-      DataCell(Text(vendor['id'].toString())),
-      DataCell(Text(vendor['businessName'] ?? 'N/A')),
-      DataCell(Text(vendor['contactName'] ?? 'N/A')),
+      DataCell(Text(vendor['shopId'].toString())),
+      DataCell(
+        CircleAvatar(
+          backgroundImage: NetworkImage(vendor['photo'] ?? ''),
+        ),
+      ),
+      DataCell(Text(vendor['name'] ?? 'N/A')),
+      DataCell(Text(vendor['address'] ?? 'N/A')),
       DataCell(Text(vendor['email'] ?? 'N/A')),
-      DataCell(Text(vendor['mobile'] ?? 'N/A')),
-      DataCell(_buildStatusBadge(vendor['status'] ?? 'N/A')),
-      DataCell(Text(vendor['created'] ?? 'N/A')),
-      DataCell(_buildActionButtons(vendor)),
+      DataCell(Text(vendor['businessDescription'] ?? 'N/A')),
+      DataCell(_buildActionButtons(vendor)), // Add action buttons
     ]);
-  }
-
-  Widget _buildStatusBadge(String status) {
-    final isActive = status == 'Active';
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-          color: isActive ? Colors.green.shade100 : Colors.red.shade100,
-          borderRadius: BorderRadius.circular(4)),
-      child: Text(status,
-          style: TextStyle(
-              color: isActive ? Colors.green : Colors.red,
-              fontWeight: FontWeight.bold,
-              fontSize: 12)),
-    );
   }
 
   Widget _buildActionButtons(Map<String, dynamic> vendor) {
     return Row(
       children: [
         IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () => _confirmDelete(vendor)),
+          icon: const Icon(Icons.delete),
+          onPressed: () => _confirmDelete(vendor),
+        ),
         IconButton(
-            icon: const Icon(Icons.block),
-            onPressed: () => _toggleVendorStatus(vendor)),
+          icon: const Icon(Icons.block),
+          onPressed: () => _toggleVendorStatus(vendor),
+        ),
       ],
     );
   }
@@ -194,31 +186,33 @@ class _VendorManagementState extends State<VendorManagement> {
             "Are you sure you want to delete this vendor? This action cannot be undone."),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel")),
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
           ElevatedButton(
-              onPressed: () async {
-                // Call the API to delete the vendor
-                final success = await _deleteVendor(vendor['id']);
-                if (success) {
-                  // Remove the vendor from the local list if the API call is successful
-                  setState(() {
-                    _vendors.removeWhere((v) => v['id'] == vendor['id']);
-                  });
-                }
-                Navigator.pop(context); // Close the dialog
-              },
-              child: const Text("Delete"))
+            onPressed: () async {
+              // Call the API to delete the vendor
+              final success = await _deleteVendor(vendor['shopId']);
+              if (success) {
+                // Remove the vendor from the local list if the API call is successful
+                setState(() {
+                  _vendors.removeWhere((v) => v['shopId'] == vendor['shopId']);
+                });
+              }
+              Navigator.pop(context); // Close the dialog
+            },
+            child: const Text("Delete"),
+          ),
         ],
       ),
     );
   }
 
   // Function to delete a vendor via the API
-  Future<bool> _deleteVendor(int foodShopId) async {
+  Future<bool> _deleteVendor(int shopId) async {
     try {
       final response = await http.delete(
-        Uri.parse('http://127.0.0.1:8080/api/admin/deleteFoodShop/$foodShopId'),
+        Uri.parse('http://127.0.0.1:8080/api/admin/deleteFoodShop/$shopId'),
       );
 
       if (response.statusCode == 200) {
@@ -238,12 +232,9 @@ class _VendorManagementState extends State<VendorManagement> {
   }
 
   void _toggleVendorStatus(Map<String, dynamic> vendor) {
-    setState(() {
-      final index = _vendors.indexWhere((v) => v['id'] == vendor['id']);
-      if (index != -1) {
-        final isActive = _vendors[index]['status'] == 'Active';
-        _vendors[index]['status'] = isActive ? 'Inactive' : 'Active';
-      }
-    });
+    // Since the backend response does not include a "status" field,
+    // this function can be updated to send a request to the backend
+    // to toggle the vendor's status (e.g., active/inactive).
+    print("Toggle status for vendor: ${vendor['name']}");
   }
 }

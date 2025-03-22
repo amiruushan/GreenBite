@@ -33,7 +33,8 @@ class _OrdersState extends State<Orders> {
     } else if (index == 1) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const ListFood()),
+        MaterialPageRoute(
+            builder: (context) => ListFood(shopId: widget.shopId!)),
       );
     } else if (index == 3) {
       if (widget.shopId == null) {
@@ -74,6 +75,7 @@ class _OrdersState extends State<Orders> {
         ),
       ),
       bottomNavigationBar: VendorNavBar(
+        shopId: widget.shopId!,
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
       ),
