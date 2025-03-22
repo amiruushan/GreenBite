@@ -70,7 +70,6 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
 
     double progress = (normalPoints / npGoal).clamp(0.0, 1.0);
 

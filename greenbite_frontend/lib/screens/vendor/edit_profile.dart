@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:image_picker/image_picker.dart'; // Import image_picker
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -64,6 +65,18 @@ class _EditProfileState extends State<EditProfile> {
       _isLoading = true;
     });
 
+    // Retrieve the token
+    String? token = await AuthService.getToken();
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No authentication token found")),
+      );
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
     final updatedProfile = {
       "id": widget.vendorId, // Ensure vendorId is included
       "name":
@@ -79,6 +92,12 @@ class _EditProfileState extends State<EditProfile> {
         'PUT',
         Uri.parse('${Config.apiBaseUrl}/api/shop/update/${widget.vendorId}'),
       );
+
+      // Add headers
+      request.headers.addAll({
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      });
 
       // Add JSON data
       request.fields['shop'] = jsonEncode(updatedProfile);

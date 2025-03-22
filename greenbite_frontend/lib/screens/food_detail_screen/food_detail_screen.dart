@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:greenbite_frontend/config.dart';
 
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
-import 'package:greenbite_frontend/service/auth_service.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
 
@@ -22,47 +18,9 @@ class FoodDetailScreen extends StatefulWidget {
 class _FoodDetailScreenState extends State<FoodDetailScreen> {
   int selectedQuantity = 1;
 
-  Future<Map<String, String>> _getHeaders() async {
-    String? token = await AuthService.getToken();
-    if (token == null) throw Exception("No JWT token found.");
-    return {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $token",
-    };
-  }
-
   void _addToCart() async {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
     cartProvider.addToCart(widget.foodItem, selectedQuantity);
-
-    int earnedPoints = widget.foodItem.tags.contains("vegan") ||
-            widget.foodItem.tags.contains("low-fat") ||
-            widget.foodItem.tags.contains("sugar-free")
-        ? 20
-        : 10;
-
-    try {
-      int? userId = await AuthService.getUserId();
-      if (userId == null) throw Exception("User ID not found");
-
-      final response = await http.post(
-        Uri.parse("${Config.apiBaseUrl}/api/users/add-points"),
-        headers: await _getHeaders(),
-        body: jsonEncode({"userId": userId, "normalPoints": earnedPoints}),
-      );
-
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text("+$earnedPoints NP added!",
-                  style: const TextStyle(color: Colors.green))),
-        );
-      } else {
-        print("Failed to add points: ${response.body}");
-      }
-    } catch (e) {
-      print("Error adding points: $e");
-    }
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

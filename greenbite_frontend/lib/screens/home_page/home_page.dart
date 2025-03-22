@@ -15,6 +15,7 @@ import 'package:greenbite_frontend/screens/home_page/widgets/food_card.dart';
 import 'package:greenbite_frontend/screens/search_page/search_page.dart';
 import 'package:greenbite_frontend/screens/user_profile/user_profile_screen.dart';
 import 'package:greenbite_frontend/widgets/bottom_nav_bar.dart';
+import 'package:lottie/lottie.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -25,7 +26,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _places =
-  GoogleMapsPlaces(apiKey: 'AIzaSyAYKLcSlEwCHUZP23MmBG7SstvpP8xZcAQ');
+      GoogleMapsPlaces(apiKey: 'AIzaSyAYKLcSlEwCHUZP23MmBG7SstvpP8xZcAQ');
   List<Prediction> _predictions = [];
   String _selectedLocation = "";
   bool _showDropdown = false; // Controls whether the dropdown is visible
@@ -34,6 +35,9 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   List<FoodItem> foodItems = [];
   Set<FoodItem> favoriteItems = {}; // Use a Set to avoid duplicates
+
+  bool _isLoading = true; // Track loading state
+  bool _noItemsFound = false; // Track if no items are found
 
   @override
   void initState() {
@@ -69,6 +73,34 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<Map<String, double>> _fetchUserLocation(int userId) async {
+    try {
+      String? token = await AuthService.getToken(); // Retrieve token
+      if (token == null) {
+        print("No token found");
+        throw Exception("No token found");
+      }
+
+      final response = await http.get(
+        Uri.parse('${Config.apiBaseUrl}/api/users/location/$userId'),
+        headers: {"Authorization": "Bearer $token"},
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        return {
+          "latitude": data["latitude"],
+          "longitude": data["longitude"],
+        };
+      } else {
+        throw Exception("Failed to fetch user location");
+      }
+    } catch (e) {
+      print("Error fetching user location: $e");
+      throw e;
+    }
+  }
+
   Future<void> _onLocationSelected(Prediction prediction) async {
     final details = await _places.getDetailsByPlaceId(prediction.placeId ?? "");
     if (details.status == "OK") {
@@ -89,11 +121,19 @@ class _HomePageState extends State<HomePage> {
           SnackBar(
               content: Text("Location updated to ${prediction.description}")),
         );
+
+        // Refresh the list of nearby food items
+        await _loadFoodItems();
       }
     }
   }
 
   Future<void> _loadFoodItems() async {
+    setState(() {
+      _isLoading = true; // Start loading
+      _noItemsFound = false; // Reset no items found flag
+    });
+
     try {
       int? userId = await AuthService.getUserId(); // Retrieve user ID
       if (userId == null) {
@@ -107,16 +147,17 @@ class _HomePageState extends State<HomePage> {
         return;
       }
 
-      // Get the user's current location
-      final position = await LocationService.getCurrentLocation();
-      final double latitude = position.latitude;
-      final double longitude = position.longitude;
-      print("User location: Latitude=$latitude, Longitude=$longitude");
+      // Fetch the user's saved location from the backend
+      final userLocation = await _fetchUserLocation(userId);
+      final double latitude = userLocation["latitude"]!;
+      final double longitude = userLocation["longitude"]!;
+      print(
+          "User location from backend: Latitude=$latitude, Longitude=$longitude");
 
-      // Fetch nearby food items
+      // Fetch nearby food items within a 10km radius
       final foodResponse = await http.get(
         Uri.parse(
-            '${Config.apiBaseUrl}/api/food-items/nearby/$latitude/$longitude/5'),
+            '${Config.apiBaseUrl}/api/food-items/nearby/$latitude/$longitude/10'), // 10km radius
         headers: {"Authorization": "Bearer $token"},
       );
 
@@ -133,21 +174,31 @@ class _HomePageState extends State<HomePage> {
 
         // Convert food items
         List<FoodItem> allFoodItems =
-        foodJson.map((data) => FoodItem.fromJson(data)).toList();
+            foodJson.map((data) => FoodItem.fromJson(data)).toList();
 
         // Convert favorites
         Set<FoodItem> favorites =
-        favoriteJson.map((data) => FoodItem.fromJson(data)).toSet();
+            favoriteJson.map((data) => FoodItem.fromJson(data)).toSet();
 
         setState(() {
           foodItems = allFoodItems;
           favoriteItems = favorites;
+          _isLoading = false; // Stop loading
+          _noItemsFound = foodItems.isEmpty; // Set no items found flag
         });
       } else {
         print("Failed to load food or favorite items");
+        setState(() {
+          _isLoading = false; // Stop loading
+          _noItemsFound = true; // Set no items found flag
+        });
       }
     } catch (e) {
       print("Error fetching data: $e");
+      setState(() {
+        _isLoading = false; // Stop loading
+        _noItemsFound = true; // Set no items found flag
+      });
     }
   }
 
@@ -219,6 +270,7 @@ class _HomePageState extends State<HomePage> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
+
     final List<Widget> screens = [
       HomePageContent(
         foodItems: foodItems,
@@ -234,6 +286,8 @@ class _HomePageState extends State<HomePage> {
             _showDropdown = false; // Close dropdown when requested
           });
         },
+        isLoading: _isLoading,
+        noItemsFound: _noItemsFound,
       ),
       SearchScreen(foodItems: foodItems),
       FavoritesScreen(
@@ -263,6 +317,8 @@ class HomePageContent extends StatefulWidget {
   final String selectedLocation;
   final bool showDropdown;
   final VoidCallback onCloseDropdown;
+  final bool isLoading;
+  final bool noItemsFound;
 
   const HomePageContent({
     super.key,
@@ -275,6 +331,8 @@ class HomePageContent extends StatefulWidget {
     required this.selectedLocation,
     required this.showDropdown,
     required this.onCloseDropdown,
+    required this.isLoading,
+    required this.noItemsFound,
   });
 
   @override
@@ -287,9 +345,9 @@ class _HomePageContentState extends State<HomePageContent> {
   int _currentFeaturedIndex = 0;
   Timer? _featuredTimer;
   final FocusNode _searchFocusNode =
-  FocusNode(); // Focus node for the search bar
+      FocusNode(); // Focus node for the search bar
   final TextEditingController _searchController =
-  TextEditingController(); // Controller for the search bar
+      TextEditingController(); // Controller for the search bar
 
   @override
   void initState() {
@@ -354,8 +412,8 @@ class _HomePageContentState extends State<HomePageContent> {
     // Filter recommended items based on the selected tags
     List<FoodItem> recommendedItems = widget.foodItems
         .where((item) =>
-    _selectedTags.isEmpty ||
-        _selectedTags.every((tag) => item.tags.contains(tag)))
+            _selectedTags.isEmpty ||
+            _selectedTags.every((tag) => item.tags.contains(tag)))
         .toList();
 
     return DefaultTabController(
@@ -404,339 +462,371 @@ class _HomePageContentState extends State<HomePageContent> {
         body: TabBarView(
           children: [
             // 🍽 Food Items Tab
-            widget.foodItems.isEmpty
+            widget.isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : GestureDetector(
-              onTap: () {
-                // Close the dropdown and unfocus the search bar when tapping outside
-                _searchFocusNode.unfocus();
-                widget.onCloseDropdown();
-              },
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 🔍 Location Search Bar
-                    Container(
-                      decoration: BoxDecoration(
-                        color: isDarkMode
-                            ? Colors.grey[900]
-                            : Colors.grey[200],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                    onTap: () {
+                      // Close the dropdown and unfocus the search bar when tapping outside
+                      _searchFocusNode.unfocus();
+                      widget.onCloseDropdown();
+                    },
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(16),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TextField(
-                            focusNode: _searchFocusNode,
-                            controller: _searchController,
-                            decoration: InputDecoration(
-                              hintText: "Search for a location...",
-                              prefixIcon: Icon(Icons.search),
+                          // 🔍 Location Search Bar (Always Visible)
+                          Container(
+                            decoration: BoxDecoration(
+                              color: isDarkMode
+                                  ? Colors.grey[900]
+                                  : Colors.grey[200],
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            onChanged: widget.onSearchLocations,
+                            child: Column(
+                              children: [
+                                TextField(
+                                  focusNode: _searchFocusNode,
+                                  controller: _searchController,
+                                  decoration: InputDecoration(
+                                    hintText: "Search for a location...",
+                                    prefixIcon: Icon(Icons.search),
+                                  ),
+                                  onChanged: widget.onSearchLocations,
+                                ),
+                                if (widget.showDropdown &&
+                                    widget.predictions.isNotEmpty)
+                                  Container(
+                                    height: 200,
+                                    child: ListView.builder(
+                                      itemCount: widget.predictions.length,
+                                      itemBuilder: (context, index) {
+                                        final prediction =
+                                            widget.predictions[index];
+                                        return ListTile(
+                                          title: Text(
+                                              prediction.description ?? ""),
+                                          onTap: () {
+                                            widget
+                                                .onLocationSelected(prediction);
+                                            _searchFocusNode
+                                                .unfocus(); // Close keyboard
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
-                          if (widget.showDropdown &&
-                              widget.predictions.isNotEmpty)
-                            Container(
-                              height: 200,
-                              child: ListView.builder(
-                                itemCount: widget.predictions.length,
-                                itemBuilder: (context, index) {
-                                  final prediction =
-                                  widget.predictions[index];
-                                  return ListTile(
-                                    title: Text(
-                                        prediction.description ?? ""),
-                                    onTap: () {
-                                      widget
-                                          .onLocationSelected(prediction);
-                                      _searchFocusNode
-                                          .unfocus(); // Close keyboard
-                                    },
-                                  );
-                                },
+                          const SizedBox(height: 10),
+
+                          // Show "No food items near you" message if no items are found
+                          if (widget.noItemsFound)
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Lottie.asset(
+                                    'assets/animations/notfound.json',
+                                    width: 200,
+                                    height: 200,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Text(
+                                    "No food items near you",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: theme.colorScheme.onBackground
+                                          .withOpacity(0.5),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 10),
 
-                    // 🍽 Featured Items Section
-                    Text(
-                      "Recommended For You",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onBackground,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      height: 170,
-                      child: Stack(
-                        children: [
-                          // PageView for Featured Items
-                          PageView.builder(
-                            controller: _featuredController,
-                            itemCount: widget.foodItems.length,
-                            onPageChanged: (index) {
-                              setState(() {
-                                _currentFeaturedIndex = index;
-                              });
-                            },
-                            itemBuilder: (context, index) {
-                              final item = widget.foodItems[index];
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          FoodDetailScreen(
-                                              foodItem: item),
-                                    ),
-                                  );
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8),
-                                  child: ClipRRect(
-                                    borderRadius:
-                                    BorderRadius.circular(12),
-                                    child: Stack(
-                                      children: [
-                                        Image.network(
-                                          item.photo,
-                                          fit: BoxFit.cover,
-                                          width: double.infinity,
-                                        ),
-                                        // Overlay for item name and price
-                                        Positioned(
-                                          bottom: 0,
-                                          left: 0,
-                                          right: 0,
-                                          child: Container(
-                                            padding:
-                                            const EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              color: Colors.black
-                                                  .withOpacity(0.5),
-                                              borderRadius:
-                                              const BorderRadius.only(
-                                                bottomLeft:
-                                                Radius.circular(12),
-                                                bottomRight:
-                                                Radius.circular(12),
-                                              ),
+                          // Show food items if available
+                          if (!widget.noItemsFound) ...[
+                            // 🍽 Featured Items Section
+                            Text(
+                              "Recommended For You",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.onBackground,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              height: 170,
+                              child: Stack(
+                                children: [
+                                  // PageView for Featured Items
+                                  PageView.builder(
+                                    controller: _featuredController,
+                                    itemCount: widget.foodItems.length,
+                                    onPageChanged: (index) {
+                                      setState(() {
+                                        _currentFeaturedIndex = index;
+                                      });
+                                    },
+                                    itemBuilder: (context, index) {
+                                      final item = widget.foodItems[index];
+                                      return GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  FoodDetailScreen(
+                                                      foodItem: item),
                                             ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                              CrossAxisAlignment
-                                                  .start,
+                                          );
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            child: Stack(
                                               children: [
-                                                Text(
-                                                  item.name,
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                    FontWeight.bold,
-                                                  ),
+                                                Image.network(
+                                                  item.photo,
+                                                  fit: BoxFit.cover,
+                                                  width: double.infinity,
                                                 ),
-                                                Text(
-                                                  "\$${item.price.toStringAsFixed(2)}",
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 16,
+                                                // Overlay for item name and price
+                                                Positioned(
+                                                  bottom: 0,
+                                                  left: 0,
+                                                  right: 0,
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.black
+                                                          .withOpacity(0.5),
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                              .only(
+                                                        bottomLeft:
+                                                            Radius.circular(12),
+                                                        bottomRight:
+                                                            Radius.circular(12),
+                                                      ),
+                                                    ),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          item.name,
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          "\$${item.price.toStringAsFixed(2)}",
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ],
                                             ),
                                           ),
                                         ),
-                                      ],
+                                      );
+                                    },
+                                  ),
+
+                                  // Previous Button (<)
+                                  Positioned(
+                                    left: 8,
+                                    top: 0,
+                                    bottom: 0,
+                                    child: IconButton(
+                                      icon: const Icon(Icons.arrow_back_ios,
+                                          color: Colors.white),
+                                      onPressed: () {
+                                        if (_currentFeaturedIndex > 0) {
+                                          _featuredController.previousPage(
+                                            duration: const Duration(
+                                                milliseconds: 500),
+                                            curve: Curves.easeInOut,
+                                          );
+                                        }
+                                      },
                                     ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
 
-                          // Previous Button (<)
-                          Positioned(
-                            left: 8,
-                            top: 0,
-                            bottom: 0,
-                            child: IconButton(
-                              icon: const Icon(Icons.arrow_back_ios,
-                                  color: Colors.white),
-                              onPressed: () {
-                                if (_currentFeaturedIndex > 0) {
-                                  _featuredController.previousPage(
-                                    duration:
-                                    const Duration(milliseconds: 500),
-                                    curve: Curves.easeInOut,
+                                  // Next Button (>)
+                                  Positioned(
+                                    right: 8,
+                                    top: 0,
+                                    bottom: 0,
+                                    child: IconButton(
+                                      icon: const Icon(Icons.arrow_forward_ios,
+                                          color: Colors.white),
+                                      onPressed: () {
+                                        if (_currentFeaturedIndex <
+                                            widget.foodItems.length - 1) {
+                                          _featuredController.nextPage(
+                                            duration: const Duration(
+                                                milliseconds: 500),
+                                            curve: Curves.easeInOut,
+                                          );
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // 🍽 Recommended Section
+                            Text(
+                              "Food to Suit Your Diet",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.onBackground,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+
+                            // 🏷 Clickable Tags for Filtering (Horizontal List)
+                            SizedBox(
+                              height: 50,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: getUniqueTags().length,
+                                separatorBuilder: (context, index) =>
+                                    const SizedBox(width: 8),
+                                itemBuilder: (context, index) {
+                                  final tag = getUniqueTags()[index];
+                                  bool isSelected = _selectedTags.contains(tag);
+                                  return GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        if (isSelected) {
+                                          _selectedTags.remove(tag);
+                                        } else {
+                                          _selectedTags.add(tag);
+                                        }
+                                      });
+                                    },
+                                    child: Chip(
+                                      label: Text(tag),
+                                      backgroundColor: isSelected
+                                          ? Colors.green
+                                          : (isDarkMode
+                                              ? Colors.grey[800]
+                                              : Colors.grey[300]),
+                                      labelStyle: TextStyle(
+                                        color: isSelected
+                                            ? Colors.white
+                                            : theme.colorScheme.onBackground,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   );
-                                }
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+
+                            // 🍽 Recommended Items ListView
+                            SizedBox(
+                              height: 250,
+                              child: recommendedItems.isEmpty
+                                  ? Center(
+                                      child: Text(
+                                        "No items match this filter!",
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color: theme.colorScheme.onBackground
+                                              .withOpacity(0.5),
+                                        ),
+                                      ),
+                                    )
+                                  : ListView.separated(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: recommendedItems.length,
+                                      separatorBuilder: (context, index) =>
+                                          const SizedBox(width: 10),
+                                      itemBuilder: (context, index) {
+                                        final item = recommendedItems[index];
+                                        return SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.4,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 4),
+                                            child: FoodCard(
+                                              foodItem: item,
+                                              isFavorite: widget.favoriteItems
+                                                  .contains(item),
+                                              onFavoritePressed: () =>
+                                                  widget.onToggleFavorite(item),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // 🍽 All Food Items
+                            Text(
+                              "All Food Items",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.onBackground,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: widget.foodItems.length,
+                              itemBuilder: (context, index) {
+                                final item = widget.foodItems[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: FoodCard(
+                                    foodItem: item,
+                                    isFavorite:
+                                        widget.favoriteItems.contains(item),
+                                    onFavoritePressed: () =>
+                                        widget.onToggleFavorite(item),
+                                  ),
+                                );
                               },
                             ),
-                          ),
-
-                          // Next Button (>)
-                          Positioned(
-                            right: 8,
-                            top: 0,
-                            bottom: 0,
-                            child: IconButton(
-                              icon: const Icon(Icons.arrow_forward_ios,
-                                  color: Colors.white),
-                              onPressed: () {
-                                if (_currentFeaturedIndex <
-                                    widget.foodItems.length - 1) {
-                                  _featuredController.nextPage(
-                                    duration:
-                                    const Duration(milliseconds: 500),
-                                    curve: Curves.easeInOut,
-                                  );
-                                }
-                              },
-                            ),
-                          ),
+                          ],
                         ],
                       ),
                     ),
-
-                    const SizedBox(height: 20),
-
-                    // 🍽 Recommended Section
-                    Text(
-                      "Food to Suit Your Diet",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onBackground,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // 🏷 Clickable Tags for Filtering (Horizontal List)
-                    SizedBox(
-                      height: 50,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: getUniqueTags().length,
-                        separatorBuilder: (context, index) =>
-                        const SizedBox(width: 8),
-                        itemBuilder: (context, index) {
-                          final tag = getUniqueTags()[index];
-                          bool isSelected = _selectedTags.contains(tag);
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                if (isSelected) {
-                                  _selectedTags.remove(tag);
-                                } else {
-                                  _selectedTags.add(tag);
-                                }
-                              });
-                            },
-                            child: Chip(
-                              label: Text(tag),
-                              backgroundColor: isSelected
-                                  ? Colors.green
-                                  : (isDarkMode
-                                  ? Colors.grey[800]
-                                  : Colors.grey[300]),
-                              labelStyle: TextStyle(
-                                color: isSelected
-                                    ? Colors.white
-                                    : theme.colorScheme.onBackground,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // 🍽 Recommended Items ListView
-                    SizedBox(
-                      height: 250,
-                      child: recommendedItems.isEmpty
-                          ? Center(
-                        child: Text(
-                          "No items match this filter!",
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: theme.colorScheme.onBackground
-                                .withOpacity(0.5),
-                          ),
-                        ),
-                      )
-                          : ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: recommendedItems.length,
-                        separatorBuilder: (context, index) =>
-                        const SizedBox(width: 10),
-                        itemBuilder: (context, index) {
-                          final item = recommendedItems[index];
-                          return SizedBox(
-                            width:
-                            MediaQuery.of(context).size.width *
-                                0.4,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 4),
-                              child: FoodCard(
-                                foodItem: item,
-                                isFavorite: widget.favoriteItems
-                                    .contains(item),
-                                onFavoritePressed: () =>
-                                    widget.onToggleFavorite(item),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // 🍽 All Food Items
-                    Text(
-                      "All Food Items",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onBackground,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: widget.foodItems.length,
-                      itemBuilder: (context, index) {
-                        final item = widget.foodItems[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: FoodCard(
-                            foodItem: item,
-                            isFavorite:
-                            widget.favoriteItems.contains(item),
-                            onFavoritePressed: () =>
-                                widget.onToggleFavorite(item),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
+                  ),
 
             const ShopsTab(),
           ],

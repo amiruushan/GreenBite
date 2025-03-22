@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greenbite.backend.dto.AddPointsDTO;
 import com.greenbite.backend.dto.LocationUpdateDTO;
 import com.greenbite.backend.dto.UserDTO;
+import com.greenbite.backend.model.User;
+import com.greenbite.backend.repository.UserRepository;
 import com.greenbite.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +21,11 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     // Get user by ID
@@ -62,9 +66,27 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
     @PutMapping("/updateLocation")
-    public ResponseEntity<UserDTO> updateUserLocation(@RequestBody LocationUpdateDTO locationUpdateDTO) {
-        UserDTO updatedUser = userService.updateUserLocation(locationUpdateDTO);
-        return ResponseEntity.ok(updatedUser);
+    public ResponseEntity<String> updateUserLocation(@RequestBody LocationUpdateDTO dto) {
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setLatitude(dto.getLatitude());
+        user.setLongitude(dto.getLongitude());
+        userRepository.save(user);
+
+        return ResponseEntity.ok("User location updated successfully");
     }
+    @GetMapping("/location/{userId}")
+    public ResponseEntity<Map<String, Double>> getUserLocation(@PathVariable Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Map<String, Double> location = new HashMap<>();
+        location.put("latitude", user.getLatitude());
+        location.put("longitude", user.getLongitude());
+
+        return ResponseEntity.ok(location);
+    }
+
 }
 

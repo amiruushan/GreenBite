@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
@@ -27,10 +28,14 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
     super.initState();
     // Initialize controllers with the food item data
     _nameController = TextEditingController(text: widget.foodItem["name"]);
-    _descriptionController = TextEditingController(text: widget.foodItem["description"]);
-    _priceController = TextEditingController(text: widget.foodItem["price"].toString());
-    _quantityController = TextEditingController(text: widget.foodItem["quantity"].toString());
-    _tagsController = TextEditingController(text: widget.foodItem["tags"].join(', '));
+    _descriptionController =
+        TextEditingController(text: widget.foodItem["description"]);
+    _priceController =
+        TextEditingController(text: widget.foodItem["price"].toString());
+    _quantityController =
+        TextEditingController(text: widget.foodItem["quantity"].toString());
+    _tagsController =
+        TextEditingController(text: widget.foodItem["tags"].join(', '));
     _selectedCategory = widget.foodItem["category"];
   }
 
@@ -47,6 +52,11 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
 
   // Function to handle form submission (Update)
   void _updateFoodItem() async {
+    String? token = await AuthService.getToken();
+    if (token == null) {
+      throw Exception("No authentication token found");
+    }
+
     final updatedFoodItem = {
       "id": widget.foodItem["id"],
       "name": _nameController.text,
@@ -65,8 +75,9 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
     // Send the PUT request to the backend API
     final response = await http.put(
       Uri.parse('${Config.apiBaseUrl}/api/food-items/update'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token"
       },
       body: jsonBody,
     );

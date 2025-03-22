@@ -4,9 +4,7 @@ import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 import 'package:greenbite_frontend/screens/home_page/home_page.dart';
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
-
 import 'package:greenbite_frontend/service/auth_service.dart';
-
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -19,7 +17,7 @@ class CheckoutPage extends StatefulWidget {
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
-  String selectedOption = "Card Payment"; // Default selection
+  String? selectedOption;
 
   void _selectOption(String option) {
     setState(() {
@@ -30,96 +28,152 @@ class _CheckoutPageState extends State<CheckoutPage> {
   Future<void> _confirmOrder(BuildContext context) async {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
 
-    // Group items by shopId
-    Map<int, List<FoodItem>> shopItemsMap = {};
-    for (var item in cartProvider.cartItems) {
-      if (!shopItemsMap.containsKey(item.shopId)) {
-        shopItemsMap[item.shopId] = [];
-      }
-      shopItemsMap[item.shopId]!.add(item);
+    // Validate payment method selection
+    if (selectedOption == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please select a payment method!"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
     }
 
+    // Calculate total points first
+    final int totalEarnedPoints = cartProvider.cartItems.fold(0, (sum, item) {
+      return sum +
+          (item.tags.contains("vegan") ||
+                  item.tags.contains("low-fat") ||
+                  item.tags.contains("sugar-free")
+              ? 20
+              : 10);
+    });
+
     try {
-      String? token = await AuthService.getToken(); // Retrieve token
+      String? token = await AuthService.getToken();
       if (token == null) {
-        print("No token found");
-        return;
+        throw Exception("No authentication token found");
       }
 
-      // Get the current date and time
-      final DateTime now = DateTime.now();
-      final String orderTime = now.toIso8601String(); // ISO 8601 format
+      // Process all orders first
+      final Map<int, List<FoodItem>> shopItemsMap = {};
+      for (var item in cartProvider.cartItems) {
+        shopItemsMap.putIfAbsent(item.shopId, () => []).add(item);
+      }
 
-      // Process each shop's items as a separate order
       for (var shopId in shopItemsMap.keys) {
         final items = shopItemsMap[shopId]!;
         final totalPrice = items.fold(
             0.0, (sum, item) => sum + (item.price * int.parse(item.quantity)));
 
-        // Format order data
-        final orderData = {
-          "shopId": shopId,
-          "customerId": 1, // Update this dynamically if needed
-          "paymentMethod": selectedOption == "Stripe Payment"
-              ? "Credit Card"
-              : "Self Checkout",
-          "items": items
-              .map((item) => {
-                    "id": item.id,
-                    "name": item.name,
-                    "description": item.description,
-                    "price": item.price,
-                    "quantity": item.quantity,
-                    "photo": item.photo,
-                    "tags": item.tags,
-                    "category": item.category,
-                    "latitude": item.latitude,
-                    "longitude": item.longitude,
-                  })
-              .toList(),
-          "totalAmount": totalPrice,
-          "orderTime": orderTime, // Include the order time
-        };
-
+        // Handle Stripe payment if selected
         if (selectedOption == "Stripe Payment") {
           await _handleStripePayment(context, totalPrice);
         }
 
-        // Confirm order in backend
+        // Process order for each shop
         final orderResponse = await http.post(
           Uri.parse("${Config.apiBaseUrl}/api/orders/confirm"),
           headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer $token"
           },
-          body: jsonEncode(orderData),
+          body: jsonEncode({
+            "shopId": shopId,
+            "customerId": await AuthService.getUserId() ?? 0,
+            "paymentMethod": selectedOption == "Stripe Payment"
+                ? "Credit Card"
+                : "Self Checkout",
+            "items": items
+                .map((item) => {
+                      "id": item.id,
+                      "name": item.name,
+                      "description": item.description,
+                      "price": item.price,
+                      "quantity": item.quantity,
+                      "photo": item.photo,
+                      "tags": item.tags,
+                      "category": item.category,
+                      "latitude": item.latitude,
+                      "longitude": item.longitude,
+                    })
+                .toList(),
+            "totalAmount": totalPrice,
+            "orderTime": DateTime.now().toIso8601String(),
+          }),
         );
 
         if (orderResponse.statusCode != 200) {
-          throw Exception("Failed to confirm order for shop $shopId.");
+          throw Exception(
+              "Order failed for shop $shopId: ${orderResponse.body}");
         }
       }
 
-      // Clear the cart
-      cartProvider.clearCart();
+      // Only proceed if all orders succeeded
+      // Redeem coupon
+      if (cartProvider.selectedCoupon != null) {
+        print("Attempting to redeem coupon: ${cartProvider.selectedCoupon}");
+        final couponResponse = await http.post(
+          Uri.parse('${Config.apiBaseUrl}/api/user/inventory/redeem-coupon'),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token"
+          },
+          body: jsonEncode({"couponCode": cartProvider.selectedCoupon}),
+        );
 
-      // Show success message
+        print("Coupon redemption response: ${couponResponse.statusCode}");
+        print("Coupon redemption response body: ${couponResponse.body}");
+
+        if (couponResponse.statusCode != 200) {
+          throw Exception("Coupon redemption failed: ${couponResponse.body}");
+        }
+      }
+
+      // Add points
+      if (totalEarnedPoints > 0) {
+        final pointsResponse = await http.post(
+          Uri.parse("${Config.apiBaseUrl}/api/users/add-points"),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token"
+          },
+          body: jsonEncode({
+            "userId": await AuthService.getUserId(),
+            "normalPoints": totalEarnedPoints
+          }),
+        );
+
+        if (pointsResponse.statusCode != 200) {
+          throw Exception("Points addition failed: ${pointsResponse.body}");
+        }
+      }
+
+      // Clear cart state
+      cartProvider.clearCart();
+      cartProvider.clearCoupon();
+
+      // Show success
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("Order Confirmed!"), backgroundColor: Colors.green),
+          content: Text("Order Confirmed!"),
+          backgroundColor: Colors.green,
+        ),
       );
 
-      // Reload the app (navigate to home)
+      // Navigate to home
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
         (route) => false,
       );
     } catch (e) {
+      print("Order Error Details: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("Order confirmation failed: $e"),
-            backgroundColor: Colors.red),
+          content: Text("Order failed: ${e.toString()}"),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -128,15 +182,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
       BuildContext context, double totalAmount) async {
     try {
       String? token = await AuthService.getToken();
-      if (token == null) {
-        print("No token found");
-        return;
-      }
+      if (token == null) return;
 
-      final int amountInCents =
-          (totalAmount * 100).toInt(); // Stripe requires amount in cents
-
-      // Call backend with dynamic amount
+      final int amountInCents = (totalAmount * 100).toInt();
       final response = await http.post(
         Uri.parse(
             '${Config.apiBaseUrl}/api/payments/create?amount=$amountInCents&currency=usd'),
@@ -144,9 +192,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
       );
 
       final responseData = json.decode(response.body);
-      final clientSecret = responseData['clientSecret']; // Extract clientSecret
+      final clientSecret = responseData['clientSecret'];
 
-      // Initialize the PaymentSheet
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: clientSecret,
@@ -154,44 +201,43 @@ class _CheckoutPageState extends State<CheckoutPage> {
         ),
       );
 
-      // Present the PaymentSheet
       await Stripe.instance.presentPaymentSheet();
 
-      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("Payment successful!"),
-            backgroundColor: Colors.green),
+          content: Text("Payment successful!"),
+          backgroundColor: Colors.green,
+        ),
       );
     } catch (e) {
-      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("Payment failed: $e"), backgroundColor: Colors.red),
+          content: Text("Payment failed: $e"),
+          backgroundColor: Colors.red,
+        ),
       );
-      rethrow; // Rethrow the exception to handle it in the calling method
+      rethrow;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bool isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           "Checkout",
           style: TextStyle(
-            color: Colors.white, // ✅ Keep white text for AppBar
+            color: Colors.white,
             fontSize: 30,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.green, // ✅ Keep green for AppBar
+        backgroundColor: Colors.green,
         iconTheme: const IconThemeData(
-          color: Colors.white, // ✅ Keep white icons for AppBar
+          color: Colors.white,
         ),
       ),
       body: SingleChildScrollView(
@@ -201,7 +247,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
-              // 🍽 Header Image
               Center(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
@@ -214,56 +259,39 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // 📝 Order Summary
               _buildOrderSummary(),
-
               const SizedBox(height: 20),
-
-              // 💳 Choose Payment Method
               Text(
                 "Choose Payment Method",
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color:
-                      theme.colorScheme.onBackground, // ✅ Adaptive text color
+                  color: theme.colorScheme.onBackground,
                 ),
               ),
               const SizedBox(height: 15),
-
-              // Card Payment Option
-              const SizedBox(height: 15),
-
-              // Stripe Payment Option
               _buildOptionTile(
-                title: "Card Payment",
+                title: "Stripe Payment",
                 icon: Icons.payment,
                 isSelected: selectedOption == "Stripe Payment",
                 onTap: () => _selectOption("Stripe Payment"),
               ),
-
               const SizedBox(height: 15),
-
-              // Self Pickup Option
               _buildOptionTile(
                 title: "Self Pick-up",
                 icon: Icons.map,
                 isSelected: selectedOption == "Self Pick-up",
                 onTap: () => _selectOption("Self Pick-up"),
               ),
-
               const SizedBox(height: 30),
-
-              // 🛒 Confirm Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    _confirmOrder(context);
-                  },
+                  onPressed: selectedOption != null
+                      ? () => _confirmOrder(context)
+                      : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green, // ✅ Keep green for button
+                    backgroundColor: Colors.green,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -282,18 +310,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-// 🛍 Order Summary Widget
   Widget _buildOrderSummary() {
     final cartProvider = Provider.of<CartProvider>(context);
     final theme = Theme.of(context);
-    final bool isDarkMode = theme.brightness == Brightness.dark;
+    final double total =
+        cartProvider.totalPrice() + 2.50 - cartProvider.discountAmount;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode
+        color: theme.brightness == Brightness.dark
             ? Colors.grey[900]
-            : Colors.white, // ✅ Adaptive background color
+            : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -312,25 +340,24 @@ class _CheckoutPageState extends State<CheckoutPage> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+              color: theme.colorScheme.onBackground,
             ),
           ),
           const SizedBox(height: 10),
           _buildSummaryRow(
               "Subtotal", "\$${cartProvider.totalPrice().toStringAsFixed(2)}"),
           _buildSummaryRow("Delivery Fee", "\$2.50"),
-          _buildSummaryRow("Total",
-              "\$${(cartProvider.totalPrice() + 2.50).toStringAsFixed(2)}",
+          _buildSummaryRow("Discount",
+              "-\$${cartProvider.discountAmount.toStringAsFixed(2)}"),
+          _buildSummaryRow("Total", "\$${total.toStringAsFixed(2)}",
               isTotal: true),
         ],
       ),
     );
   }
 
-// 🧾 Order Summary Row Widget
   Widget _buildSummaryRow(String label, String amount, {bool isTotal = false}) {
     final theme = Theme.of(context);
-    final bool isDarkMode = theme.brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -342,7 +369,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             style: TextStyle(
               fontSize: isTotal ? 18 : 16,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-              color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+              color: theme.colorScheme.onBackground,
             ),
           ),
           Text(
@@ -350,9 +377,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             style: TextStyle(
               fontSize: isTotal ? 18 : 16,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-              color: isTotal
-                  ? Colors.green
-                  : theme.colorScheme.onBackground, // ✅ Adaptive text color
+              color: isTotal ? Colors.green : theme.colorScheme.onBackground,
             ),
           ),
         ],
@@ -360,7 +385,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-// 💳 Payment Option Tile Widget
   Widget _buildOptionTile({
     required String title,
     required IconData icon,
@@ -368,7 +392,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
     required VoidCallback onTap,
   }) {
     final theme = Theme.of(context);
-    final bool isDarkMode = theme.brightness == Brightness.dark;
 
     return GestureDetector(
       onTap: onTap,
@@ -377,9 +400,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
         decoration: BoxDecoration(
           color: isSelected
               ? Colors.green.withOpacity(0.1)
-              : isDarkMode
+              : theme.brightness == Brightness.dark
                   ? Colors.grey[900]
-                  : Colors.white, // ✅ Adaptive background color
+                  : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? Colors.green : Colors.grey.shade300,
@@ -396,20 +419,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 28, color: Colors.green), // ✅ Keep green icon
+            Icon(icon, size: 28, color: Colors.green),
             const SizedBox(width: 15),
             Text(
               title,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
-                color: theme.colorScheme.onBackground, // ✅ Adaptive text color
+                color: theme.colorScheme.onBackground,
               ),
             ),
             const Spacer(),
             if (isSelected)
-              const Icon(Icons.check_circle,
-                  color: Colors.green, size: 26), // ✅ Keep green checkmark
+              const Icon(Icons.check_circle, color: Colors.green, size: 26),
           ],
         ),
       ),
