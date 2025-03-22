@@ -3,6 +3,8 @@ import 'package:admin_panel/widgets/common_layout.dart'; // Import the CommonLay
 import '../service/food_shop_service.dart';
 
 class FoodShopScreen extends StatefulWidget {
+  const FoodShopScreen({super.key});
+
   @override
   _FoodShopScreenState createState() => _FoodShopScreenState();
 }
@@ -159,6 +161,8 @@ class _FoodShopScreenState extends State<FoodShopScreen> {
 }
 
 class AddFoodShopScreen extends StatefulWidget {
+  const AddFoodShopScreen({super.key});
+
   @override
   _AddFoodShopScreenState createState() => _AddFoodShopScreenState();
 }

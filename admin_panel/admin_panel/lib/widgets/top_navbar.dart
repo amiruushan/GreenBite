@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class TopNavBar extends StatelessWidget {
   final String title; // Add a title parameter
 
-  const TopNavBar({Key? key, required this.title}) : super(key: key); // Accept the title parameter
+  const TopNavBar({super.key, required this.title}); // Accept the title parameter
 
   @override
   Widget build(BuildContext context) {

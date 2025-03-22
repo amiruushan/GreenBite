@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class VendorManagement extends StatefulWidget {
-  const VendorManagement({Key? key}) : super(key: key);
+  const VendorManagement({super.key});
 
   @override
   _VendorManagementState createState() => _VendorManagementState();
@@ -128,7 +128,7 @@ class _VendorManagementState extends State<VendorManagement> {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: DataTable(
-        headingRowColor: MaterialStateProperty.all(Colors.grey.shade200),
+        headingRowColor: WidgetStateProperty.all(Colors.grey.shade200),
         columns: const [
           DataColumn(label: Text("Shop ID")),
           DataColumn(label: Text("Profile Photo")),
@@ -167,12 +167,12 @@ class _VendorManagementState extends State<VendorManagement> {
       children: [
         IconButton(
           icon: const Icon(Icons.delete,
-              color: const Color(0xFF87F031)), // Green color
+              color: Color(0xFF87F031)), // Green color
           onPressed: () => _confirmDelete(vendor),
         ),
         IconButton(
           icon: const Icon(Icons.block,
-              color: const Color(0xFF87F031)), // Green color
+              color: Color(0xFF87F031)), // Green color
           onPressed: () => _toggleVendorStatus(vendor),
         ),
       ],
@@ -191,7 +191,7 @@ class _VendorManagementState extends State<VendorManagement> {
             onPressed: () => Navigator.pop(context),
             child: const Text("Cancel",
                 style:
-                    TextStyle(color: const Color(0xFF87F031))), // Green color
+                    TextStyle(color: Color(0xFF87F031))), // Green color
           ),
           ElevatedButton(
             onPressed: () async {

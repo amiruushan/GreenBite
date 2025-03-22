@@ -126,7 +126,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         iconTheme: IconThemeData(
           color: Theme.of(context)
               .colorScheme
-              .onBackground, // ✅ Icons adapt to theme
+              .onSurface, // ✅ Icons adapt to theme
         ),
         actions: [
           IconButton(
@@ -139,7 +139,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             },
             color: Theme.of(context)
                 .colorScheme
-                .onBackground, // ✅ Action icons adapt
+                .onSurface, // ✅ Action icons adapt
           ),
         ],
       ),

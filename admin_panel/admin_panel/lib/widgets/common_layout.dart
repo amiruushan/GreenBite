@@ -7,7 +7,7 @@ class CommonLayout extends StatelessWidget {
   final Widget child;
   final String title;
 
-  const CommonLayout({Key? key, required this.child, required this.title}) : super(key: key);
+  const CommonLayout({super.key, required this.child, required this.title});
 
   @override
   Widget build(BuildContext context) {

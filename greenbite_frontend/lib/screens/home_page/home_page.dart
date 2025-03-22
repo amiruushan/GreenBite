@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> {
       }
     } catch (e) {
       print("Error fetching user location: $e");
-      throw e;
+      rethrow;
     }
   }
 
@@ -419,7 +419,7 @@ class _HomePageContentState extends State<HomePageContent> {
     return DefaultTabController(
       length: 2, // Two tabs (Food Items & Shops)
       child: Scaffold(
-        backgroundColor: theme.colorScheme.background,
+        backgroundColor: theme.colorScheme.surface,
         appBar: AppBar(
           title: Text(
             "GreenBite",
@@ -433,13 +433,13 @@ class _HomePageContentState extends State<HomePageContent> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           iconTheme: IconThemeData(
-            color: theme.colorScheme.onBackground,
+            color: theme.colorScheme.onSurface,
           ),
           actions: [
             IconButton(
               icon: Icon(
                 Icons.shopping_cart,
-                color: theme.colorScheme.onBackground,
+                color: theme.colorScheme.onSurface,
               ),
               onPressed: () {
                 Navigator.push(
@@ -496,7 +496,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                 ),
                                 if (widget.showDropdown &&
                                     widget.predictions.isNotEmpty)
-                                  Container(
+                                  SizedBox(
                                     height: 200,
                                     child: ListView.builder(
                                       itemCount: widget.predictions.length,
@@ -538,7 +538,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                     "No food items near you",
                                     style: TextStyle(
                                       fontSize: 18,
-                                      color: theme.colorScheme.onBackground
+                                      color: theme.colorScheme.onSurface
                                           .withOpacity(0.5),
                                     ),
                                   ),
@@ -554,7 +554,7 @@ class _HomePageContentState extends State<HomePageContent> {
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.onBackground,
+                                color: theme.colorScheme.onSurface,
                               ),
                             ),
                             const SizedBox(height: 10),
@@ -704,7 +704,7 @@ class _HomePageContentState extends State<HomePageContent> {
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.onBackground,
+                                color: theme.colorScheme.onSurface,
                               ),
                             ),
                             const SizedBox(height: 10),
@@ -740,7 +740,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                       labelStyle: TextStyle(
                                         color: isSelected
                                             ? Colors.white
-                                            : theme.colorScheme.onBackground,
+                                            : theme.colorScheme.onSurface,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -759,7 +759,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                         "No items match this filter!",
                                         style: TextStyle(
                                           fontSize: 18,
-                                          color: theme.colorScheme.onBackground
+                                          color: theme.colorScheme.onSurface
                                               .withOpacity(0.5),
                                         ),
                                       ),
@@ -800,7 +800,7 @@ class _HomePageContentState extends State<HomePageContent> {
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.onBackground,
+                                color: theme.colorScheme.onSurface,
                               ),
                             ),
                             const SizedBox(height: 10),

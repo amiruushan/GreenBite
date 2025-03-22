@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class CustomerManagement extends StatefulWidget {
-  const CustomerManagement({Key? key}) : super(key: key);
+  const CustomerManagement({super.key});
 
   @override
   _CustomerManagementState createState() => _CustomerManagementState();
@@ -122,7 +122,7 @@ class _CustomerManagementState extends State<CustomerManagement> {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: DataTable(
-        headingRowColor: MaterialStateProperty.all(Colors.grey.shade200),
+        headingRowColor: WidgetStateProperty.all(Colors.grey.shade200),
         columns: const [
           DataColumn(label: Text("ID")),
           DataColumn(label: Text("Username")),
@@ -155,12 +155,12 @@ class _CustomerManagementState extends State<CustomerManagement> {
       children: [
         IconButton(
           icon: const Icon(Icons.delete,
-              color: const Color(0xFF87F031)), // Green color
+              color: Color(0xFF87F031)), // Green color
           onPressed: () => _confirmDelete(user),
         ),
         IconButton(
           icon: const Icon(Icons.block,
-              color: const Color(0xFF87F031)), // Green color
+              color: Color(0xFF87F031)), // Green color
           onPressed: () => _toggleUserStatus(user),
         ),
       ],
@@ -179,7 +179,7 @@ class _CustomerManagementState extends State<CustomerManagement> {
             onPressed: () => Navigator.pop(context),
             child: const Text("Cancel",
                 style:
-                    TextStyle(color: const Color(0xFF87F031))), // Green color
+                    TextStyle(color: Color(0xFF87F031))), // Green color
           ),
           ElevatedButton(
             onPressed: () async {

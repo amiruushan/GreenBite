@@ -78,7 +78,7 @@ class _CartScreenState extends State<CartScreen> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         iconTheme: IconThemeData(
-          color: theme.colorScheme.onBackground,
+          color: theme.colorScheme.onSurface,
         ),
       ),
       body: cartProvider.cartItems.isEmpty
@@ -94,7 +94,7 @@ class _CartScreenState extends State<CartScreen> {
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w500,
-          color: theme.colorScheme.onBackground,
+          color: theme.colorScheme.onSurface,
         ),
       ),
     );
@@ -154,7 +154,7 @@ class _CartScreenState extends State<CartScreen> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onBackground,
+                      color: theme.colorScheme.onSurface,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -211,7 +211,7 @@ class _CartScreenState extends State<CartScreen> {
       child: DropdownButton<String>(
         hint: Text(
           "Select Coupon",
-          style: TextStyle(color: theme.colorScheme.onBackground),
+          style: TextStyle(color: theme.colorScheme.onSurface),
         ),
         value: context.watch<CartProvider>().selectedCoupon,
         items: inventoryCoupons.map<DropdownMenuItem<String>>((coupon) {
@@ -219,7 +219,7 @@ class _CartScreenState extends State<CartScreen> {
             value: coupon['coupon_code'],
             child: Text(
               "${coupon['deal_name']} - \$${coupon['discount']}",
-              style: TextStyle(color: theme.colorScheme.onBackground),
+              style: TextStyle(color: theme.colorScheme.onSurface),
             ),
           );
         }).toList(),
@@ -258,7 +258,7 @@ class _CartScreenState extends State<CartScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onBackground,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               Text(
@@ -266,7 +266,7 @@ class _CartScreenState extends State<CartScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onBackground,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ],
@@ -305,7 +305,7 @@ class _CartScreenState extends State<CartScreen> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onBackground,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               Text(

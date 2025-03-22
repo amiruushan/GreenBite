@@ -119,7 +119,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background, // ✅ Theme-based background
+      backgroundColor: theme.colorScheme.surface, // ✅ Theme-based background
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -234,7 +234,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       termsAccepted = value!;
                     });
                   },
-                  fillColor: MaterialStateProperty.resolveWith<Color>(
+                  fillColor: WidgetStateProperty.resolveWith<Color>(
                     (states) =>
                         theme.colorScheme.primary, // ✅ Theme-based color
                   ),

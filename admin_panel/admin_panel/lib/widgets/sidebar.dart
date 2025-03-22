@@ -8,6 +8,8 @@ import 'package:admin_panel/screens/vendor_management.dart';
 import 'package:flutter/material.dart';
 
 class SideBar extends StatelessWidget {
+  const SideBar({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -28,7 +30,7 @@ class SideBar extends StatelessWidget {
           _buildMenuItem(
               context, "Orders", Icons.shopping_cart, OrdersScreen()),
           _buildMenuItem(context, "Products", Icons.store, ProductsScreen()),
-          _buildMenuItem(context, "Trials", Icons.list, TrialsScreen()),
+          _buildMenuItem(context, "Trials", Icons.list, SalesScreen()),
           _buildMenuItem(context, "Settings", Icons.settings, SettingsScreen()),
         ],
       ),
