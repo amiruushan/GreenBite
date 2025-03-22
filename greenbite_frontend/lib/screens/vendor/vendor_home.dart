@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/screens/vendor/vendor_sales.dart';
 import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:greenbite_frontend/config.dart';
@@ -26,6 +27,7 @@ class _VendorHomeState extends State<VendorHome> {
   String vendorDescription = "";
   String vendorImageUrl = "";
 
+  // Fetch vendor details and food items from backend
   Future<void> fetchVendorData() async {
     String? token = await AuthService.getToken();
     if (token == null) {
@@ -89,6 +91,7 @@ class _VendorHomeState extends State<VendorHome> {
   @override
   void initState() {
     super.initState();
+    print("Shop ID: ${widget.shopId}"); // Debugging
     fetchVendorData();
     fetchFoodItems();
   }
@@ -102,21 +105,23 @@ class _VendorHomeState extends State<VendorHome> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => ListFood(shopId: widget.shopId),
+          builder: (context) => ListFood(shopId: widget.shopId), // Pass shopId
         ),
       );
     } else if (index == 2) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => Orders(shopId: widget.shopId),
+          builder: (context) =>
+              VendorSalesPage(shopId: widget.shopId), // Pass shopId
         ),
       );
     } else if (index == 3) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => VendorProfile(vendorId: widget.shopId),
+          builder: (context) =>
+              VendorProfile(vendorId: widget.shopId), // Pass shopId
         ),
       );
     }
@@ -124,129 +129,123 @@ class _VendorHomeState extends State<VendorHome> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Dashboard",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-          ),
+        title: const Text("Dashboard"),
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
         ),
         centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 117, 237, 123),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator()) // Show loader
           : SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Vendor Image
-            vendorImageUrl.isNotEmpty
-                ? ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.network(
-                vendorImageUrl,
-                width: double.infinity,
-                height: 200,
-                fit: BoxFit.cover,
-              ),
-            )
-                : const SizedBox(height: 200),
-            const SizedBox(height: 16),
-
-            // Vendor Name and Description
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    vendorName,
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    vendorDescription,
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
+                  // Vendor Image
+                  vendorImageUrl.isNotEmpty
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.network(
+                            vendorImageUrl,
+                            width: double.infinity,
+                            height: 200,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : const SizedBox(height: 200),
                   const SizedBox(height: 16),
-                  const Text(
-                    "Available Food Items",
-                    style: TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
+
+                  // Vendor Name and Description
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          vendorName,
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          vendorDescription,
+                          style:
+                              const TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          "Available Food Items",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 8),
+
+                  // Food Items List
+                  ListView.builder(
+                    shrinkWrap: true, // Prevent infinite height
+                    physics:
+                        const NeverScrollableScrollPhysics(), // Disable scrolling
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: foodItems.length,
+                    itemBuilder: (context, index) {
+                      final food = foodItems[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.all(12),
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              food["photo"],
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          title: Text(
+                            food["name"],
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(food["description"]),
+                          trailing: Text(
+                            "\$${food["price"].toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green),
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    FoodItemScreen(foodItem: food),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
-
-            // Food Items List
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: foodItems.length,
-              itemBuilder: (context, index) {
-                final food = foodItems[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(12),
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        food["photo"],
-                        width: 60,
-                        height: 60,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    title: Text(
-                      food["name"],
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Text(food["description"]),
-                    trailing: Text(
-                      "\$${food["price"].toStringAsFixed(2)}",
-                      style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green),
-                    ),
-                    onTap: () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => FoodItemScreen(foodItem: food),
-                        ),
-                      );
-
-                      if (result == true) {
-                        fetchFoodItems();
-                      }
-                    },
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
       bottomNavigationBar: VendorNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
-        shopId: widget.shopId,
+        shopId: widget.shopId, // Pass shopId to VendorNavBar
       ),
     );
   }

@@ -57,7 +57,7 @@ class _VendorManagementState extends State<VendorManagement> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Vendor Management"),
-        backgroundColor: Colors.orange,
+        backgroundColor: const Color(0xFF87F031), // Green color
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -80,14 +80,14 @@ class _VendorManagementState extends State<VendorManagement> {
       children: [
         Row(
           children: [
-            Icon(Icons.store, color: Colors.orange.shade700),
+            Icon(Icons.store, color: const Color(0xFF87F031)), // Green color
             const SizedBox(width: 8),
             Text(
               "Vendor List",
               style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.orange.shade700),
+                  color: const Color(0xFF87F031)), // Green color
             ),
           ],
         ),
@@ -166,11 +166,13 @@ class _VendorManagementState extends State<VendorManagement> {
     return Row(
       children: [
         IconButton(
-          icon: const Icon(Icons.delete),
+          icon: const Icon(Icons.delete,
+              color: const Color(0xFF87F031)), // Green color
           onPressed: () => _confirmDelete(vendor),
         ),
         IconButton(
-          icon: const Icon(Icons.block),
+          icon: const Icon(Icons.block,
+              color: const Color(0xFF87F031)), // Green color
           onPressed: () => _toggleVendorStatus(vendor),
         ),
       ],
@@ -187,7 +189,9 @@ class _VendorManagementState extends State<VendorManagement> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+            child: const Text("Cancel",
+                style:
+                    TextStyle(color: const Color(0xFF87F031))), // Green color
           ),
           ElevatedButton(
             onPressed: () async {
@@ -201,6 +205,9 @@ class _VendorManagementState extends State<VendorManagement> {
               }
               Navigator.pop(context); // Close the dialog
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF87F031), // Green color
+            ),
             child: const Text("Delete"),
           ),
         ],
