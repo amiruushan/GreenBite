@@ -64,7 +64,9 @@ public class FoodShopService {
                 foodShop.getAddress(),
                 foodShop.getPhoneNumber(),  // or getPhoneNumber() if you rename it
                 foodShop.getLatitude(),
-                foodShop.getLongitude()
+                foodShop.getLongitude(),
+                foodShop.getLicenseExpirationDate(),
+                foodShop.getBusinessDescription()
         );
     }
 

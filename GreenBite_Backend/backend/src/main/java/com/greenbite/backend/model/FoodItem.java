@@ -27,9 +27,4 @@ public class FoodItem {
 
     private String category; // New field for category
 
-    @Column(nullable = false)
-    private double latitude; // Add latitude field
-
-    @Column(nullable = false)
-    private double longitude; // Add longitude field
 }
