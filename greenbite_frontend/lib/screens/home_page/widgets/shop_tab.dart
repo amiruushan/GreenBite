@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/home_page/models/shop_item.dart';
 import 'package:greenbite_frontend/screens/home_page/widgets/shop_details_page.dart';
-
 import 'package:greenbite_frontend/service/auth_service.dart';
-
-import 'package:greenbite_frontend/service/location_service.dart';
 import 'dart:convert'; // For JSON parsing
 import 'package:http/http.dart' as http;
 
@@ -27,6 +24,35 @@ class _ShopsTabState extends State<ShopsTab> {
     fetchShopData(); // Call the function to fetch shop data
   }
 
+  // Fetch the user's location from the backend
+  Future<Map<String, double>> _fetchUserLocation(int userId) async {
+    try {
+      String? token = await AuthService.getToken(); // Retrieve token
+      if (token == null) {
+        print("No token found");
+        throw Exception("No token found");
+      }
+
+      final response = await http.get(
+        Uri.parse('${Config.apiBaseUrl}/api/users/location/$userId'),
+        headers: {"Authorization": "Bearer $token"},
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        return {
+          "latitude": data["latitude"],
+          "longitude": data["longitude"],
+        };
+      } else {
+        throw Exception("Failed to fetch user location");
+      }
+    } catch (e) {
+      print("Error fetching user location: $e");
+      throw e;
+    }
+  }
+
   Future<void> fetchShopData() async {
     try {
       String? token = await AuthService.getToken(); // Retrieve token
@@ -35,11 +61,21 @@ class _ShopsTabState extends State<ShopsTab> {
         return;
       }
 
-      // Get the user's current location
-      final position = await LocationService.getCurrentLocation();
-      final double latitude = position.latitude;
-      final double longitude = position.longitude;
+      int? userId = await AuthService.getUserId(); // Retrieve user ID
+      if (userId == null) {
+        print("No user ID found");
+        return;
+      }
 
+      // Fetch the user's saved location from the backend
+      final userLocation = await _fetchUserLocation(userId);
+      final double latitude = userLocation["latitude"]!;
+      final double longitude = userLocation["longitude"]!;
+
+      print(
+          "User location from backend: Latitude=$latitude, Longitude=$longitude");
+
+      // Fetch nearby shops within a 5km radius using the user's location from the backend
       final response = await http.get(
         Uri.parse(
             "${Config.apiBaseUrl}/api/shop/nearby?lat=$latitude&lon=$longitude&radius=5"),

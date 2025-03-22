@@ -48,7 +48,6 @@ public class FoodShopController {
             @RequestParam double lat,
             @RequestParam double lon,
             @RequestParam(defaultValue = "5") double radius) {
-        radius=10000;
         return foodShopService.findShopsNearby(lat, lon, radius);
     }
 }
