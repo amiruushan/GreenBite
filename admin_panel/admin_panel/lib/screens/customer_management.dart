@@ -51,7 +51,7 @@ class _CustomerManagementState extends State<CustomerManagement> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Customer Management"),
-        backgroundColor: Colors.green,
+        backgroundColor: const Color(0xFF87F031), // Green color
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -74,14 +74,14 @@ class _CustomerManagementState extends State<CustomerManagement> {
       children: [
         Row(
           children: [
-            Icon(Icons.people, color: Colors.green.shade700),
+            Icon(Icons.people, color: const Color(0xFF87F031)), // Green color
             const SizedBox(width: 8),
             Text(
               "User List",
               style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.green.shade700),
+                  color: const Color(0xFF87F031)), // Green color
             ),
           ],
         ),
@@ -154,11 +154,15 @@ class _CustomerManagementState extends State<CustomerManagement> {
     return Row(
       children: [
         IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () => _confirmDelete(user)),
+          icon: const Icon(Icons.delete,
+              color: const Color(0xFF87F031)), // Green color
+          onPressed: () => _confirmDelete(user),
+        ),
         IconButton(
-            icon: const Icon(Icons.block),
-            onPressed: () => _toggleUserStatus(user)),
+          icon: const Icon(Icons.block,
+              color: const Color(0xFF87F031)), // Green color
+          onPressed: () => _toggleUserStatus(user),
+        ),
       ],
     );
   }
@@ -172,21 +176,28 @@ class _CustomerManagementState extends State<CustomerManagement> {
             "Are you sure you want to delete this user? This action cannot be undone."),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel")),
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel",
+                style:
+                    TextStyle(color: const Color(0xFF87F031))), // Green color
+          ),
           ElevatedButton(
-              onPressed: () async {
-                // Call the API to delete the user
-                final success = await _deleteUser(user['id']);
-                if (success) {
-                  // Remove the user from the local list if the API call is successful
-                  setState(() {
-                    _users.removeWhere((u) => u['id'] == user['id']);
-                  });
-                }
-                Navigator.pop(context); // Close the dialog
-              },
-              child: const Text("Delete"))
+            onPressed: () async {
+              // Call the API to delete the user
+              final success = await _deleteUser(user['id']);
+              if (success) {
+                // Remove the user from the local list if the API call is successful
+                setState(() {
+                  _users.removeWhere((u) => u['id'] == user['id']);
+                });
+              }
+              Navigator.pop(context); // Close the dialog
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF87F031), // Green color
+            ),
+            child: const Text("Delete"),
+          ),
         ],
       ),
     );
