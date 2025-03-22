@@ -5,7 +5,9 @@ import com.greenbite.backend.model.FoodShop;
 import com.greenbite.backend.repository.FoodItemRepository;
 import com.greenbite.backend.repository.FoodShopRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -17,10 +19,12 @@ public class FoodItemService {
     private static final double EARTH_RADIUS = 6371; // Earth's radius in km
     private final FoodItemRepository foodItemRepository;
     private final FoodShopRepository foodShopRepository;
+    private final FileStorageService fileStorageService;
 
-    public FoodItemService(FoodItemRepository foodItemRepository, FoodShopRepository foodShopRepository) {
+    public FoodItemService(FoodItemRepository foodItemRepository, FoodShopRepository foodShopRepository,FileStorageService fileStorageService) {
         this.foodItemRepository = foodItemRepository;
         this.foodShopRepository = foodShopRepository;
+        this.fileStorageService = fileStorageService;
     }
 
     public List<FoodItemDTO> getAllFoodItems() {
@@ -41,9 +45,19 @@ public class FoodItemService {
                 .collect(Collectors.toList());
     }
 
-    public FoodItemDTO addFoodItem(FoodItemDTO foodItemDTO) {
+    public FoodItemDTO addFoodItem(FoodItemDTO foodItemDTO, MultipartFile foodImage) throws IOException {
+        // Convert DTO to Entity
         FoodItem foodItem = convertToEntity(foodItemDTO);
-        return convertToDTO(foodItemRepository.save(foodItem));
+
+        // Handle food image upload
+        if (foodImage != null && !foodImage.isEmpty()) {
+            String fileUrl = fileStorageService.saveFile(foodImage);
+            foodItem.setPhoto(fileUrl); // Save the uploaded image URL
+        }
+
+        // Save food item to database
+        foodItem = foodItemRepository.save(foodItem);
+        return convertToDTO(foodItem);
     }
 
     private FoodItemDTO convertToDTO(FoodItem foodItem) {
