@@ -84,6 +84,14 @@ public class AdminPanelController {
         foodItemService.deleteFoodItem(foodItemDTO.getId());
     }
 
+    //list all food items
+    @GetMapping("/listAllFoodItems")
+    public ResponseEntity<List<FoodItemDTO>> getAllFoodItems() {
+        System.out.println("ssss");
+        List<FoodItemDTO> foodItems = foodItemService.getAllFoodItems();
+        return ResponseEntity.ok(foodItems);
+    }
+
     @GetMapping("/listFoodItems/{foodShopId}")
     public ResponseEntity<List<FoodItemDTO>> getFoodItemsByShop(@PathVariable Long foodShopId) {
         List<FoodItemDTO> foodItems = foodItemService.getFoodItemsByShop(foodShopId);
