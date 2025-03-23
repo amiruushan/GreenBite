@@ -140,21 +140,43 @@ class _VendorSalesPageState extends State<VendorSalesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Sales Overview",
+        title: Text(
+          "GreenBite",
           style: TextStyle(
-              fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.green,
+          ),
         ),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 117, 237, 123),
+        backgroundColor: Colors.transparent, // Make AppBar transparent
+        elevation: 0, // Remove elevation
+        iconTheme: IconThemeData(
+          color: theme.colorScheme.onBackground, // Match icon color
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.shopping_cart,
+              color: theme.colorScheme.onBackground,
+            ),
+            onPressed: () {
+              // Add cart functionality if needed
+            },
+          ),
+        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : sales.isEmpty
               ? const Center(child: Text("No sales records available"))
               : ListView.builder(
+                  padding: const EdgeInsets.all(16),
                   itemCount: sales.length,
                   itemBuilder: (context, index) {
                     var sale = sales[index];
@@ -170,12 +192,14 @@ class _VendorSalesPageState extends State<VendorSalesPage> {
   }
 
   Widget _buildOrderButton(Map<String, dynamic> sale) {
+    final theme = Theme.of(context);
+    final bool isDarkMode = theme.brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: ElevatedButton(
         onPressed: () => _showOrderDetails(sale),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
+          backgroundColor: isDarkMode ? Colors.grey[950] : Colors.grey[100],
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -188,10 +212,10 @@ class _VendorSalesPageState extends State<VendorSalesPage> {
             children: [
               Text(
                 "Order #${sale['id']}",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: isDarkMode ? Colors.white : Colors.green[100],
                 ),
               ),
               Container(

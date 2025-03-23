@@ -60,6 +60,7 @@ class _VendorOrderManagementScreenState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
@@ -68,11 +69,11 @@ class _VendorOrderManagementScreenState
           style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: isDarkMode ? Colors.white : Colors.green,
           ),
         ),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 117, 237, 123),
+        backgroundColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

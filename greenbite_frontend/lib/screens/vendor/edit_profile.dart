@@ -33,7 +33,7 @@ class _EditProfileState extends State<EditProfile> {
     super.initState();
     // Initialize controllers with the vendor profile data
     _nameController =
-        TextEditingController(text: widget.vendorProfile["name"] ?? "");
+        TextEditingController(text: widget.vendorProfile["username"] ?? "");
     _emailController =
         TextEditingController(text: widget.vendorProfile["email"] ?? "");
     _phoneController =
@@ -113,7 +113,8 @@ class _EditProfileState extends State<EditProfile> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profile updated successfully!')),
         );
-        Navigator.pop(context); // Close the screen
+        Navigator.pop(context,
+            updatedProfile); // Close the screen and return updated profile
       } else {
         throw Exception('Failed to update profile: ${response.statusCode}');
       }
@@ -142,16 +143,18 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Profile",
             style: TextStyle(
               color: Colors.white,
-              fontSize: 30,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
             )),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 117, 237, 123),
+        backgroundColor: Colors.green,
         actions: [
           IconButton(
             icon: const Icon(Icons.save, color: Colors.white),
@@ -176,7 +179,7 @@ class _EditProfileState extends State<EditProfile> {
                           backgroundImage: _imageFile != null
                               ? FileImage(_imageFile!) // Use the selected image
                               : NetworkImage(
-                                  widget.vendorProfile["photo"] ??
+                                  widget.vendorProfile["profilePictureUrl"] ??
                                       "https://via.placeholder.com/150",
                                 ) as ImageProvider,
                         ),
@@ -290,6 +293,9 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 16),
+
+                  // Sign Out Button
                 ],
               ),
             ),

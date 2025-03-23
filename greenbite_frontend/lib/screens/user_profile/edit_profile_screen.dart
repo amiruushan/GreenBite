@@ -46,15 +46,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() => _isSaving = true);
 
     final updatedProfile = UserProfile(
-      id: widget.userProfile.id, // ✅ Keep the same ID
-      username: _nameController.text.trim(),
-      email: _emailController.text.trim(),
-      profilePictureUrl: _imageFile != null
-          ? _imageFile!.path
-          : widget.userProfile.profilePictureUrl, // Use new image if selected
-      phoneNumber: _phoneController.text.trim(),
-      address: _addressController.text.trim(), shopId: widget.userProfile.shopId
-    );
+        id: widget.userProfile.id, // ✅ Keep the same ID
+        username: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        profilePictureUrl: _imageFile != null
+            ? _imageFile!.path
+            : widget.userProfile.profilePictureUrl, // Use new image if selected
+        phoneNumber: _phoneController.text.trim(),
+        address: _addressController.text.trim(),
+        shopId: widget.userProfile.shopId);
 
     bool success =
         await UserProfileService.updateUserProfile(updatedProfile, _imageFile);
@@ -113,8 +113,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   backgroundImage: _imageFile != null
                       ? FileImage(_imageFile!) // Use the selected image
                       : NetworkImage(
-                          widget.userProfile.profilePictureUrl ??
-                              UserProfile.placeholderProfilePictureUrl,
+                          widget.userProfile.profilePictureUrl,
                         ) as ImageProvider,
                 ),
                 Positioned(

@@ -128,16 +128,19 @@ class _VendorHomeState extends State<VendorHome> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Dashboard"),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
+        title: const Text("GreenBite"),
+        titleTextStyle: TextStyle(
+          color: isDarkMode ? Colors.white : Colors.green,
           fontSize: 30,
           fontWeight: FontWeight.bold,
         ),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 117, 237, 123),
+        backgroundColor: Colors.transparent, // Make AppBar transparent
+        elevation: 0, // Remove elevation
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator()) // Show loader
