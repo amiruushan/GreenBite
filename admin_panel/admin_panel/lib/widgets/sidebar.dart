@@ -1,8 +1,7 @@
+import 'package:admin_panel/screens/coupons_screen.dart';
 import 'package:admin_panel/screens/customer_management.dart';
-import 'package:admin_panel/screens/customer_screen.dart';
+import 'package:admin_panel/screens/food_item_screen.dart';
 import 'package:admin_panel/screens/orders_screen.dart';
-import 'package:admin_panel/screens/products_screen.dart';
-import 'package:admin_panel/screens/settings_screen.dart';
 import 'package:admin_panel/screens/trials_screen.dart';
 import 'package:admin_panel/screens/vendor_management.dart';
 import 'package:flutter/material.dart';
@@ -26,9 +25,8 @@ class SideBar extends StatelessWidget {
           _buildMenuItem(context, "Shops", Icons.people, VendorManagement()),
           _buildMenuItem(
               context, "Orders", Icons.shopping_cart, OrdersScreen()),
-          _buildMenuItem(context, "Products", Icons.store, ProductsScreen()),
-          _buildMenuItem(context, "Trials", Icons.list, TrialsScreen()),
-          _buildMenuItem(context, "Settings", Icons.settings, SettingsScreen()),
+          _buildMenuItem(context, "Products", Icons.store, FoodItemsScreen()),
+          _buildMenuItem(context, "Coupons", Icons.list, CouponsScreen()),
         ],
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../widgets/common_layout.dart'; // Import the CommonLayout
 
 class CustomerManagement extends StatefulWidget {
   const CustomerManagement({Key? key}) : super(key: key);
@@ -25,7 +26,7 @@ class _CustomerManagementState extends State<CustomerManagement> {
   // Function to fetch users from the backend
   Future<void> _fetchUsers() async {
     final response = await http.get(
-      Uri.parse('http://127.0.0.1:8080/api/admin/listUsers'),
+      Uri.parse('http://10.190.13.69:8080/api/admin/listUsers'),
     );
 
     if (response.statusCode == 200) {
@@ -42,110 +43,77 @@ class _CustomerManagementState extends State<CustomerManagement> {
   @override
   Widget build(BuildContext context) {
     final filteredUsers = _users.where((user) {
-      return user['username']
-              .toLowerCase()
-              .contains(_searchQuery.toLowerCase()) ||
-          user['email'].toLowerCase().contains(_searchQuery.toLowerCase());
+      final username = user['username']?.toString().toLowerCase() ?? '';
+      final email = user['email']?.toString().toLowerCase() ?? '';
+      return username.contains(_searchQuery.toLowerCase()) ||
+          email.contains(_searchQuery.toLowerCase());
     }).toList();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Customer Management"),
-        backgroundColor: const Color(0xFF87F031), // Green color
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildHeader(),
-            const SizedBox(height: 16),
-            _buildSearchAndEntriesRow(),
-            const SizedBox(height: 16),
-            Expanded(child: _buildUserTable(filteredUsers)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Icon(Icons.people, color: const Color(0xFF87F031)), // Green color
-            const SizedBox(width: 8),
-            Text(
-              "User List",
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF87F031)), // Green color
-            ),
-          ],
-        ),
-        const Text("Welcome!", style: TextStyle(fontSize: 16)),
-      ],
-    );
-  }
-
-  Widget _buildSearchAndEntriesRow() {
-    return Row(
-      children: [
-        DropdownButton<int>(
-          value: _entriesPerPage,
-          items: [10, 25, 50]
-              .map((value) =>
-                  DropdownMenuItem(value: value, child: Text("$value entries")))
-              .toList(),
-          onChanged: (value) => setState(() => _entriesPerPage = value ?? 10),
-        ),
-        const Spacer(),
-        SizedBox(
-          width: 200,
-          child: TextField(
-            onChanged: (query) => setState(() => _searchQuery = query),
-            decoration: InputDecoration(
-              hintText: 'Search...',
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+    return CommonLayout(
+      title: 'Customer Management', // Title for the TopNavBar
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: TextEditingController(text: _searchQuery),
+              decoration: InputDecoration(
+                labelText: 'Search by Username or Email',
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () {
+                    setState(() {
+                      // Trigger search when the search icon is pressed
+                    });
+                  },
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+              onChanged: (query) {
+                setState(() {
+                  _searchQuery = query;
+                });
+              },
             ),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUserTable(List<Map<String, dynamic>> users) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        headingRowColor: MaterialStateProperty.all(Colors.grey.shade200),
-        columns: const [
-          DataColumn(label: Text("ID")),
-          DataColumn(label: Text("Username")),
-          DataColumn(label: Text("Email")),
-          DataColumn(label: Text("Phone Number")),
-          DataColumn(label: Text("Address")),
-          DataColumn(label: Text("Actions")),
+          Expanded(
+            child: filteredUsers.isEmpty
+                ? Center(
+              child: Text("No users found."),
+            )
+                : SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                headingRowColor: MaterialStateProperty.all(Colors.grey.shade200),
+                columns: const [
+                  DataColumn(label: Text("ID")),
+                  DataColumn(label: Text("Username")),
+                  DataColumn(label: Text("Email")),
+                  DataColumn(label: Text("Phone Number")),
+                  DataColumn(label: Text("Address")),
+                  DataColumn(label: Text("Actions")),
+                ],
+                rows: filteredUsers
+                    .take(_entriesPerPage)
+                    .map((user) => _buildDataRow(user))
+                    .toList(),
+              ),
+            ),
+          ),
         ],
-        rows: users
-            .take(_entriesPerPage)
-            .map((user) => _buildDataRow(user))
-            .toList(),
       ),
     );
   }
 
   DataRow _buildDataRow(Map<String, dynamic> user) {
     return DataRow(cells: [
-      DataCell(Text(user['id'].toString())),
-      DataCell(Text(user['username'])),
-      DataCell(Text(user['email'])),
-      DataCell(Text(user['phoneNumber'])),
-      DataCell(Text(user['address'])),
+      DataCell(Text(user['id'].toString())), // ID is guaranteed to be non-null
+      DataCell(Text(user['username']?.toString() ?? "N/A")), // Handle null username
+      DataCell(Text(user['email']?.toString() ?? "N/A")), // Handle null email
+      DataCell(Text(user['phoneNumber']?.toString() ?? "N/A")), // Handle null phoneNumber
+      DataCell(Text(user['address']?.toString() ?? "N/A")), // Handle null address
       DataCell(_buildActionButtons(user)),
     ]);
   }
@@ -154,13 +122,11 @@ class _CustomerManagementState extends State<CustomerManagement> {
     return Row(
       children: [
         IconButton(
-          icon: const Icon(Icons.delete,
-              color: const Color(0xFF87F031)), // Green color
+          icon: Icon(Icons.delete, color: Colors.red),
           onPressed: () => _confirmDelete(user),
         ),
         IconButton(
-          icon: const Icon(Icons.block,
-              color: const Color(0xFF87F031)), // Green color
+          icon: Icon(Icons.block, color: Colors.orange),
           onPressed: () => _toggleUserStatus(user),
         ),
       ],
@@ -171,15 +137,13 @@ class _CustomerManagementState extends State<CustomerManagement> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text("Confirm Delete"),
-        content: const Text(
+        title: Text("Confirm Delete"),
+        content: Text(
             "Are you sure you want to delete this user? This action cannot be undone."),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel",
-                style:
-                    TextStyle(color: const Color(0xFF87F031))), // Green color
+            child: Text("Cancel", style: TextStyle(color: Colors.green)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -194,9 +158,9 @@ class _CustomerManagementState extends State<CustomerManagement> {
               Navigator.pop(context); // Close the dialog
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF87F031), // Green color
+              backgroundColor: Colors.green,
             ),
-            child: const Text("Delete"),
+            child: Text("Delete"),
           ),
         ],
       ),
@@ -207,7 +171,7 @@ class _CustomerManagementState extends State<CustomerManagement> {
   Future<bool> _deleteUser(int userId) async {
     try {
       final response = await http.delete(
-        Uri.parse('http://127.0.0.1:8080/api/admin/deleteUser/$userId'),
+        Uri.parse('http://10.190.13.69:8080/api/admin/deleteUser/$userId'),
       );
 
       if (response.statusCode == 200) {
@@ -230,6 +194,6 @@ class _CustomerManagementState extends State<CustomerManagement> {
     // Since the backend response does not include a "status" field,
     // this function can be updated to send a request to the backend
     // to toggle the user's status (e.g., active/inactive).
-    print("Toggle status for user: ${user['username']}");
+    print("Toggle status for user: ${user['username'] ?? 'N/A'}");
   }
 }
