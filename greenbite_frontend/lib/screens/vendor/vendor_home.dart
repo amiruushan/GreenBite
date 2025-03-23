@@ -222,7 +222,7 @@ class _VendorHomeState extends State<VendorHome> {
                           ),
                           subtitle: Text(food["description"]),
                           trailing: Text(
-                            "\$${food["price"].toStringAsFixed(2)}",
+                            "Rs. ${food["price"].toStringAsFixed(2)}",
                             style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

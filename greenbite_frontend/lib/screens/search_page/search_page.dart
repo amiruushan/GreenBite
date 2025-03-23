@@ -18,12 +18,13 @@ class _SearchScreenState extends State<SearchScreen> {
   String? _selectedCategory;
 
   final List<String> _categories = [
-    "Pizza",
-    "Burger",
-    "Pasta",
-    "Sushi",
+    "Drinks",
+    "Rice",
+    "Dessert",
+    "Bakery",
     "Salad",
-    "Dessert"
+    "Meat",
+    "Snack"
   ];
 
   @override

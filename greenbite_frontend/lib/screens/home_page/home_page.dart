@@ -172,13 +172,23 @@ class _HomePageState extends State<HomePage> {
         List<dynamic> foodJson = json.decode(foodResponse.body);
         List<dynamic> favoriteJson = json.decode(favoriteResponse.body);
 
-        // Convert food items
-        List<FoodItem> allFoodItems =
-            foodJson.map((data) => FoodItem.fromJson(data)).toList();
+        // Convert food items and filter out any invalid items
+        List<FoodItem> allFoodItems = foodJson
+            .map((data) => FoodItem.fromJson(data))
+            .where((item) =>
+                item.tags != null &&
+                item.tags
+                    .isNotEmpty) // Filter out items with empty or null tags
+            .toList();
 
         // Convert favorites
-        Set<FoodItem> favorites =
-            favoriteJson.map((data) => FoodItem.fromJson(data)).toSet();
+        Set<FoodItem> favorites = favoriteJson
+            .map((data) => FoodItem.fromJson(data))
+            .where((item) =>
+                item.tags != null &&
+                item.tags
+                    .isNotEmpty) // Filter out items with empty or null tags
+            .toSet();
 
         setState(() {
           foodItems = allFoodItems;
@@ -399,7 +409,9 @@ class _HomePageContentState extends State<HomePageContent> {
   List<String> getUniqueTags() {
     final Set<String> uniqueTags = {};
     for (var item in widget.foodItems) {
-      uniqueTags.addAll(item.tags);
+      // Filter out empty or null tags
+      uniqueTags
+          .addAll(item.tags.where((tag) => tag != null && tag.isNotEmpty));
     }
     return uniqueTags.toList();
   }
@@ -633,7 +645,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                                           ),
                                                         ),
                                                         Text(
-                                                          "\$${item.price.toStringAsFixed(2)}",
+                                                          "Rs. ${item.price.toStringAsFixed(2)}",
                                                           style:
                                                               const TextStyle(
                                                             color: Colors.white,
