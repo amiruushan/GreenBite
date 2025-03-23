@@ -35,10 +35,10 @@ class FoodCard extends StatelessWidget {
         color: isDarkMode ? Colors.grey[950] : Colors.grey[100],
         child: Padding(
           padding:
-              const EdgeInsets.all(8.0), // ✅ Reduce padding for tighter layout
+              const EdgeInsets.all(8.0), //  Reduce padding for tighter layout
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min, // ✅ Ensure minimal height
+            mainAxisSize: MainAxisSize.min, //  Ensure minimal height
             children: [
               ClipRRect(
                 borderRadius:
@@ -60,15 +60,15 @@ class FoodCard extends StatelessWidget {
                   },
                 ),
               ),
-              const SizedBox(height: 8), // ✅ Less space between image & text
+              const SizedBox(height: 8), //  Less space between image & text
               Text(
                 foodItem.name,
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: isDarkMode
                       ? Colors.white
-                      : Colors.black, // ✅ Dynamic color
+                      : Colors.black, //  Dynamic color
                   fontWeight: FontWeight.bold,
-                  fontSize: 16, // ✅ Make font consistent
+                  fontSize: 16, //  Make font consistent
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -78,12 +78,12 @@ class FoodCard extends StatelessWidget {
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: isDarkMode
                       ? Colors.grey[400]
-                      : Colors.grey[700], // ✅ Adjust contrast
+                      : Colors.grey[700], //  Adjust contrast
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 4), // ✅ Reduce unnecessary space
+              const SizedBox(height: 4), //  Reduce unnecessary space
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

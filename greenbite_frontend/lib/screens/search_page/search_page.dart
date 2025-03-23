@@ -71,7 +71,7 @@ class _SearchScreenState extends State<SearchScreen> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background, // ✅ Theme-based background
+      backgroundColor: theme.colorScheme.background, //  Theme-based background
       appBar: AppBar(
         title: Text(
           "GreenBite",
@@ -82,10 +82,10 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.transparent, // ✅ Transparent AppBar
-        elevation: 0, // ✅ No shadow
+        backgroundColor: Colors.transparent, //  Transparent AppBar
+        elevation: 0, //  No shadow
         iconTheme: IconThemeData(
-          color: theme.colorScheme.onBackground, // ✅ Icon color adapts to theme
+          color: theme.colorScheme.onBackground, //  Icon color adapts to theme
         ),
         actions: [
           IconButton(
@@ -96,7 +96,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 MaterialPageRoute(builder: (context) => const CartScreen()),
               );
             },
-            color: theme.colorScheme.onBackground, // ✅ Action icons adapt
+            color: theme.colorScheme.onBackground, //  Action icons adapt
           ),
         ],
       ),
@@ -111,7 +111,7 @@ class _SearchScreenState extends State<SearchScreen> {
               decoration: BoxDecoration(
                 color: isDarkMode
                     ? Colors.grey[900]
-                    : Colors.grey[200], // ✅ Adaptive color
+                    : Colors.grey[200], //  Adaptive color
                 borderRadius: BorderRadius.circular(12),
               ),
               child: TextField(

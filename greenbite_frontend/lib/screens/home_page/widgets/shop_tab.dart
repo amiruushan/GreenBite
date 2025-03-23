@@ -116,7 +116,7 @@ class _ShopsTabState extends State<ShopsTab> {
         child: Text(
           errorMessage,
           style: TextStyle(
-            color: theme.colorScheme.onSurface, // ✅ Adaptive text color
+            color: theme.colorScheme.onSurface, //  Adaptive text color
           ),
         ),
       );
@@ -132,7 +132,7 @@ class _ShopsTabState extends State<ShopsTab> {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onSurface, // ✅ Adaptive text color
+              color: theme.colorScheme.onSurface, //  Adaptive text color
             ),
           ),
           const SizedBox(height: 20),
@@ -151,7 +151,7 @@ class _ShopsTabState extends State<ShopsTab> {
                     decoration: BoxDecoration(
                       color: isDarkMode
                           ? Colors.grey[900]
-                          : Colors.white, // ✅ Adaptive background color
+                          : Colors.white, // Adaptive background color
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: GestureDetector(
@@ -181,7 +181,7 @@ class _ShopsTabState extends State<ShopsTab> {
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: theme
-                                .colorScheme.onSurface, // ✅ Adaptive text color
+                                .colorScheme.onSurface, // Adaptive text color
                           ),
                         ),
                         subtitle: Text(
@@ -190,7 +190,7 @@ class _ShopsTabState extends State<ShopsTab> {
                             fontSize: 14,
                             color: isDarkMode
                                 ? Colors.grey[400]
-                                : Colors.grey[700], // ✅ Adaptive text color
+                                : Colors.grey[700], //  Adaptive text color
                           ),
                         ),
                       ),

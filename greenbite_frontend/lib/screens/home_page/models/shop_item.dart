@@ -23,7 +23,7 @@ class ShopItem {
     required this.longitude, // Add longitude
   });
 
-  // ✅ Add copyWith method
+  //  Add copyWith method
   ShopItem copyWith({
     String? shopId,
     String? name,
