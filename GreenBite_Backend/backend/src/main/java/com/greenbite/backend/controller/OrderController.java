@@ -65,4 +65,11 @@ public class OrderController {
         float totalCalories = orderService.getTotalCaloriesConsumed(userId);
         return ResponseEntity.ok(totalCalories);
     }
+
+    @PutMapping("/{orderId}/status")
+    public ResponseEntity<Order> updateOrderStatus(@PathVariable Long orderId, @RequestParam String status) {
+        Order updatedOrder = orderService.updateOrderStatus(orderId, status);
+        return ResponseEntity.ok(updatedOrder);
+    }
+
 }
