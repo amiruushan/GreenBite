@@ -41,12 +41,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
-  // ✅ Save changes (PUT request)
+  //  Save changes (PUT request)
   Future<void> _saveProfile() async {
     setState(() => _isSaving = true);
 
     final updatedProfile = UserProfile(
-        id: widget.userProfile.id, // ✅ Keep the same ID
+        id: widget.userProfile.id, //  Keep the same ID
         username: _nameController.text.trim(),
         email: _emailController.text.trim(),
         profilePictureUrl: _imageFile != null
@@ -73,7 +73,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  // ✅ Function to pick an image from the gallery or camera
+  //  Function to pick an image from the gallery or camera
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: source);
@@ -94,17 +94,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         title: const Text("Edit Profile",
             style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
-        backgroundColor: Colors.transparent, // ✅ Transparent AppBar
-        elevation: 0, // ✅ Remove shadow
+        backgroundColor: Colors.transparent, //  Transparent AppBar
+        elevation: 0, //  Remove shadow
         iconTheme: IconThemeData(
-          color: theme.colorScheme.onSurface, // ✅ Icons adapt to theme
+          color: theme.colorScheme.onSurface, //  Icons adapt to theme
         ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            // ✅ Profile Picture Update Option
+            //  Profile Picture Update Option
             Stack(
               alignment: Alignment.center,
               children: [
@@ -121,13 +121,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   right: 0,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary, // ✅ Theme-based color
+                      color: theme.colorScheme.primary, //  Theme-based color
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
                       icon: Icon(Icons.edit,
                           color: theme.colorScheme.onPrimary,
-                          size: 20), // ✅ Theme-based color
+                          size: 20), //  Theme-based color
                       onPressed: () {
                         // Show a dialog to choose between gallery and camera
                         showDialog(
@@ -168,7 +168,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             const SizedBox(height: 20),
 
-            // ✅ Input Fields
+            //  Input Fields
             _buildTextField("Full Name", _nameController, Icons.person, theme),
             _buildTextField(
                 "Email Address", _emailController, Icons.email, theme),
@@ -178,7 +178,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 "Home Address", _addressController, Icons.location_on, theme),
             const SizedBox(height: 20),
 
-            // ✅ Save Button
+            //  Save Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -186,18 +186,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 icon: _isSaving
                     ? CircularProgressIndicator(
                         color:
-                            theme.colorScheme.onPrimary) // ✅ Theme-based color
+                            theme.colorScheme.onPrimary) //  Theme-based color
                     : Icon(Icons.save,
                         color:
-                            theme.colorScheme.onPrimary), // ✅ Theme-based color
+                            theme.colorScheme.onPrimary), //  Theme-based color
                 label: Text("Save Changes",
                     style: TextStyle(
                         fontSize: 18,
                         color: theme
-                            .colorScheme.onPrimary)), // ✅ Theme-based color
+                            .colorScheme.onPrimary)), //  Theme-based color
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                      theme.colorScheme.primary, // ✅ Theme-based color
+                      theme.colorScheme.primary, //  Theme-based color
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
@@ -210,7 +210,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  // ✅ Custom Text Field with Icon
+  //  Custom Text Field with Icon
   Widget _buildTextField(String label, TextEditingController controller,
       IconData icon, ThemeData theme) {
     return Padding(
@@ -218,17 +218,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: TextField(
         controller: controller,
         style: TextStyle(
-            color: theme.colorScheme.onSurface), // ✅ Theme-based color
+            color: theme.colorScheme.onSurface), //  Theme-based color
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(
               color: theme.colorScheme.onSurface
-                  .withOpacity(0.7)), // ✅ Theme-based color
+                  .withOpacity(0.7)), //  Theme-based color
           prefixIcon: Icon(icon,
-              color: theme.colorScheme.primary), // ✅ Theme-based color
+              color: theme.colorScheme.primary), //  Theme-based color
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           filled: true,
-          fillColor: theme.colorScheme.surface, // ✅ Theme-based color
+          fillColor: theme.colorScheme.surface, //  Theme-based color
         ),
       ),
     );

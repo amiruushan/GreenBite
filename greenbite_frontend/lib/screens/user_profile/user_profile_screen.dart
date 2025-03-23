@@ -129,7 +129,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final theme = Theme.of(context); // ✅ Get theme for adaptive colors
+    final theme = Theme.of(context); //  Get theme for adaptive colors
 
     return Scaffold(
       body: _isLoading
@@ -146,15 +146,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   child: Column(
                     children: [
                       const SizedBox(height: 80),
-                      // ✅ Profile Header
+                      //  Profile Header
                       _buildProfileHeader(theme),
                       const SizedBox(height: 16),
 
-                      // ✅ Dark Mode Toggle
+                      //Dark Mode Toggle
                       _buildDarkModeToggle(themeProvider, theme),
                       const SizedBox(height: 16),
 
-                      // ✅ Main Profile Options
+                      //  Main Profile Options
                       _buildOptionsContainer(theme, [
                         _buildSectionItem(
                           icon: Icons.edit,
@@ -183,7 +183,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
                       const SizedBox(height: 16),
 
-                      // ✅ Additional Options
+                      //  Additional Options
                       _buildOptionsContainer(theme, [
                         _buildSectionItem(
                           icon: Icons.emoji_events,
@@ -225,7 +225,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  // ✅ Profile Header
+  //  Profile Header
   Widget _buildProfileHeader(ThemeData theme) {
     return Column(
       children: [
@@ -257,7 +257,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  // ✅ Dark Mode Toggle
+  //  Dark Mode Toggle
   Widget _buildDarkModeToggle(ThemeProvider themeProvider, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -286,7 +286,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  // ✅ Generalized Options Container
+  //  Generalized Options Container
   Widget _buildOptionsContainer(ThemeData theme, List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
@@ -303,7 +303,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  // ✅ Section Item with Icon, Text, and Divider
+  //  Section Item with Icon, Text, and Divider
   Widget _buildSectionItem({
     required IconData icon,
     required String text,

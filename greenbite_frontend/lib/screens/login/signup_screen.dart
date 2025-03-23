@@ -20,7 +20,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _streetAddressController = TextEditingController();
   String? _selectedDistrict;
   bool termsAccepted = false;
-  bool _isLoading = false; // ✅ Loading state
+  bool _isLoading = false; //  Loading state
 
   @override
   void dispose() {
@@ -119,7 +119,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background, // ✅ Theme-based background
+      backgroundColor: theme.colorScheme.background, //  Theme-based background
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -129,13 +129,13 @@ class _SignupScreenState extends State<SignupScreen> {
 
             const SizedBox(height: 10),
 
-            // ✅ Title & Subtitle
+            //  Title & Subtitle
             Text(
               "Create an Account",
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: theme.colorScheme.primary, // ✅ Theme-based color
+                color: theme.colorScheme.primary, //  Theme-based color
               ),
             ),
             const SizedBox(height: 5),
@@ -144,13 +144,13 @@ class _SignupScreenState extends State<SignupScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.colorScheme.onSurface
-                    .withOpacity(0.7), // ✅ Theme-based color
+                    .withOpacity(0.7), //  Theme-based color
                 fontSize: 16,
               ),
             ),
             const SizedBox(height: 25),
 
-            // ✅ Name Fields
+            //  Name Fields
             _CustomTextField(
               label: "First Name",
               controller: _firstNameController,
@@ -164,7 +164,7 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
             const SizedBox(height: 10),
 
-            // ✅ Email & Username
+            //  Email & Username
             _CustomTextField(
               label: "Email",
               controller: _emailController,
@@ -178,7 +178,7 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
             const SizedBox(height: 10),
 
-            // ✅ Password Field
+            //  Password Field
             _CustomTextField(
               label: "Password",
               isPassword: true,
@@ -202,7 +202,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 filled: true,
                 fillColor: isDarkMode
                     ? Colors.grey[800]
-                    : Colors.grey[200], // ✅ Adaptive color
+                    : Colors.grey[200], //  Adaptive color
               ),
               items: ["Colombo", "Galle", "Gampaha", "Ratnapura"]
                   .map((district) => DropdownMenuItem(
@@ -211,7 +211,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           district,
                           style: TextStyle(
                             color: theme
-                                .colorScheme.onSurface, // ✅ Theme-based color
+                                .colorScheme.onSurface, // Theme-based color
                           ),
                         ),
                       ))
@@ -224,7 +224,7 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
             const SizedBox(height: 10),
 
-            // ✅ Terms & Conditions
+            //  Terms & Conditions
             Row(
               children: [
                 Checkbox(
@@ -236,14 +236,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   },
                   fillColor: MaterialStateProperty.resolveWith<Color>(
                     (states) =>
-                        theme.colorScheme.primary, // ✅ Theme-based color
+                        theme.colorScheme.primary, //  Theme-based color
                   ),
                 ),
                 Expanded(
                   child: Text(
                     "I accept all terms and conditions",
                     style: TextStyle(
-                      color: theme.colorScheme.onSurface, // ✅ Theme-based color
+                      color: theme.colorScheme.onSurface, //  Theme-based color
                     ),
                   ),
                 ),
@@ -251,16 +251,16 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
             const SizedBox(height: 15),
 
-            // ✅ Signup Button
+            //  Signup Button
             _isLoading
                 ? const CircularProgressIndicator()
                 : _CustomButton(
                     text: "Continue",
                     onPressed: _validateAndProceed,
                     backgroundColor:
-                        theme.colorScheme.primary, // ✅ Theme-based color
+                        theme.colorScheme.primary, //  Theme-based color
                     textColor:
-                        theme.colorScheme.onPrimary, // ✅ Theme-based color
+                        theme.colorScheme.onPrimary, //  Theme-based color
                     shadow: true,
                   ),
             const SizedBox(height: 15),
@@ -271,7 +271,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 }
 
-/// ✅ **Custom Text Field**
+///  **Custom Text Field**
 class _CustomTextField extends StatelessWidget {
   final String label;
   final bool isPassword;
@@ -294,27 +294,27 @@ class _CustomTextField extends StatelessWidget {
       controller: controller,
       obscureText: isPassword,
       style:
-          TextStyle(color: theme.colorScheme.onSurface), // ✅ Theme-based color
+          TextStyle(color: theme.colorScheme.onSurface), //  Theme-based color
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(
             color: theme.colorScheme.onSurface
-                .withOpacity(0.7)), // ✅ Theme-based color
+                .withOpacity(0.7)), //  Theme-based color
         prefixIcon: prefixIcon != null
             ? Icon(prefixIcon,
-                color: theme.colorScheme.primary) // ✅ Theme-based color
+                color: theme.colorScheme.primary) //  Theme-based color
             : null,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
         fillColor: isDarkMode
             ? Colors.grey[800]
-            : Colors.grey[200], // ✅ Adaptive color
+            : Colors.grey[200], //  Adaptive color
       ),
     );
   }
 }
 
-/// ✅ **Custom Button**
+///  **Custom Button**
 class _CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;

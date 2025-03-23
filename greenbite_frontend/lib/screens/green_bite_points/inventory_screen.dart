@@ -56,7 +56,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   })
               .toList()
               .reversed
-              .toList(); // ✅ Most recent coupons appear at the top
+              .toList(); //  Most recent coupons appear at the top
         });
       } else {
         _showSnackBar("Failed to fetch inventory: ${response.body}");
@@ -105,26 +105,26 @@ class _InventoryScreenState extends State<InventoryScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface, // ✅ Theme-based background
+      backgroundColor: theme.colorScheme.surface, //  Theme-based background
       appBar: AppBar(
         title: Text(
           "My Inventory",
           style: TextStyle(
-            color: theme.colorScheme.onSurface, // ✅ Adaptive text color
+            color: theme.colorScheme.onSurface, // Adaptive text color
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.transparent, // ✅ Transparent AppBar
-        elevation: 0, // ✅ Remove shadow
+        backgroundColor: Colors.transparent, //  Transparent AppBar
+        elevation: 0, //  Remove shadow
         iconTheme: IconThemeData(
-          color: theme.colorScheme.onSurface, // ✅ Icons adapt to theme
+          color: theme.colorScheme.onSurface, //  Icons adapt to theme
         ),
         actions: [
           IconButton(
             icon: Icon(
               Icons.refresh,
-              color: theme.colorScheme.onSurface, // ✅ Action icons adapt
+              color: theme.colorScheme.onSurface, //  Action icons adapt
             ),
             onPressed: _fetchInventory,
           ),
@@ -133,7 +133,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       body: isLoading
           ? Center(
               child: CircularProgressIndicator(
-                color: theme.colorScheme.primary, // ✅ Theme-based color
+                color: theme.colorScheme.primary, //  Theme-based color
               ),
             )
           : inventoryItems.isEmpty
@@ -142,7 +142,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     "No items in inventory",
                     style: TextStyle(
                       fontSize: 18,
-                      color: theme.colorScheme.onSurface, // ✅ Theme-based color
+                      color: theme.colorScheme.onSurface, // Theme-based color
                     ),
                   ),
                 )
@@ -170,7 +170,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: theme.colorScheme.surface, // ✅ Theme-based card background
+      color: theme.colorScheme.surface, //  Theme-based card background
       child: ListTile(
         leading: Icon(
           _getIcon(icon),
@@ -182,7 +182,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: theme.colorScheme.onSurface, // ✅ Theme-based text color
+            color: theme.colorScheme.onSurface, //  Theme-based text color
           ),
         ),
         subtitle: Text(
@@ -190,25 +190,25 @@ class _InventoryScreenState extends State<InventoryScreen> {
           style: TextStyle(
             fontSize: 14,
             color: theme.colorScheme.onSurface
-                .withOpacity(0.7), // ✅ Theme-based text color
+                .withOpacity(0.7), // Theme-based text color
           ),
         ),
         trailing: redeemed
             ? Icon(
                 Icons.check_circle,
-                color: theme.colorScheme.primary, // ✅ Theme-based color
+                color: theme.colorScheme.primary, //  Theme-based color
               )
             : ElevatedButton(
                 onPressed: () => _redeemCoupon(couponCode),
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                      theme.colorScheme.error, // ✅ Theme-based color
+                      theme.colorScheme.error, //  Theme-based color
                 ),
                 child: Text(
                   "Redeem",
                   style: TextStyle(
                     color:
-                        theme.colorScheme.onError, // ✅ Theme-based text color
+                        theme.colorScheme.onError, //  Theme-based text color
                   ),
                 ),
               ),

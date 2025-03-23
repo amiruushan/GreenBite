@@ -68,7 +68,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface, // ✅ Theme-based background
+      backgroundColor: theme.colorScheme.surface, //  Theme-based background
       body: Stack(
         children: [
           // PageView for onboarding screens
@@ -100,7 +100,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: theme
-                            .colorScheme.onSurface, // ✅ Adaptive text color
+                            .colorScheme.onSurface, //  Adaptive text color
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -113,7 +113,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         style: TextStyle(
                           fontSize: 16,
                           color: theme.colorScheme.onSurface
-                              .withOpacity(0.8), // ✅ Adaptive text color
+                              .withOpacity(0.8), //  Adaptive text color
                           height: 1.5,
                         ),
                         textAlign: TextAlign.center,
@@ -136,7 +136,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   color:
-                      theme.colorScheme.onSurface, // ✅ Adaptive text color
+                      theme.colorScheme.onSurface, //  Adaptive text color
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -159,9 +159,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   height: 8,
                   decoration: BoxDecoration(
                     color: _currentIndex == index
-                        ? theme.colorScheme.primary // ✅ Adaptive color
+                        ? theme.colorScheme.primary //  Adaptive color
                         : theme.colorScheme.onSurface
-                            .withOpacity(0.3), // ✅ Adaptive color
+                            .withOpacity(0.3), //  Adaptive color
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -177,7 +177,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: ElevatedButton(
               onPressed: _nextPage,
               style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary, // ✅ Adaptive color
+                backgroundColor: theme.colorScheme.primary, //  Adaptive color
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -190,7 +190,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onPrimary, // ✅ Adaptive text color
+                  color: theme.colorScheme.onPrimary, //  Adaptive text color
                 ),
               ),
             ),
