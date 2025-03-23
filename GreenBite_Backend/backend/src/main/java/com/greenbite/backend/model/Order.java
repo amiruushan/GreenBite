@@ -25,6 +25,8 @@ public class Order {
     private float totalAmount;
     private float totalCalories;
     private LocalDateTime orderDate;
+    private double latitude; // Add latitude
+    private double longitude; // Add longitude
 
     @Column(columnDefinition = "TEXT") // Store JSON as text
     private String orderedItemsJson;
