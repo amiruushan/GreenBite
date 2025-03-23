@@ -14,7 +14,9 @@ public class GcsConfig {
     public Storage storage() throws IOException {
         // Load the service account key file
         GoogleCredentials credentials = GoogleCredentials.fromStream(
-            new FileInputStream("/Users/gesithbimsara/Documents/Degree/2nd Year/json/gleaming-orbit-453215-j2-3c2c20f90023.json")
+
+            new FileInputStream("D:/IIT Second Year/Green Bite/gleaming-orbit-453215-j2-3c2c20f90023.json")
+
         );
 
         return StorageOptions.newBuilder()
