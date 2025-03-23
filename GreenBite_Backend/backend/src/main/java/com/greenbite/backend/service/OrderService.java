@@ -90,4 +90,14 @@ public class OrderService {
                 .mapToDouble(Order::getTotalCalories) // Use mapToDouble for floating-point sum
                 .sum();
     }
+
+    @Transactional
+    public Order updateOrderStatus(Long orderId, String newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        order.setStatus(newStatus);
+        return orderRepository.save(order);
+    }
+
 }
