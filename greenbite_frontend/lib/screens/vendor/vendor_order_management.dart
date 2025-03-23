@@ -113,7 +113,8 @@ class _VendorOrderManagementScreenState
             const SizedBox(height: 10),
             _buildDetailRow(
                 "Customer ID", widget.order['customerId'].toString()),
-            _buildDetailRow("Total Amount", "\$${widget.order['totalAmount']}"),
+            _buildDetailRow(
+                "Total Amount", "Rs. ${widget.order['totalAmount']}"),
             _buildDetailRow("Order Date", widget.order['orderDate'] ?? "N/A"),
             _buildDetailRow("Payment Method", widget.order['paymentMethod']),
             const SizedBox(height: 16),
@@ -135,7 +136,7 @@ class _VendorOrderManagementScreenState
                 return ListTile(
                   title: Text("Item ID: ${item['id']}"),
                   subtitle: Text(
-                      "Quantity: ${item['quantity']}, Price: \$${item['price'] ?? 'N/A'}"),
+                      "Quantity: ${item['quantity']}, Price: Rs. ${item['price'] ?? 'N/A'}"),
                 );
               },
             ),

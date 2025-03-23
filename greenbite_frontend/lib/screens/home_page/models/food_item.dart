@@ -19,7 +19,7 @@ class FoodItem {
     required this.price,
     required this.quantity,
     required this.photo,
-    required this.tags,
+    this.tags = const [], // ✅ Default to empty list
     required this.restaurant,
     required this.shopId,
     required this.category,
@@ -37,8 +37,9 @@ class FoodItem {
       photo: json['photo'],
       shopId: json['shopId'],
       tags: json['tags'] is List
-          ? List<String>.from(json['tags'])
-          : json['tags'].toString().split(','), // ✅ Convert string to list
+          ? List<String>.from(json['tags'].where((tag) =>
+              tag != null && tag.isNotEmpty)) // Filter out empty or null tags
+          : [], // Default to empty list
       restaurant: json['restaurant'] ?? 'Unknown',
       category: json['category'] ?? 'Uncategorized',
       latitude: json['latitude'] ?? 0.0, // Add latitude

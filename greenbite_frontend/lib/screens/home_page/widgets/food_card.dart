@@ -88,7 +88,7 @@ class FoodCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "\$${foodItem.price.toStringAsFixed(2)}",
+                    "Rs. ${foodItem.price.toStringAsFixed(2)}",
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
