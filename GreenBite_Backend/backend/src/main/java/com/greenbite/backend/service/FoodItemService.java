@@ -128,4 +128,24 @@ public class FoodItemService {
         // Delete the food item
         foodItemRepository.delete(foodItem);
     }
+    public FoodItemDTO updateFoodItem(FoodItemDTO foodItemDTO) {
+        FoodItem existingFoodItem = foodItemRepository.findById(foodItemDTO.getId())
+                .orElseThrow(() -> new RuntimeException("Food item not found"));
+
+        // Update fields from DTO
+        existingFoodItem.setName(foodItemDTO.getName());
+        existingFoodItem.setDescription(foodItemDTO.getDescription());
+        existingFoodItem.setPrice(foodItemDTO.getPrice());
+        existingFoodItem.setQuantity(foodItemDTO.getQuantity());
+        existingFoodItem.setCategory(foodItemDTO.getCategory());
+
+        // Convert tags list to a comma-separated string
+        String tags = String.join(",", foodItemDTO.getTags());
+        existingFoodItem.setTags(tags);
+
+        // Save updated entity
+        existingFoodItem = foodItemRepository.save(existingFoodItem);
+        return convertToDTO(existingFoodItem);
+    }
+
 }

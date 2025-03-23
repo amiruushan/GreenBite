@@ -42,7 +42,7 @@ public class FoodItemController {
 
         List<FoodItemDTO> nearbyFoodItems = foodItemService.getFoodItemsNearby(lat, lon, radius);
         System.out.println(nearbyFoodItems);
-        
+
         return nearbyFoodItems;
     }
 
@@ -68,4 +68,22 @@ public class FoodItemController {
         foodItemService.deleteFoodItem(id);
         return ResponseEntity.ok().build();
     }
+    @PutMapping("/update")
+    public ResponseEntity<FoodItemDTO> updateFoodItem(
+            @RequestPart("foodItem") String foodItemJson) throws IOException {
+
+        // Convert JSON string to DTO
+        FoodItemDTO foodItemDTO = objectMapper.readValue(foodItemJson, FoodItemDTO.class);
+
+        // Ensure the ID exists in the JSON
+        if (foodItemDTO.getId() == null) {
+            return ResponseEntity.badRequest().build(); // Return 400 Bad Request if ID is missing
+        }
+
+        // Call the service to update the food item (without an image)
+        FoodItemDTO updatedFoodItem = foodItemService.updateFoodItem(foodItemDTO);
+        return ResponseEntity.ok(updatedFoodItem);
+    }
+
 }
+
