@@ -2,6 +2,7 @@
 package com.greenbite.backend.service;
 
 import com.greenbite.backend.dto.FoodItemDTO;
+import com.greenbite.backend.dto.FoodShopDTO;
 import com.greenbite.backend.model.FoodItem;
 import com.greenbite.backend.model.FoodShop;
 import com.greenbite.backend.model.UserFavorite;
@@ -69,9 +70,14 @@ public class FoodItemService {
 
     private FoodItemDTO convertToDTO(FoodItem foodItem) {
         List<String> tagList = Arrays.asList(foodItem.getTags().split(",")); // Convert comma-separated string to list
+
+        // Fetch food shop name
+        FoodShopDTO shop = foodShopService.getFoodShopById(foodItem.getShopId());
+
         return new FoodItemDTO(
                 foodItem.getId(),
                 foodItem.getName(),
+                shop != null ? shop.getName() : null,
                 foodItem.getDescription(),
                 foodItem.getPrice(),
                 foodItem.getQuantity(),
@@ -98,10 +104,8 @@ public class FoodItemService {
     }
 
     public List<FoodItemDTO> getFoodItemsNearby(double lat, double lon, double radius) {
-        // Get nearby food shops
         List<FoodShop> nearbyShops = foodShopService.findShopsNearby(lat, lon, radius);
 
-        // Get food items from these shops
         List<FoodItem> foodItems = nearbyShops.stream()
                 .flatMap(shop -> foodItemRepository.findByShopId(shop.getId()).stream())
                 .collect(Collectors.toList());
@@ -110,6 +114,7 @@ public class FoodItemService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
 
     public void deleteFoodItem(Long id) {
         // Find the food item by ID

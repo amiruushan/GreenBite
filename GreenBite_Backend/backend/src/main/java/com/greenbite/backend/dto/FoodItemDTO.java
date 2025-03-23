@@ -12,6 +12,7 @@ import java.util.List;
 public class FoodItemDTO {
     private Long id;
     private String name;
+    private String restaurant;
     private String description;
     private Double price;
     private Integer quantity;
@@ -19,5 +20,4 @@ public class FoodItemDTO {
     private String photo;
     private List<String> tags;
     private String category; // New field for category
-
 }

@@ -39,10 +39,10 @@ public class FoodItemController {
             @PathVariable double lat,
             @PathVariable double lon,
             @PathVariable double radius) {
-        System.out.println("Item latitude: "+lat);
-        System.out.println("Item latitude: "+lon);
+
         List<FoodItemDTO> nearbyFoodItems = foodItemService.getFoodItemsNearby(lat, lon, radius);
         System.out.println(nearbyFoodItems);
+        
         return nearbyFoodItems;
     }
 
