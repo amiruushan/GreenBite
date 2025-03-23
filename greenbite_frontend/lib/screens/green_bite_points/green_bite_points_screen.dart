@@ -74,26 +74,26 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
     double progress = (normalPoints / npGoal).clamp(0.0, 1.0);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface, // ✅ Theme-based background
+      backgroundColor: theme.colorScheme.surface, // Theme-based background
       appBar: AppBar(
         title: Text(
           "Green Bite Points",
           style: TextStyle(
-            color: theme.colorScheme.onSurface, // ✅ Adaptive text color
+            color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.transparent, // ✅ Transparent AppBar
-        elevation: 0, // ✅ Remove shadow
+        backgroundColor: Colors.transparent, //  Transparent AppBar
+        elevation: 0, // Remove shadow
         iconTheme: IconThemeData(
-          color: theme.colorScheme.onSurface, // ✅ Icons adapt to theme
+          color: theme.colorScheme.onSurface, //  Icons adapt to theme
         ),
         actions: [
           IconButton(
             icon: Icon(
               Icons.refresh,
-              color: theme.colorScheme.onSurface, // ✅ Action icons adapt
+              color: theme.colorScheme.onSurface, //  Action icons adapt
             ),
             onPressed: _fetchPoints,
           ),
@@ -102,7 +102,7 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
       body: isLoading
           ? Center(
               child: CircularProgressIndicator(
-                color: theme.colorScheme.primary, // ✅ Theme-based color
+                color: theme.colorScheme.primary, //  Theme-based color
               ),
             )
           : SingleChildScrollView(
@@ -134,7 +134,7 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: theme.colorScheme.onSurface, // ✅ Adaptive text color
+            color: theme.colorScheme.onSurface, //  Adaptive text color
           ),
         ),
         const SizedBox(height: 5),
@@ -144,7 +144,7 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
           style: TextStyle(
             fontSize: 14,
             color: theme.colorScheme.onSurface
-                .withOpacity(0.7), // ✅ Adaptive text color
+                .withOpacity(0.7), //  Adaptive text color
           ),
         ),
       ],
@@ -171,7 +171,7 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20.0,
-                    color: theme.colorScheme.primary, // ✅ Theme-based color
+                    color: theme.colorScheme.primary, //  Theme-based color
                   ),
                 ),
                 const SizedBox(height: 5),
@@ -180,14 +180,14 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     color: theme.colorScheme.onSurface
-                        .withOpacity(0.7), // ✅ Adaptive text color
+                        .withOpacity(0.7), //  Adaptive text color
                   ),
                 ),
               ],
             ),
-            progressColor: theme.colorScheme.primary, // ✅ Theme-based color
+            progressColor: theme.colorScheme.primary, //  Theme-based color
             backgroundColor:
-                theme.colorScheme.surfaceContainerHighest, // ✅ Theme-based color
+                theme.colorScheme.surfaceContainerHighest, //  Theme-based color
             circularStrokeCap: CircularStrokeCap.round,
           ),
           const SizedBox(height: 15),
@@ -196,7 +196,7 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: theme.colorScheme.onSurface, // ✅ Adaptive text color
+              color: theme.colorScheme.onSurface, //  Adaptive text color
             ),
           ),
         ],
@@ -217,7 +217,7 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: theme.colorScheme.onSurface
-                  .withOpacity(0.7), // ✅ Adaptive text color
+                  .withOpacity(0.7), //  Adaptive text color
             ),
           ),
           const SizedBox(height: 10),
@@ -226,7 +226,7 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.primary, // ✅ Theme-based color
+              color: theme.colorScheme.primary, //  Theme-based color
             ),
           ),
         ],
@@ -238,16 +238,16 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
     return ElevatedButton.icon(
       icon: Icon(
         Icons.store,
-        color: theme.colorScheme.onPrimary, // ✅ Theme-based color
+        color: theme.colorScheme.onPrimary, //  Theme-based color
       ),
       label: Text(
         "Go to Green Bite Shop",
         style: TextStyle(
-          color: theme.colorScheme.onPrimary, // ✅ Theme-based color
+          color: theme.colorScheme.onPrimary, //  Theme-based color
         ),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: theme.colorScheme.primary, // ✅ Theme-based color
+        backgroundColor: theme.colorScheme.primary, //  Theme-based color
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
         elevation: 5,
@@ -273,7 +273,7 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onSurface, // ✅ Adaptive text color
+              color: theme.colorScheme.onSurface, //  Adaptive text color
             ),
           ),
           const SizedBox(height: 10),
@@ -294,7 +294,7 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
         children: [
           Icon(
             Icons.check_circle,
-            color: theme.colorScheme.primary, // ✅ Theme-based color
+            color: theme.colorScheme.primary, // Theme-based color
             size: 18,
           ),
           const SizedBox(width: 8),
@@ -303,7 +303,7 @@ class _GreenBitePointsScreenState extends State<GreenBitePointsScreen> {
             style: TextStyle(
               fontSize: 14,
               color: theme.colorScheme.onSurface
-                  .withOpacity(0.7), // ✅ Adaptive text color
+                  .withOpacity(0.7), //  Adaptive text color
             ),
           ),
         ],
