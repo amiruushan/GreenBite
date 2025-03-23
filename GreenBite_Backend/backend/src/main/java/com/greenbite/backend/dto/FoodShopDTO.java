@@ -9,6 +9,7 @@ import java.time.LocalDate;
 @Data
 @Getter
 @Setter
+
 public class FoodShopDTO {
     private Long shopId;
     private String name;
@@ -46,6 +47,17 @@ public class FoodShopDTO {
         this.latitude = latitude;
         this.longitude = longitude;
         this.licenseExpirationDate=licenseExpirationDate;
+    }
+    public FoodShopDTO(Long shopId, String name, String photo, String address, String phoneNumber, double latitude, double longitude, LocalDate licenseExpirationDate,String businessDescription) {
+        this.shopId = shopId;
+        this.name = name;
+        this.photo = photo;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.licenseExpirationDate=licenseExpirationDate;
+        this.businessDescription=businessDescription;
     }
 }
 

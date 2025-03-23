@@ -19,6 +19,5 @@ public class FoodItemDTO {
     private String photo;
     private List<String> tags;
     private String category; // New field for category
-    private double latitude; // Add latitude field
-    private double longitude; // Add longitude field
+
 }

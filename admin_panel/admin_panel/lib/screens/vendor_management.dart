@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../widgets/common_layout.dart'; // Import the CommonLayout
 
 class VendorManagement extends StatefulWidget {
-  const VendorManagement({super.key});
+  const VendorManagement({Key? key}) : super(key: key);
 
   @override
   _VendorManagementState createState() => _VendorManagementState();
@@ -25,7 +26,7 @@ class _VendorManagementState extends State<VendorManagement> {
   // Function to fetch vendors from the backend
   Future<void> _fetchVendors() async {
     final response = await http.get(
-      Uri.parse('http://127.0.0.1:8080/api/admin/listFoodShops'),
+      Uri.parse('http://10.190.13.69:8080/api/admin/listFoodShops'),
     );
 
     if (response.statusCode == 200) {
@@ -42,11 +43,11 @@ class _VendorManagementState extends State<VendorManagement> {
   @override
   Widget build(BuildContext context) {
     final filteredVendors = _vendors.where((vendor) {
-      final name = vendor['name']?.toLowerCase() ?? '';
-      final address = vendor['address']?.toLowerCase() ?? '';
-      final email = vendor['email']?.toLowerCase() ?? '';
+      final name = vendor['name']?.toString().toLowerCase() ?? '';
+      final address = vendor['address']?.toString().toLowerCase() ?? '';
+      final email = vendor['email']?.toString().toLowerCase() ?? '';
       final businessDescription =
-          vendor['businessDescription']?.toLowerCase() ?? '';
+          vendor['businessDescription']?.toString().toLowerCase() ?? '';
 
       return name.contains(_searchQuery.toLowerCase()) ||
           address.contains(_searchQuery.toLowerCase()) ||
@@ -54,111 +55,80 @@ class _VendorManagementState extends State<VendorManagement> {
           businessDescription.contains(_searchQuery.toLowerCase());
     }).toList();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Vendor Management"),
-        backgroundColor: const Color(0xFF87F031), // Green color
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildHeader(),
-            const SizedBox(height: 16),
-            _buildSearchAndEntriesRow(),
-            const SizedBox(height: 16),
-            Expanded(child: _buildVendorTable(filteredVendors)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Icon(Icons.store, color: const Color(0xFF87F031)), // Green color
-            const SizedBox(width: 8),
-            Text(
-              "Vendor List",
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF87F031)), // Green color
-            ),
-          ],
-        ),
-        const Text("Welcome!", style: TextStyle(fontSize: 16)),
-      ],
-    );
-  }
-
-  Widget _buildSearchAndEntriesRow() {
-    return Row(
-      children: [
-        DropdownButton<int>(
-          value: _entriesPerPage,
-          items: [10, 25, 50]
-              .map((value) =>
-                  DropdownMenuItem(value: value, child: Text("$value entries")))
-              .toList(),
-          onChanged: (value) => setState(() => _entriesPerPage = value ?? 10),
-        ),
-        const Spacer(),
-        SizedBox(
-          width: 200,
-          child: TextField(
-            onChanged: (query) => setState(() => _searchQuery = query),
-            decoration: InputDecoration(
-              hintText: 'Search...',
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+    return CommonLayout(
+      title: 'Vendor Management', // Title for the TopNavBar
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: TextEditingController(text: _searchQuery),
+              decoration: InputDecoration(
+                labelText: 'Search by Name, Address, or Email',
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () {
+                    setState(() {
+                      // Trigger search when the search icon is pressed
+                    });
+                  },
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+              onChanged: (query) {
+                setState(() {
+                  _searchQuery = query;
+                });
+              },
             ),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildVendorTable(List<Map<String, dynamic>> vendors) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        headingRowColor: WidgetStateProperty.all(Colors.grey.shade200),
-        columns: const [
-          DataColumn(label: Text("Shop ID")),
-          DataColumn(label: Text("Profile Photo")),
-          DataColumn(label: Text("Name")),
-          DataColumn(label: Text("Address")),
-          DataColumn(label: Text("Email")),
-          DataColumn(label: Text("Business Description")),
-          DataColumn(label: Text("Actions")), // Add Actions column
+          Expanded(
+            child: filteredVendors.isEmpty
+                ? Center(
+              child: Text("No vendors found."),
+            )
+                : SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                headingRowColor: MaterialStateProperty.all(Colors.grey.shade200),
+                columns: const [
+                  DataColumn(label: Text('Shop ID')),
+                  DataColumn(label: Text('Profile Photo')),
+                  DataColumn(label: Text('Name')),
+                  DataColumn(label: Text('Address')),
+                  DataColumn(label: Text('Email')),
+                  DataColumn(label: Text('Business Description')),
+                  DataColumn(label: Text('Actions')),
+                ],
+                rows: filteredVendors
+                    .take(_entriesPerPage)
+                    .map((vendor) => _buildDataRow(vendor))
+                    .toList(),
+              ),
+            ),
+          ),
         ],
-        rows: vendors
-            .take(_entriesPerPage)
-            .map((vendor) => _buildDataRow(vendor))
-            .toList(),
       ),
     );
   }
 
   DataRow _buildDataRow(Map<String, dynamic> vendor) {
     return DataRow(cells: [
-      DataCell(Text(vendor['shopId'].toString())),
+      DataCell(Text(vendor['shopId'].toString())), // Shop ID is guaranteed to be non-null
       DataCell(
-        CircleAvatar(
-          backgroundImage: NetworkImage(vendor['photo'] ?? ''),
-        ),
+        vendor['photo'] != null && vendor['photo'].isNotEmpty
+            ? CircleAvatar(
+          backgroundImage: NetworkImage(vendor['photo']),
+        )
+            : Text("No photo"), // Handle null or empty photo
       ),
-      DataCell(Text(vendor['name'] ?? 'N/A')),
-      DataCell(Text(vendor['address'] ?? 'N/A')),
-      DataCell(Text(vendor['email'] ?? 'N/A')),
-      DataCell(Text(vendor['businessDescription'] ?? 'N/A')),
-      DataCell(_buildActionButtons(vendor)), // Add action buttons
+      DataCell(Text(vendor['name']?.toString() ?? "N/A")), // Handle null name
+      DataCell(Text(vendor['address']?.toString() ?? "N/A")), // Handle null address
+      DataCell(Text(vendor['email']?.toString() ?? "N/A")), // Handle null email
+      DataCell(Text(vendor['businessDescription']?.toString() ?? "N/A")), // Handle null businessDescription
+      DataCell(_buildActionButtons(vendor)),
     ]);
   }
 
@@ -166,13 +136,11 @@ class _VendorManagementState extends State<VendorManagement> {
     return Row(
       children: [
         IconButton(
-          icon: const Icon(Icons.delete,
-              color: Color(0xFF87F031)), // Green color
+          icon: Icon(Icons.delete, color: Colors.red),
           onPressed: () => _confirmDelete(vendor),
         ),
         IconButton(
-          icon: const Icon(Icons.block,
-              color: Color(0xFF87F031)), // Green color
+          icon: Icon(Icons.block, color: Colors.orange),
           onPressed: () => _toggleVendorStatus(vendor),
         ),
       ],
@@ -183,15 +151,13 @@ class _VendorManagementState extends State<VendorManagement> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text("Confirm Delete"),
-        content: const Text(
+        title: Text("Confirm Delete"),
+        content: Text(
             "Are you sure you want to delete this vendor? This action cannot be undone."),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel",
-                style:
-                    TextStyle(color: Color(0xFF87F031))), // Green color
+            child: Text("Cancel", style: TextStyle(color: Colors.green)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -206,9 +172,9 @@ class _VendorManagementState extends State<VendorManagement> {
               Navigator.pop(context); // Close the dialog
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF87F031), // Green color
+              backgroundColor: Colors.green,
             ),
-            child: const Text("Delete"),
+            child: Text("Delete"),
           ),
         ],
       ),
@@ -219,7 +185,7 @@ class _VendorManagementState extends State<VendorManagement> {
   Future<bool> _deleteVendor(int shopId) async {
     try {
       final response = await http.delete(
-        Uri.parse('http://127.0.0.1:8080/api/admin/deleteFoodShop/$shopId'),
+        Uri.parse('http://10.190.13.69:8080/api/admin/deleteFoodShop/$shopId'),
       );
 
       if (response.statusCode == 200) {
@@ -242,6 +208,6 @@ class _VendorManagementState extends State<VendorManagement> {
     // Since the backend response does not include a "status" field,
     // this function can be updated to send a request to the backend
     // to toggle the vendor's status (e.g., active/inactive).
-    print("Toggle status for vendor: ${vendor['name']}");
+    print("Toggle status for vendor: ${vendor['name'] ?? 'N/A'}");
   }
 }

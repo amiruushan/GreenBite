@@ -56,9 +56,10 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
-  void _applyDiscount(String couponCode, double discount) {
+  void _applyDiscount(String couponCode, double discount, String dealName) {
     final cartProvider = context.read<CartProvider>();
-    cartProvider.applyCoupon(couponCode, discount);
+    cartProvider.applyCoupon(
+        couponCode, discount, dealName); // Pass the deal name
     _fetchInventoryCoupons(); // Refresh available coupons
   }
 
@@ -227,7 +228,8 @@ class _CartScreenState extends State<CartScreen> {
           if (couponCode != null) {
             var selected = inventoryCoupons
                 .firstWhere((item) => item['coupon_code'] == couponCode);
-            _applyDiscount(couponCode, selected['discount']);
+            _applyDiscount(couponCode, selected['discount'],
+                selected['deal_name']); // Pass the deal name
           }
         },
       ),

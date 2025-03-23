@@ -35,7 +35,7 @@ public class OrderService {
             // Convert items to JSON (only saving id and quantity)
             String orderedItemsJson = objectMapper.writeValueAsString(
                     orderDTO.getItems().stream()
-                            .map(itemDTO -> Map.of("id", itemDTO.getId(), "quantity", itemDTO.getQuantity(),"price", itemDTO.getPrice()))
+                            .map(itemDTO -> Map.of("id", itemDTO.getId(), "quantity", itemDTO.getQuantity(), "price", itemDTO.getPrice()))
                             .collect(Collectors.toList())
             );
 
@@ -48,15 +48,32 @@ public class OrderService {
             }
 
             // Create and save order
-            Order order = new Order(null, orderDTO.getCustomerId(), orderDTO.getShopId(),
-                    orderDTO.getPaymentMethod(), "pending",
-                    orderDTO.getTotalAmount(), orderDTO.getTotalCalories(),
-                    LocalDateTime.now(),orderedItemsJson);
+            LocalDateTime orderDate = orderDTO.getOrderDate() != null ? orderDTO.getOrderDate() : LocalDateTime.now();
+            Order order = new Order(
+                    null,
+                    orderDTO.getCustomerId(),
+                    orderDTO.getShopId(),
+                    orderDTO.getPaymentMethod(),
+                    "pending",
+                    orderDTO.getTotalAmount(),
+                    orderDTO.getTotalCalories(),
+                    orderDate,
+                    orderDTO.getLatitude(),
+                    orderDTO.getLongitude(),
+                    orderedItemsJson
+            );
 
             return orderRepository.save(order);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error converting food items to JSON", e);
         }
+    }
+    public Order getLatestOrder() {
+        Order order = orderRepository.findTopByOrderByOrderDateDesc();
+        if (order == null) {
+            throw new RuntimeException("No orders found.");
+        }
+        return order;
     }
 
     public List<Order> getOrdersByShopId(Long shopId) {
@@ -73,4 +90,14 @@ public class OrderService {
                 .mapToDouble(Order::getTotalCalories) // Use mapToDouble for floating-point sum
                 .sum();
     }
+
+    @Transactional
+    public Order updateOrderStatus(Long orderId, String newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        order.setStatus(newStatus);
+        return orderRepository.save(order);
+    }
+
 }

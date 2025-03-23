@@ -10,9 +10,13 @@ class UserProfileService {
   // ✅ Fetch User Profile
   static Future<UserProfile> fetchUserProfile() async {
     try {
+      int? userId = await AuthService.getUserId(); // Retrieve user ID
+      if (userId == null) {
+        print("No user ID found");
+      }
       // Replace with your actual API endpoint
       final response = await http.get(
-        Uri.parse('${Config.apiBaseUrl}/api/users/1'),
+        Uri.parse('${Config.apiBaseUrl}/api/users/$userId'),
         headers: {
           "Authorization": "Bearer ${await AuthService.getToken()}",
         },
@@ -25,7 +29,8 @@ class UserProfileService {
         final Map<String, dynamic> data = json.decode(response.body);
         return UserProfile.fromJson(data);
       } else {
-        throw Exception('Failed to load user profile. Status: ${response.statusCode}');
+        throw Exception(
+            'Failed to load user profile. Status: ${response.statusCode}');
       }
     } catch (e) {
       print("Error fetching user profile: $e");
@@ -33,9 +38,7 @@ class UserProfileService {
     }
   }
 
-
-
-static Future<bool> updateUserProfile(
+  static Future<bool> updateUserProfile(
       UserProfile updatedProfile, File? imageFile) async {
     try {
       String? token = await AuthService.getToken(); // Retrieve token

@@ -47,6 +47,7 @@ dependencies:
   google_maps_flutter: ^2.11.0
   flutter_google_maps_webservices: ^1.1.1
   url_launcher: ^6.1.7 # Add url_launcher dependency
+  geocoding: ^3.0.0
 
 dev_dependencies:
   flutter_test:

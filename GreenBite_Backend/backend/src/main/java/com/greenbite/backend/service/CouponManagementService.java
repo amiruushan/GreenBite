@@ -31,7 +31,7 @@ public class CouponManagementService {
 
         for (CouponManagement item : couponItems) {
             Map<String, Object> map = new HashMap<>();
-            map.put("coupon_name", item.getCoupon().getTitle());
+            map.put("deal_name", item.getCoupon().getTitle()); // Map to "deal_name" instead of "coupon_name"
             map.put("coupon_code", item.getCouponCode());
             map.put("discount", item.getDiscount());
             map.put("redeemed", !item.isActive());
@@ -41,7 +41,6 @@ public class CouponManagementService {
     }
 
     public void purchaseCoupon(Long userId, Long couponId, String couponCode) {
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 

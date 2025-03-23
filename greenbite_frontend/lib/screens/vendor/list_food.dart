@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'dart:io'; // For File class
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/screens/vendor/vendor_sales.dart';
 import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart'; // For image picking
 import '../../config.dart';
 import '../../widgets/vendor_nav_bar.dart';
 import 'vendor_home.dart';
-import 'orders.dart';
 import 'vendor_profile.dart';
 
 class ListFood extends StatefulWidget {
@@ -55,7 +55,7 @@ class _ListFoodState extends State<ListFood> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => Orders(shopId: widget.shopId),
+          builder: (context) => VendorSalesPage(shopId: widget.shopId),
         ),
       );
     } else if (index == 3) {
@@ -143,7 +143,8 @@ class _ListFoodState extends State<ListFood> {
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Failed to add food item. Please try again.")),
+          const SnackBar(
+              content: Text("Failed to add food item. Please try again.")),
         );
       }
     } catch (e) {
@@ -162,16 +163,20 @@ class _ListFoodState extends State<ListFood> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Add Product",
+        title: Text(
+          "GreenBite",
           style: TextStyle(
-            color: Colors.white,
             fontSize: 30,
             fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.green,
           ),
         ),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 117, 237, 123),
+        backgroundColor: Colors.transparent, // Make AppBar transparent
+        elevation: 0, // Remove elevation
+        iconTheme: IconThemeData(
+          color: isDarkMode ? Colors.white : Colors.green, // Match icon color
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -181,66 +186,82 @@ class _ListFoodState extends State<ListFood> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Image Upload Section
-              GestureDetector(
-                onTap: () {
-                  // Show a dialog to choose between gallery and camera
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text("Choose Image Source"),
-                        content: SingleChildScrollView(
-                          child: ListBody(
-                            children: <Widget>[
-                              ListTile(
-                                leading: const Icon(Icons.photo_library),
-                                title: const Text("Gallery"),
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  _pickImage(ImageSource.gallery);
-                                },
-                              ),
-                              ListTile(
-                                leading: const Icon(Icons.camera_alt),
-                                title: const Text("Camera"),
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  _pickImage(ImageSource.camera);
-                                },
-                              ),
-                            ],
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: InkWell(
+                  onTap: () {
+                    // Show a dialog to choose between gallery and camera
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Choose Image Source"),
+                          content: SingleChildScrollView(
+                            child: ListBody(
+                              children: <Widget>[
+                                ListTile(
+                                  leading: const Icon(Icons.photo_library),
+                                  title: const Text("Gallery"),
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    _pickImage(ImageSource.gallery);
+                                  },
+                                ),
+                                ListTile(
+                                  leading: const Icon(Icons.camera_alt),
+                                  title: const Text("Camera"),
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    _pickImage(ImageSource.camera);
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  );
-                },
-                child: Container(
-                  width: double.infinity,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: _imageFile != null
-                      ? ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(_imageFile!, fit: BoxFit.cover),
-                  )
-                      : const Center(
-                    child: Icon(Icons.add_a_photo_rounded,
-                        size: 50, color: Colors.grey),
+                        );
+                      },
+                    );
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: _imageFile != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.file(_imageFile!, fit: BoxFit.cover),
+                          )
+                        : Center(
+                            child: Icon(
+                              Icons.add_a_photo_rounded,
+                              size: 50,
+                              color:
+                                  isDarkMode ? Colors.grey[400] : Colors.grey,
+                            ),
+                          ),
                   ),
                 ),
               ),
               const SizedBox(height: 20),
 
               // Food Name
+              _buildSectionTitle("Food Name"),
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: "Food Name",
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: "Enter food name",
+                  filled: true,
+                  fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -252,11 +273,17 @@ class _ListFoodState extends State<ListFood> {
               const SizedBox(height: 16),
 
               // Description
+              _buildSectionTitle("Description"),
               TextFormField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: "Description",
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: "Enter food description",
+                  filled: true,
+                  fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
                 maxLines: 3,
                 validator: (value) {
@@ -268,52 +295,90 @@ class _ListFoodState extends State<ListFood> {
               ),
               const SizedBox(height: 16),
 
-              // Price
-              TextFormField(
-                controller: _priceController,
-                decoration: const InputDecoration(
-                  labelText: "Price",
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter the price";
-                  }
-                  if (double.tryParse(value) == null) {
-                    return "Please enter a valid price";
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // Quantity
-              TextFormField(
-                controller: _quantityController,
-                decoration: const InputDecoration(
-                  labelText: "Quantity",
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter the quantity";
-                  }
-                  if (int.tryParse(value) == null) {
-                    return "Please enter a valid quantity";
-                  }
-                  return null;
-                },
+              // Price and Quantity
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionTitle("Price"),
+                        TextFormField(
+                          controller: _priceController,
+                          decoration: InputDecoration(
+                            hintText: "Enter price",
+                            filled: true,
+                            fillColor: isDarkMode
+                                ? Colors.grey[800]
+                                : Colors.grey[200],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Please enter the price";
+                            }
+                            if (double.tryParse(value) == null) {
+                              return "Please enter a valid price";
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionTitle("Quantity"),
+                        TextFormField(
+                          controller: _quantityController,
+                          decoration: InputDecoration(
+                            hintText: "Enter quantity",
+                            filled: true,
+                            fillColor: isDarkMode
+                                ? Colors.grey[800]
+                                : Colors.grey[200],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Please enter the quantity";
+                            }
+                            if (int.tryParse(value) == null) {
+                              return "Please enter a valid quantity";
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
 
               // Tags
+              _buildSectionTitle("Tags"),
               TextFormField(
                 controller: _tagsController,
-                decoration: const InputDecoration(
-                  labelText: "Tags (comma-separated)",
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: "Enter tags (comma-separated)",
+                  filled: true,
+                  fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -325,11 +390,17 @@ class _ListFoodState extends State<ListFood> {
               const SizedBox(height: 16),
 
               // Category Dropdown
+              _buildSectionTitle("Category"),
               DropdownButtonFormField<String>(
                 value: _selectedCategory,
-                decoration: const InputDecoration(
-                  labelText: "Category",
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: "Select category",
+                  filled: true,
+                  fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
                 items: _categories.map((String category) {
                   return DropdownMenuItem<String>(
@@ -359,13 +430,16 @@ class _ListFoodState extends State<ListFood> {
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   child: _isSaving
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text(
-                    "Add Food Item",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
+                          "Add Food Item",
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        ),
                 ),
               ),
             ],
@@ -376,6 +450,20 @@ class _ListFoodState extends State<ListFood> {
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
         shopId: widget.shopId,
+      ),
+    );
+  }
+
+  // Helper method to build section titles
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

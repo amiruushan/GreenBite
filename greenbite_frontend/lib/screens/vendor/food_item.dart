@@ -115,8 +115,7 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -152,7 +151,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(
@@ -161,7 +159,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
               ),
             ),
             const SizedBox(height: 16),
-
             TextFormField(
               controller: _descriptionController,
               decoration: const InputDecoration(
@@ -171,7 +168,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
               maxLines: 3,
             ),
             const SizedBox(height: 16),
-
             TextFormField(
               controller: _priceController,
               decoration: const InputDecoration(
@@ -181,7 +177,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 16),
-
             TextFormField(
               controller: _quantityController,
               decoration: const InputDecoration(
@@ -191,7 +186,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 16),
-
             TextFormField(
               controller: _tagsController,
               decoration: const InputDecoration(
@@ -200,7 +194,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
               ),
             ),
             const SizedBox(height: 16),
-
             DropdownButtonFormField<String>(
               value: _selectedCategory,
               decoration: const InputDecoration(
@@ -228,7 +221,6 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
               },
             ),
             const SizedBox(height: 20),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

@@ -48,12 +48,8 @@ public class FoodShopController {
             @RequestParam double lat,
             @RequestParam double lon,
             @RequestParam(defaultValue = "5") double radius) {
-        System.out.println("Lattitude: "+lat+" Longtitude: "+lon);
-        radius = 5000000;
-        //lat=6.032894799999999;
-        //lon=80.2167912;
-        System.out.println("nearby food shops");
-
+        System.out.println("Shop latitude: "+lat);
+        System.out.println("Shop latitude: "+lon);
         List<FoodShop> nearbyShops = foodShopService.findShopsNearby(lat, lon, radius);
 
         // Print the returned values
@@ -61,4 +57,6 @@ public class FoodShopController {
 
         return nearbyShops;
     }
+
+
 }
