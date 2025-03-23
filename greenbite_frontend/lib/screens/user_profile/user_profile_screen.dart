@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/checkout_page/order_history_screen.dart';
+import 'package:greenbite_frontend/screens/login/login_screen.dart';
+import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:url_launcher/url_launcher.dart'; // Import url_launcher
 import 'package:greenbite_frontend/screens/green_bite_points/green_bite_shop.dart';
 import 'package:greenbite_frontend/screens/user_profile/about_us_screen.dart';
@@ -64,11 +66,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
-  void _signOut() {
-    print("User signed out");
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Signed out successfully!")),
-    );
+  void _signOut() async {
+    try {
+      await AuthService.removeToken(); // Clear token & user data
+
+      // Navigate to login screen and remove all previous routes
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+        (route) => false, // Remove all routes
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to sign out: $e")),
+      );
+    }
   }
 
   void _switchToVendor() {

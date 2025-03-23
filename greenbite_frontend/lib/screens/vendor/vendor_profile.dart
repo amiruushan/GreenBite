@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
+import 'package:greenbite_frontend/screens/login/login_screen.dart';
+import 'package:greenbite_frontend/screens/user_profile/edit_profile_screen.dart';
 import 'package:greenbite_frontend/screens/vendor/vendor_sales.dart';
 import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:http/http.dart' as http;
@@ -7,7 +10,9 @@ import '../../config.dart';
 import '../../widgets/vendor_nav_bar.dart';
 import 'vendor_home.dart';
 import 'list_food.dart';
-import 'edit_profile.dart'; // Import the EditProfile screen
+import 'edit_profile.dart';
+import 'package:provider/provider.dart';
+import 'package:greenbite_frontend/theme_provider.dart';
 
 class VendorProfile extends StatefulWidget {
   final int vendorId;
@@ -66,6 +71,9 @@ class _VendorProfileState extends State<VendorProfile> {
       setState(() {
         _isLoading = false;
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to load vendor profile: $e")),
+      );
     }
   }
 
@@ -75,30 +83,27 @@ class _VendorProfileState extends State<VendorProfile> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              VendorHome(shopId: widget.vendorId), // Pass shopId
+          builder: (context) => VendorHome(shopId: widget.vendorId),
         ),
       );
     } else if (index == 1) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              ListFood(shopId: widget.vendorId), // Pass shopId
+          builder: (context) => ListFood(shopId: widget.vendorId),
         ),
       );
     } else if (index == 2) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              VendorSalesPage(shopId: widget.vendorId), // Pass shopId
+          builder: (context) => VendorSalesPage(shopId: widget.vendorId),
         ),
       );
     }
   }
 
-  // ✅ Navigate to Edit Profile Screen
+  // Navigate to Edit Profile Screen
   Future<void> _editProfile() async {
     final updatedProfile = await Navigator.push(
       context,
@@ -136,145 +141,193 @@ class _VendorProfileState extends State<VendorProfile> {
     }
   }
 
-  // ✅ Sign Out (Placeholder)
-  void _signOut() {
-    print("Vendor signed out"); // TODO: Implement real sign-out logic
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Signed out successfully!")),
-    );
+  void _signOut() async {
+    try {
+      await AuthService.removeToken(); // Clear token & user data
+
+      // Navigate to login screen and remove all previous routes
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+        (route) => false, // Remove all routes
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to sign out: $e")),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Profile",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-            )),
-        centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 117, 237, 123),
-      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Profile Picture
-                  CircleAvatar(
-                    radius: 60,
-                    backgroundImage: NetworkImage(
-                      _vendorProfile["profilePictureUrl"] ??
-                          "https://via.placeholder.com/150",
-                    ),
-                  ),
+                  const SizedBox(height: 80),
+                  // Profile Header
+                  _buildProfileHeader(theme),
                   const SizedBox(height: 16),
 
-                  // Vendor Name
-                  Text(
-                    _vendorProfile["username"],
-                    style: const TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Email
-                  Text(
-                    _vendorProfile["email"],
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                  ),
+                  // Dark Mode Toggle
+                  _buildDarkModeToggle(themeProvider, theme),
                   const SizedBox(height: 16),
 
-                  // Business Name
-                  _buildInfoCard(Icons.business, "Business Name",
-                      _vendorProfile["businessName"]),
-                  // Business Description
-                  _buildInfoCard(Icons.description, "Business Description",
-                      _vendorProfile["businessDescription"]),
-                  // Phone Number
-                  _buildInfoCard(
-                      Icons.phone, "Phone", _vendorProfile["phoneNumber"]),
-                  // Address
-                  _buildInfoCard(
-                      Icons.location_on, "Address", _vendorProfile["address"]),
+                  // Main Profile Options
+                  _buildOptionsContainer(theme, [
+                    _buildSectionItem(
+                      icon: Icons.edit,
+                      text: "Edit Profile",
+                      onPressed: _editProfile,
+                    ),
+                    _buildSectionItem(
+                      icon: Icons.logout,
+                      text: "Sign Out",
+                      onPressed: _signOut,
+                    ),
+                  ]),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
 
-                  // Edit Profile Button
-                  _buildActionButton(
-                    icon: Icons.edit,
-                    text: "Edit Profile",
-                    color: Colors.blue,
-                    onPressed: _editProfile,
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Sign Out Button
-                  _buildActionButton(
-                    icon: Icons.logout,
-                    text: "Sign Out",
-                    color: Colors.red,
-                    onPressed: _signOut,
-                  ),
+                  // Business Details Options
+                  _buildOptionsContainer(theme, [
+                    _buildSectionItem(
+                      icon: Icons.business,
+                      text: "Business Name",
+                      subtitle: _vendorProfile["businessName"] ?? "Not set",
+                      onPressed: null,
+                    ),
+                    _buildSectionItem(
+                      icon: Icons.description,
+                      text: "Business Description",
+                      subtitle:
+                          _vendorProfile["businessDescription"] ?? "Not set",
+                      onPressed: null,
+                    ),
+                    _buildSectionItem(
+                      icon: Icons.phone,
+                      text: "Phone Number",
+                      subtitle: _vendorProfile["phoneNumber"] ?? "Not set",
+                      onPressed: null,
+                    ),
+                    _buildSectionItem(
+                      icon: Icons.location_on,
+                      text: "Address",
+                      subtitle: _vendorProfile["address"] ?? "Not set",
+                      onPressed: null,
+                    ),
+                  ]),
                 ],
               ),
             ),
       bottomNavigationBar: VendorNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
-        shopId: widget.vendorId, // Pass shopId to VendorNavBar
+        shopId: widget.vendorId,
       ),
     );
   }
 
-  // Widget to display vendor info
-  Widget _buildInfoCard(IconData icon, String title, String value) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        leading: Icon(icon, color: Colors.green),
-        title: Text(
-          title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+  // Profile Header
+  Widget _buildProfileHeader(ThemeData theme) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 50,
+          backgroundImage: NetworkImage(
+            _vendorProfile["profilePictureUrl"] ??
+                "https://via.placeholder.com/150",
+          ),
         ),
-        subtitle: Text(value, style: const TextStyle(fontSize: 14)),
+        const SizedBox(height: 10),
+        Text(
+          _vendorProfile["username"] ?? "Unknown Vendor",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: theme.textTheme.bodyLarge?.color,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          _vendorProfile["email"] ?? "",
+          style: TextStyle(
+            fontSize: 14,
+            color: theme.textTheme.bodySmall?.color,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Dark Mode Toggle
+  Widget _buildDarkModeToggle(ThemeProvider themeProvider, ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: SwitchListTile(
+        title: Text(
+          "Dark Mode",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: theme.textTheme.bodyLarge?.color,
+          ),
+        ),
+        value: themeProvider.themeMode == ThemeMode.dark,
+        onChanged: (value) {
+          themeProvider.toggleTheme(value);
+        },
+        secondary: Icon(
+          Icons.dark_mode,
+          color: theme.iconTheme.color,
+        ),
       ),
     );
   }
 
-  // Widget to display buttons
-  Widget _buildActionButton({
+  // Generalized Options Container
+  Widget _buildOptionsContainer(ThemeData theme, List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: children
+            .expand((widget) =>
+                [widget, const Divider(height: 1, indent: 16, endIndent: 16)])
+            .toList()
+            .sublist(0, children.length * 2 - 1), // Remove last divider
+      ),
+    );
+  }
+
+  // Section Item with Icon, Text, and Divider
+  Widget _buildSectionItem({
     required IconData icon,
     required String text,
-    required Color color,
-    required VoidCallback onPressed,
+    String? subtitle,
+    VoidCallback? onPressed,
   }) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, color: Colors.white),
-        label: Text(text,
-            style: const TextStyle(fontSize: 18, color: Colors.white)),
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          backgroundColor: color,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+    return ListTile(
+      onTap: onPressed,
+      leading: Icon(icon),
+      title: Text(
+        text,
+        style: const TextStyle(fontSize: 16),
       ),
+      subtitle: subtitle != null ? Text(subtitle) : null,
+      trailing: onPressed != null ? const Icon(Icons.arrow_forward_ios) : null,
     );
   }
 }
