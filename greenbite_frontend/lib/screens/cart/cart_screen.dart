@@ -170,7 +170,7 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    "\$${item.price.toStringAsFixed(2)}",
+                    "Rs. ${item.price.toStringAsFixed(2)}",
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -219,7 +219,7 @@ class _CartScreenState extends State<CartScreen> {
           return DropdownMenuItem<String>(
             value: coupon['coupon_code'],
             child: Text(
-              "${coupon['deal_name']} - \$${coupon['discount']}",
+              "${coupon['deal_name']} - Rs. ${coupon['discount']}",
               style: TextStyle(color: theme.colorScheme.onBackground),
             ),
           );
@@ -264,7 +264,7 @@ class _CartScreenState extends State<CartScreen> {
                 ),
               ),
               Text(
-                "\$${cartProvider.totalPrice().toStringAsFixed(2)}",
+                "Rs. ${cartProvider.totalPrice().toStringAsFixed(2)}",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -288,7 +288,7 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                   ),
                   Text(
-                    "-\$${cartProvider.discountAmount.toStringAsFixed(2)}",
+                    "-Rs.${cartProvider.discountAmount.toStringAsFixed(2)}",
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -311,7 +311,7 @@ class _CartScreenState extends State<CartScreen> {
                 ),
               ),
               Text(
-                "\$${finalPrice.toStringAsFixed(2)}",
+                "Rs. ${finalPrice.toStringAsFixed(2)}",
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

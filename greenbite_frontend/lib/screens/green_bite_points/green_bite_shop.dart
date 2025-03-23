@@ -289,7 +289,7 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
               ),
             ),
             Text(
-              "Discount: \$$discount",
+              "Discount: Rs. $discount",
               style: TextStyle(
                 fontSize: 12,
                 color: theme.colorScheme.primary, // ✅ Theme-based color

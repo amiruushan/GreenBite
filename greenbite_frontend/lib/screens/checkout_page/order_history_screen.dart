@@ -105,7 +105,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                           ),
                         ),
                         subtitle: Text(
-                          "Total: \$${order['totalAmount'].toStringAsFixed(2)}",
+                          "Total: Rs. ${order['totalAmount'].toStringAsFixed(2)}",
                           style: TextStyle(
                             fontSize: 16,
                             color:

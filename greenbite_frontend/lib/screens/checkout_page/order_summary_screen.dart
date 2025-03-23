@@ -118,7 +118,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             _buildSummaryRow("Order ID", widget.orderId, theme),
             _buildSummaryRow("Order Time", widget.orderTime, theme),
             _buildSummaryRow(
-                "Total", "\$${widget.total.toStringAsFixed(2)}", theme),
+                "Total", " Rs. ${widget.total.toStringAsFixed(2)}", theme),
             _buildSummaryRow("NP Earned", "${widget.npEarned} NP", theme),
             _buildSummaryRow(
                 "Location", _location, theme), // Display geocoded address
@@ -186,7 +186,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             ),
           ),
           subtitle: Text(
-            "\$${item.price.toStringAsFixed(2)} x ${item.quantity}",
+            "Rs. ${item.price.toStringAsFixed(2)} x ${item.quantity}",
             style: TextStyle(
               fontSize: 14,
               color: theme.colorScheme.onBackground.withOpacity(0.7),

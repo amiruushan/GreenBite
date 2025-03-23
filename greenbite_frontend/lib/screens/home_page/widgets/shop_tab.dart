@@ -78,7 +78,7 @@ class _ShopsTabState extends State<ShopsTab> {
       // Fetch nearby shops within a 5km radius using the user's location from the backend
       final response = await http.get(
         Uri.parse(
-            "${Config.apiBaseUrl}/api/shop/nearby?lat=$latitude&lon=$longitude&radius=5"),
+            "${Config.apiBaseUrl}/api/shop/nearby?lat=$latitude&lon=$longitude&radius=10"),
         headers: {"Authorization": "Bearer $token"},
       );
 
