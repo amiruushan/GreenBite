@@ -19,4 +19,6 @@ public class OrderDTO {
     private float totalAmount;
     private float totalCalories;
     private LocalDateTime orderDate;
+    private double latitude; // Add latitude
+    private double longitude; // Add longitude
 }

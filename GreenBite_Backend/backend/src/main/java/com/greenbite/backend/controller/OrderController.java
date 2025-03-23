@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -26,6 +27,26 @@ public class OrderController {
         Order order = orderService.createOrder(orderDTO);
         return ResponseEntity.ok(order);
     }
+    @GetMapping("/latest")
+    public ResponseEntity<Map<String, Object>> getLatestOrder() {
+        Order latestOrder = orderService.getLatestOrder();
+        if (latestOrder == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "No orders found"));
+        }
+
+        Map<String, Object> response = Map.of(
+                "orderId", String.valueOf(latestOrder.getId()), // Ensure it's a string
+                "orderTime", latestOrder.getOrderDate().toString(),
+                "totalAmount", latestOrder.getTotalAmount(),
+                "status", latestOrder.getStatus(),
+                "latitude", latestOrder.getLatitude(),
+                "longitude", latestOrder.getLongitude(),
+                "paymentMethod", latestOrder.getPaymentMethod()
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
 
     @GetMapping("/shop_order/{shopId}")
     public ResponseEntity<List<Order>> getOrdersByShopId(@PathVariable Long shopId) {

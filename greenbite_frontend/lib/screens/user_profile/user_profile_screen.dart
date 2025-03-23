@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/screens/checkout_page/order_history_screen.dart';
 import 'package:url_launcher/url_launcher.dart'; // Import url_launcher
 import 'package:greenbite_frontend/screens/green_bite_points/green_bite_shop.dart';
 import 'package:greenbite_frontend/screens/user_profile/about_us_screen.dart';
@@ -105,6 +106,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
+  // Function to navigate to Order History Screen
+  void _goToOrderHistory() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const OrderHistoryScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -179,6 +188,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   builder: (context) => GreenBiteShopScreen()),
                             );
                           },
+                        ),
+                        _buildSectionItem(
+                          icon: Icons.history,
+                          text: "Order History",
+                          onPressed:
+                              _goToOrderHistory, // Navigate to Order History
                         ),
                         _buildSectionItem(
                           icon: Icons.info,

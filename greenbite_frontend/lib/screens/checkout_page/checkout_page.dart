@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
-import 'package:greenbite_frontend/screens/home_page/home_page.dart';
+import 'package:greenbite_frontend/screens/checkout_page/order_summary_screen.dart';
+
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
 import 'package:greenbite_frontend/service/auth_service.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +40,61 @@ class _CheckoutPageState extends State<CheckoutPage> {
       return;
     }
 
+    // If Stripe Payment is selected, handle the payment first
+    if (selectedOption == "Stripe Payment") {
+      try {
+        // Handle Stripe payment
+        await _handleStripePayment(context);
+
+        // If payment is successful, proceed with order confirmation
+        await _processOrder(context);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Payment failed: ${e.toString()}"),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return; // Stop further processing if payment fails
+      }
+    } else {
+      // For other payment methods (e.g., Self Pick-up), proceed directly with order confirmation
+      await _processOrder(context);
+    }
+  }
+
+  Future<void> _processOrder(BuildContext context) async {
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+
+    // Fetch user's saved location from the backend
+    Future<Map<String, double>> _fetchUserLocation() async {
+      try {
+        String? token = await AuthService.getToken();
+        int? userId = await AuthService.getUserId();
+        if (token == null || userId == null) {
+          throw Exception("User not authenticated");
+        }
+
+        final response = await http.get(
+          Uri.parse('${Config.apiBaseUrl}/api/users/location/$userId'),
+          headers: {"Authorization": "Bearer $token"},
+        );
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> data = json.decode(response.body);
+          return {
+            "latitude": data["latitude"] ?? 0.0,
+            "longitude": data["longitude"] ?? 0.0,
+          };
+        } else {
+          throw Exception("Failed to fetch user location");
+        }
+      } catch (e) {
+        print("Error fetching user location: $e");
+        throw e;
+      }
+    }
+
     // Calculate total points first
     final int totalEarnedPoints = cartProvider.cartItems.fold(0, (sum, item) {
       return sum +
@@ -55,7 +111,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
         throw Exception("No authentication token found");
       }
 
-      // Process all orders first
+      // Get user's saved location from backend
+      final userLocation = await _fetchUserLocation();
+      final double latitude = userLocation["latitude"]!;
+      final double longitude = userLocation["longitude"]!;
+
       final Map<int, List<FoodItem>> shopItemsMap = {};
       for (var item in cartProvider.cartItems) {
         shopItemsMap.putIfAbsent(item.shopId, () => []).add(item);
@@ -64,12 +124,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
       for (var shopId in shopItemsMap.keys) {
         final items = shopItemsMap[shopId]!;
         final totalPrice = items.fold(
-            0.0, (sum, item) => sum + (item.price * int.parse(item.quantity)));
-
-        // Handle Stripe payment if selected
-        if (selectedOption == "Stripe Payment") {
-          await _handleStripePayment(context, totalPrice);
-        }
+            0.0,
+            (sum, item) =>
+                sum +
+                (item.price * int.parse(item.quantity)) - // Add delivery fee
+                cartProvider.discountAmount); // Subtract discount
 
         // Process order for each shop
         final orderResponse = await http.post(
@@ -88,18 +147,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 .map((item) => {
                       "id": item.id,
                       "name": item.name,
-                      "description": item.description,
                       "price": item.price,
                       "quantity": item.quantity,
-                      "photo": item.photo,
-                      "tags": item.tags,
-                      "category": item.category,
-                      "latitude": item.latitude,
-                      "longitude": item.longitude,
                     })
                 .toList(),
-            "totalAmount": totalPrice,
+            "totalAmount":
+                totalPrice, // Pass the total amount (subtotal + delivery fee - discount)
             "orderTime": DateTime.now().toIso8601String(),
+            "latitude": latitude, // Now fetched from backend
+            "longitude": longitude, // Now fetched from backend
           }),
         );
 
@@ -153,20 +209,39 @@ class _CheckoutPageState extends State<CheckoutPage> {
       cartProvider.clearCart();
       cartProvider.clearCoupon();
 
-      // Show success
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Order Confirmed!"),
-          backgroundColor: Colors.green,
-        ),
+      // Fetch the order details from the backend
+      final orderDetailsResponse = await http.get(
+        Uri.parse("${Config.apiBaseUrl}/api/orders/latest"),
+        headers: {
+          "Authorization": "Bearer $token",
+        },
       );
 
-      // Navigate to home
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-        (route) => false,
-      );
+      if (orderDetailsResponse.statusCode == 200) {
+        final Map<String, dynamic> orderDetails =
+            json.decode(orderDetailsResponse.body);
+
+        // Navigate to the OrderSummaryPage with the fetched details
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrderSummaryPage(
+              orderId: orderDetails['orderId'],
+              orderTime: orderDetails['orderTime'],
+              total: orderDetails[
+                  'totalAmount'], // Pass the total amount (subtotal + delivery fee - discount)
+              npEarned: totalEarnedPoints,
+              status: orderDetails['status'],
+              latitude: orderDetails['latitude'], // Pass user's latitude
+              longitude: orderDetails['longitude'], // Pass user's longitude
+              paymentMethod: orderDetails['paymentMethod'],
+            ),
+          ),
+        );
+      } else {
+        throw Exception(
+            "Failed to fetch order details: ${orderDetailsResponse.body}");
+      }
     } catch (e) {
       print("Order Error Details: $e");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -178,22 +253,32 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
   }
 
-  Future<void> _handleStripePayment(
-      BuildContext context, double totalAmount) async {
+  Future<void> _handleStripePayment(BuildContext context) async {
     try {
+      final cartProvider = Provider.of<CartProvider>(context, listen: false);
+
+      // Calculate the total amount (subtotal + delivery fee - discount)
+      final double totalAmount =
+          cartProvider.totalPrice() - cartProvider.discountAmount;
+
       String? token = await AuthService.getToken();
       if (token == null) return;
 
+      // Convert the total amount to cents (Stripe requires amounts in cents)
       final int amountInCents = (totalAmount * 100).toInt();
+
+      // Call the backend to create a payment intent
       final response = await http.post(
         Uri.parse(
             '${Config.apiBaseUrl}/api/payments/create?amount=$amountInCents&currency=usd'),
         headers: {"Authorization": "Bearer $token"},
       );
 
+      // Parse the response to get the client secret
       final responseData = json.decode(response.body);
       final clientSecret = responseData['clientSecret'];
 
+      // Initialize the Stripe payment sheet
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: clientSecret,
@@ -201,8 +286,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
         ),
       );
 
+      // Present the payment sheet to the user
       await Stripe.instance.presentPaymentSheet();
 
+      // Show a success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Payment successful!"),
@@ -210,13 +297,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
         ),
       );
     } catch (e) {
+      // Show an error message if the payment fails
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Payment failed: $e"),
           backgroundColor: Colors.red,
         ),
       );
-      rethrow;
+      rethrow; // Re-throw the error to stop further processing
     }
   }
 
@@ -314,7 +402,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     final cartProvider = Provider.of<CartProvider>(context);
     final theme = Theme.of(context);
     final double total =
-        cartProvider.totalPrice() + 2.50 - cartProvider.discountAmount;
+        cartProvider.totalPrice() - cartProvider.discountAmount;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -346,7 +434,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
           const SizedBox(height: 10),
           _buildSummaryRow(
               "Subtotal", "\$${cartProvider.totalPrice().toStringAsFixed(2)}"),
-          _buildSummaryRow("Delivery Fee", "\$2.50"),
           _buildSummaryRow("Discount",
               "-\$${cartProvider.discountAmount.toStringAsFixed(2)}"),
           _buildSummaryRow("Total", "\$${total.toStringAsFixed(2)}",
