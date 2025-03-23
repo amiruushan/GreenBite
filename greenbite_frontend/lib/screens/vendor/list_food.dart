@@ -30,12 +30,11 @@ class _ListFoodState extends State<ListFood> {
   File? _imageFile; // To store the selected image file
   String? _selectedCategory;
   final List<String> _categories = [
-    "Pizza",
-    "Burger",
-    "Cake",
-    "Salad",
-    "Drink",
+    "Meat",
+    "Snack",
     "Dessert",
+    "Entree",
+    "Salad",
   ];
   bool _isSaving = false; // To handle loading state
 
