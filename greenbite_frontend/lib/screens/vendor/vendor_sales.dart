@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:greenbite_frontend/screens/vendor/vendor_order_management.dart';
 import 'package:http/http.dart' as http;
 import 'package:greenbite_frontend/config.dart';
 import 'package:greenbite_frontend/service/auth_service.dart';
@@ -214,75 +215,16 @@ class _VendorSalesPageState extends State<VendorSalesPage> {
   }
 
   void _showOrderDetails(Map<String, dynamic> sale) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true, // Allow the bottom sheet to expand
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min, // Fit content height
-            children: [
-              const Text(
-                "Order Details",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              _buildDetailRow("Order ID", sale['id'].toString()),
-              _buildDetailRow("Customer ID", sale['customerId'].toString()),
-              _buildDetailRow("Status", sale['status']),
-              _buildDetailRow("Total Amount", "\$${sale['totalAmount']}"),
-              _buildDetailRow("Order Date", sale['orderDate'] ?? "N/A"),
-              _buildDetailRow("Payment Method", sale['paymentMethod']),
-              const SizedBox(height: 16),
-              const Text(
-                "Ordered Items",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              ListView.builder(
-                shrinkWrap: true, // Fit content height
-                physics:
-                    const NeverScrollableScrollPhysics(), // Disable scrolling
-                itemCount: sale['orderedItems'].length,
-                itemBuilder: (context, index) {
-                  var item = sale['orderedItems'][index];
-                  return ListTile(
-                    title: Text("Item ID: ${item['id']}"),
-                    subtitle: Text(
-                        "Quantity: ${item['quantity']}, Price: \$${item['price'] ?? 'N/A'}"),
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context), // Close bottom sheet
-                child: const Text("Close"),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 16),
-          ),
-        ],
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VendorOrderManagementScreen(order: sale),
       ),
-    );
+    ).then((success) {
+      if (success == true) {
+        // If the order status was updated, refresh the sales list
+        fetchSales();
+      }
+    });
   }
 }
