@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/config.dart';
 import '../login/login_screen.dart';
-import '/../widgets/custom_button_widget.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -20,27 +19,43 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: BackButton(color: Colors.black),
+        leading: BackButton(color: isDarkMode ? Colors.white : Colors.black),
       ),
-      backgroundColor: Colors.grey[200],
+      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[200],
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Verification",
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-            SizedBox(height: 5),
-            Text("Enter 6-digit code sent to email",
-                style: TextStyle(color: Colors.black54)),
-            Text(widget.email,
-                style:
-                    TextStyle(color: Colors.black54)), // Use the passed email
-            SizedBox(height: 20),
+            Text(
+              "Verification",
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              "Enter 6-digit code sent to email",
+              style: TextStyle(
+                color: isDarkMode ? Colors.grey[400] : Colors.black54,
+              ),
+            ),
+            Text(
+              widget.email,
+              style: TextStyle(
+                color: isDarkMode ? Colors.grey[400] : Colors.black54,
+              ),
+            ),
+            const SizedBox(height: 20),
             OTPField(
               onOTPEntered: (enteredOTP) {
                 setState(() {
@@ -48,12 +63,18 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 });
               },
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Align(
-                alignment: Alignment.centerRight,
-                child: Text("Resend code in 0:40")),
-            SizedBox(height: 20),
-            CustomButton(
+              alignment: Alignment.centerRight,
+              child: Text(
+                "Resend code in 0:40",
+                style: TextStyle(
+                  color: isDarkMode ? Colors.grey[400] : Colors.black54,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            _CustomButton(
               text: "Continue",
               onPressed: () async {
                 // Prepare the email and OTP
@@ -100,6 +121,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
               },
               backgroundColor: Colors.green,
               textColor: Colors.white,
+              shadow: true,
             ),
           ],
         ),
@@ -147,6 +169,9 @@ class _OTPFieldState extends State<OTPField> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: List.generate(
@@ -159,8 +184,18 @@ class _OTPFieldState extends State<OTPField> {
             textAlign: TextAlign.center,
             keyboardType: TextInputType.number,
             maxLength: 1,
-            decoration:
-                InputDecoration(counterText: "", border: OutlineInputBorder()),
+            style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+            decoration: InputDecoration(
+              counterText: "",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: isDarkMode ? Colors.grey[600]! : Colors.grey[400]!,
+                ),
+              ),
+              filled: true,
+              fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+            ),
             onChanged: (value) {
               _onKeyPressed(value, index);
               widget.onOTPEntered(_getOTP()); // Pass OTP to parent
@@ -174,6 +209,46 @@ class _OTPFieldState extends State<OTPField> {
               }
             },
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// ✅ **Custom Button Component**
+class _CustomButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final Color backgroundColor;
+  final Color textColor;
+  final bool shadow;
+
+  const _CustomButton({
+    required this.text,
+    required this.onPressed,
+    required this.backgroundColor,
+    required this.textColor,
+    this.shadow = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor,
+          foregroundColor: textColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: shadow ? 5 : 0, // ✅ Apply shadow if true
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
     );

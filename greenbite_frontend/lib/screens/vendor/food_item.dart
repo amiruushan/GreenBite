@@ -201,11 +201,13 @@ class _FoodItemScreenState extends State<FoodItemScreen> {
                 border: OutlineInputBorder(),
               ),
               items: const [
-                "Meat",
-                "Snack",
+                "Drinks",
+                "Rice",
                 "Dessert",
-                "Entree",
+                "Bakery",
                 "Salad",
+                "Meat",
+                "Snack"
               ].map((String category) {
                 return DropdownMenuItem<String>(
                   value: category,

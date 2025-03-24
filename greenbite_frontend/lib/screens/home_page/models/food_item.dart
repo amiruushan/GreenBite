@@ -5,7 +5,7 @@ class FoodItem {
   final double price;
   String quantity;
   final String photo;
-  final List<String> tags;
+  final List<String> tags; // Tags can be empty
   final String restaurant;
   final int shopId; // Assuming you want to keep this field
   final String category; // New category field
@@ -19,7 +19,7 @@ class FoodItem {
     required this.price,
     required this.quantity,
     required this.photo,
-    this.tags = const [], // ✅ Default to empty list
+    this.tags = const [], // Default to empty list
     required this.restaurant,
     required this.shopId,
     required this.category,
@@ -39,7 +39,7 @@ class FoodItem {
       tags: json['tags'] is List
           ? List<String>.from(json['tags'].where((tag) =>
               tag != null && tag.isNotEmpty)) // Filter out empty or null tags
-          : [], // Default to empty list
+          : [], // Default to empty list if tags is null or not a list
       restaurant: json['restaurant'] ?? 'Unknown',
       category: json['category'] ?? 'Uncategorized',
       latitude: json['latitude'] ?? 0.0, // Add latitude

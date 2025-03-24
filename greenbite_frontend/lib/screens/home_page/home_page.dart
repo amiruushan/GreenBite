@@ -172,23 +172,15 @@ class _HomePageState extends State<HomePage> {
         List<dynamic> foodJson = json.decode(foodResponse.body);
         List<dynamic> favoriteJson = json.decode(favoriteResponse.body);
 
-        // Convert food items and filter out any invalid items
+        // Convert food items (no filtering for tags)
         List<FoodItem> allFoodItems = foodJson
             .map((data) => FoodItem.fromJson(data))
-            .where((item) =>
-                item.tags != null &&
-                item.tags
-                    .isNotEmpty) // Filter out items with empty or null tags
-            .toList();
+            .toList(); // Remove the filter for tags
 
-        // Convert favorites
+        // Convert favorites (no filtering for tags)
         Set<FoodItem> favorites = favoriteJson
             .map((data) => FoodItem.fromJson(data))
-            .where((item) =>
-                item.tags != null &&
-                item.tags
-                    .isNotEmpty) // Filter out items with empty or null tags
-            .toSet();
+            .toSet(); // Remove the filter for tags
 
         setState(() {
           foodItems = allFoodItems;
@@ -359,6 +351,16 @@ class _HomePageContentState extends State<HomePageContent> {
   final TextEditingController _searchController =
       TextEditingController(); // Controller for the search bar
 
+  // Hardcoded tags
+  final List<String> _hardcodedTags = [
+    "Vegan",
+    "High Calory",
+    "Low Sugar",
+    "Low Fat",
+    "Vegetarian",
+    "High Protein",
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -406,14 +408,9 @@ class _HomePageContentState extends State<HomePageContent> {
     });
   }
 
+  // Use hardcoded tags instead of fetching from backend
   List<String> getUniqueTags() {
-    final Set<String> uniqueTags = {};
-    for (var item in widget.foodItems) {
-      // Filter out empty or null tags
-      uniqueTags
-          .addAll(item.tags.where((tag) => tag != null && tag.isNotEmpty));
-    }
-    return uniqueTags.toList();
+    return _hardcodedTags;
   }
 
   @override

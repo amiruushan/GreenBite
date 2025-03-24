@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:greenbite_frontend/screens/cart/cart_provider.dart';
 
 import 'package:greenbite_frontend/screens/home_page/models/food_item.dart';
-import 'package:greenbite_frontend/service/auth_service.dart';
 
 import 'package:provider/provider.dart';
 
@@ -104,10 +103,13 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
               style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
             Text(
-              widget.foodItem.tags.contains("vegan") ||
-                      widget.foodItem.tags.contains("low-fat") ||
-                      widget.foodItem.tags.contains("sugar-free")
-                  ? "+20 NP on purchase"
+              widget.foodItem.tags.contains("Vegan") ||
+                      widget.foodItem.tags.contains("High Calory") ||
+                      widget.foodItem.tags.contains("Low Sugar") ||
+                      widget.foodItem.tags.contains("Low Fat") ||
+                      widget.foodItem.tags.contains("Vegetarian") ||
+                      widget.foodItem.tags.contains("High Protein")
+                  ? "+50 NP on purchase"
                   : "+10 NP on purchase",
               style: const TextStyle(
                   fontSize: 16,
