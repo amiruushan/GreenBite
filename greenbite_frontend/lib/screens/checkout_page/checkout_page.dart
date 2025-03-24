@@ -27,7 +27,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Future<void> _confirmOrder(BuildContext context) async {
-    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    Provider.of<CartProvider>(context, listen: false);
 
     // Validate payment method selection
     if (selectedOption == null) {
@@ -98,10 +98,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
     // Calculate total points first
     final int totalEarnedPoints = cartProvider.cartItems.fold(0, (sum, item) {
       return sum +
-          (item.tags.contains("vegan") ||
-                  item.tags.contains("low-fat") ||
-                  item.tags.contains("sugar-free")
-              ? 20
+          (item.tags.contains("Vegan") ||
+                  item.tags.contains("High Calory") ||
+                  item.tags.contains("Low Sugar") ||
+                  item.tags.contains("Low Fat") ||
+                  item.tags.contains("Vegetarian") ||
+                  item.tags.contains("High Protein")
+              ? 50
               : 10);
     });
 
