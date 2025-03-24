@@ -39,10 +39,10 @@ public class FoodItemController {
             @PathVariable double lat,
             @PathVariable double lon,
             @PathVariable double radius) {
-        System.out.println("Item latitude: "+lat);
-        System.out.println("Item latitude: "+lon);
+
         List<FoodItemDTO> nearbyFoodItems = foodItemService.getFoodItemsNearby(lat, lon, radius);
         System.out.println(nearbyFoodItems);
+
         return nearbyFoodItems;
     }
 
@@ -68,4 +68,17 @@ public class FoodItemController {
         foodItemService.deleteFoodItem(id);
         return ResponseEntity.ok().build();
     }
+    @PutMapping("/update")
+    public ResponseEntity<FoodItemDTO> updateFoodItem(@RequestBody FoodItemDTO foodItemDTO) {
+        // Ensure the ID exists in the JSON
+        if (foodItemDTO.getId() == null) {
+            return ResponseEntity.badRequest().build(); // Return 400 Bad Request if ID is missing
+        }
+
+        // Call the service to update the food item (no photo handling)
+        FoodItemDTO updatedFoodItem = foodItemService.updateFoodItem(foodItemDTO);
+        return ResponseEntity.ok(updatedFoodItem);
+    }
+
 }
+

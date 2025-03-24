@@ -66,7 +66,7 @@ class _CustomerOrdersPageState extends State<CustomerOrdersPage> {
               itemBuilder: (context, index) {
                 return ListTile(
                   title: Text("Order #${orders[index]['id']}"),
-                  subtitle: Text("Total: \$${orders[index]['totalAmount']}"),
+                  subtitle: Text("Total: Rs. ${orders[index]['totalAmount']}"),
                 );
               },
             ),

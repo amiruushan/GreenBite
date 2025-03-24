@@ -27,7 +27,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Future<void> _confirmOrder(BuildContext context) async {
-    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    Provider.of<CartProvider>(context, listen: false);
 
     // Validate payment method selection
     if (selectedOption == null) {
@@ -98,10 +98,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
     // Calculate total points first
     final int totalEarnedPoints = cartProvider.cartItems.fold(0, (sum, item) {
       return sum +
-          (item.tags.contains("vegan") ||
-                  item.tags.contains("low-fat") ||
-                  item.tags.contains("sugar-free")
-              ? 20
+          (item.tags.contains("Vegan") ||
+                  item.tags.contains("High Calory") ||
+                  item.tags.contains("Low Sugar") ||
+                  item.tags.contains("Low Fat") ||
+                  item.tags.contains("Vegetarian") ||
+                  item.tags.contains("High Protein")
+              ? 50
               : 10);
     });
 
@@ -432,11 +435,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
             ),
           ),
           const SizedBox(height: 10),
-          _buildSummaryRow(
-              "Subtotal", "\$${cartProvider.totalPrice().toStringAsFixed(2)}"),
+          _buildSummaryRow("Subtotal",
+              "Rs. ${cartProvider.totalPrice().toStringAsFixed(2)}"),
           _buildSummaryRow("Discount",
-              "-\$${cartProvider.discountAmount.toStringAsFixed(2)}"),
-          _buildSummaryRow("Total", "\$${total.toStringAsFixed(2)}",
+              "-Rs. ${cartProvider.discountAmount.toStringAsFixed(2)}"),
+          _buildSummaryRow("Total", "Rs. ${total.toStringAsFixed(2)}",
               isTotal: true),
         ],
       ),

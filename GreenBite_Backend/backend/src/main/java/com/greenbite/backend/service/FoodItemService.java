@@ -2,6 +2,7 @@
 package com.greenbite.backend.service;
 
 import com.greenbite.backend.dto.FoodItemDTO;
+import com.greenbite.backend.dto.FoodShopDTO;
 import com.greenbite.backend.model.FoodItem;
 import com.greenbite.backend.model.FoodShop;
 import com.greenbite.backend.model.UserFavorite;
@@ -68,22 +69,40 @@ public class FoodItemService {
     }
 
     private FoodItemDTO convertToDTO(FoodItem foodItem) {
-        List<String> tagList = Arrays.asList(foodItem.getTags().split(",")); // Convert comma-separated string to list
+        // Handle null tags
+        List<String> tagList = foodItem.getTags() == null
+                ? List.of() // Return an empty list if tags is null
+                : Arrays.asList(foodItem.getTags().split(",")); // Otherwise, split the tags string
+
+        // Fetch food shop name
+        FoodShopDTO shop = foodShopService.getFoodShopById(foodItem.getShopId());
+
         return new FoodItemDTO(
                 foodItem.getId(),
                 foodItem.getName(),
+                shop != null ? shop.getName() : null,
                 foodItem.getDescription(),
                 foodItem.getPrice(),
                 foodItem.getQuantity(),
                 foodItem.getShopId(),
                 foodItem.getPhoto(),
-                tagList,
+                tagList, // Pass the list of tags (empty if tags is null)
                 foodItem.getCategory()
         );
     }
 
     private FoodItem convertToEntity(FoodItemDTO foodItemDTO) {
-        String tags = String.join(",", foodItemDTO.getTags()); // Convert list to comma-separated string
+        String tags;
+        if (foodItemDTO.getTags() == null || foodItemDTO.getTags().isEmpty()) {
+            tags = ""; // Handle empty tags
+        } else if (foodItemDTO.getTags().size() == 1 && foodItemDTO.getTags().get(0).contains(",")) {
+            // If tags is a single string with commas, split it
+            tags = foodItemDTO.getTags().get(0);
+        } else {
+            // If tags is a list, join it with commas
+            tags = String.join(",", foodItemDTO.getTags());
+        }
+
         return new FoodItem(
                 foodItemDTO.getId(),
                 foodItemDTO.getName(),
@@ -91,17 +110,15 @@ public class FoodItemService {
                 foodItemDTO.getPrice(),
                 foodItemDTO.getQuantity(),
                 foodItemDTO.getPhoto(),
-                tags,
+                tags, // Store tags as a comma-separated string
                 foodItemDTO.getShopId(),
                 foodItemDTO.getCategory()
         );
     }
 
     public List<FoodItemDTO> getFoodItemsNearby(double lat, double lon, double radius) {
-        // Get nearby food shops
         List<FoodShop> nearbyShops = foodShopService.findShopsNearby(lat, lon, radius);
 
-        // Get food items from these shops
         List<FoodItem> foodItems = nearbyShops.stream()
                 .flatMap(shop -> foodItemRepository.findByShopId(shop.getId()).stream())
                 .collect(Collectors.toList());
@@ -110,6 +127,7 @@ public class FoodItemService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
 
     public void deleteFoodItem(Long id) {
         // Find the food item by ID
@@ -123,4 +141,24 @@ public class FoodItemService {
         // Delete the food item
         foodItemRepository.delete(foodItem);
     }
+    public FoodItemDTO updateFoodItem(FoodItemDTO foodItemDTO) {
+        FoodItem existingFoodItem = foodItemRepository.findById(foodItemDTO.getId())
+                .orElseThrow(() -> new RuntimeException("Food item not found"));
+
+        // Update fields from DTO
+        existingFoodItem.setName(foodItemDTO.getName());
+        existingFoodItem.setDescription(foodItemDTO.getDescription());
+        existingFoodItem.setPrice(foodItemDTO.getPrice());
+        existingFoodItem.setQuantity(foodItemDTO.getQuantity());
+        existingFoodItem.setCategory(foodItemDTO.getCategory());
+
+        // Convert tags list to a comma-separated string
+        String tags = String.join(",", foodItemDTO.getTags());
+        existingFoodItem.setTags(tags);
+
+        // Save updated entity
+        existingFoodItem = foodItemRepository.save(existingFoodItem);
+        return convertToDTO(existingFoodItem);
+    }
+
 }

@@ -21,7 +21,7 @@ public class FoodItem {
     private Integer quantity;
     private String photo;
 
-    private String tags; // Store tags as a comma-separated string
+    private String tags = ""; // Store tags as a comma-separated string
 
     private Long shopId; // Use shopId instead of mapping FoodShop to simplify DTO conversion
 

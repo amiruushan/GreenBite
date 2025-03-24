@@ -172,13 +172,15 @@ class _HomePageState extends State<HomePage> {
         List<dynamic> foodJson = json.decode(foodResponse.body);
         List<dynamic> favoriteJson = json.decode(favoriteResponse.body);
 
-        // Convert food items
-        List<FoodItem> allFoodItems =
-            foodJson.map((data) => FoodItem.fromJson(data)).toList();
+        // Convert food items (no filtering for tags)
+        List<FoodItem> allFoodItems = foodJson
+            .map((data) => FoodItem.fromJson(data))
+            .toList(); // Remove the filter for tags
 
-        // Convert favorites
-        Set<FoodItem> favorites =
-            favoriteJson.map((data) => FoodItem.fromJson(data)).toSet();
+        // Convert favorites (no filtering for tags)
+        Set<FoodItem> favorites = favoriteJson
+            .map((data) => FoodItem.fromJson(data))
+            .toSet(); // Remove the filter for tags
 
         setState(() {
           foodItems = allFoodItems;
@@ -349,6 +351,16 @@ class _HomePageContentState extends State<HomePageContent> {
   final TextEditingController _searchController =
       TextEditingController(); // Controller for the search bar
 
+  // Hardcoded tags
+  final List<String> _hardcodedTags = [
+    "Vegan",
+    "High Calory",
+    "Low Sugar",
+    "Low Fat",
+    "Vegetarian",
+    "High Protein",
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -396,12 +408,9 @@ class _HomePageContentState extends State<HomePageContent> {
     });
   }
 
+  // Use hardcoded tags instead of fetching from backend
   List<String> getUniqueTags() {
-    final Set<String> uniqueTags = {};
-    for (var item in widget.foodItems) {
-      uniqueTags.addAll(item.tags);
-    }
-    return uniqueTags.toList();
+    return _hardcodedTags;
   }
 
   @override
@@ -633,7 +642,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                                           ),
                                                         ),
                                                         Text(
-                                                          "\$${item.price.toStringAsFixed(2)}",
+                                                          "Rs. ${item.price.toStringAsFixed(2)}",
                                                           style:
                                                               const TextStyle(
                                                             color: Colors.white,

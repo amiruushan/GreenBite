@@ -26,18 +26,28 @@ class _ListFoodState extends State<ListFood> {
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
   final _quantityController = TextEditingController();
-  final _tagsController = TextEditingController();
   File? _imageFile; // To store the selected image file
   String? _selectedCategory;
   final List<String> _categories = [
-    "Pizza",
-    "Burger",
-    "Cake",
-    "Salad",
-    "Drink",
+    "Drinks",
+    "Rice",
     "Dessert",
+    "Bakery",
+    "Salad",
+    "Meat",
+    "Snack"
   ];
   bool _isSaving = false; // To handle loading state
+  List<String> _selectedTags = []; // To store selected tags
+  final List<String> _predefinedTags = [
+    "Vegan",
+    "High Calory",
+    "Low Sugar",
+    "Low Fat",
+    "Vegetarian",
+    "High Protein"
+    // Add more tags as needed
+  ];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -101,7 +111,7 @@ class _ListFoodState extends State<ListFood> {
       "price": double.parse(_priceController.text.trim()),
       "quantity": int.parse(_quantityController.text.trim()),
       "shopId": widget.shopId,
-      "tags": _tagsController.text.split(',').map((tag) => tag.trim()).toList(),
+      "tags": _selectedTags.join(','), // Convert list to comma-separated string
       "category": _selectedCategory,
     };
 
@@ -140,6 +150,7 @@ class _ListFoodState extends State<ListFood> {
         setState(() {
           _imageFile = null;
           _selectedCategory = null;
+          _selectedTags.clear(); // Clear selected tags
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -369,23 +380,34 @@ class _ListFoodState extends State<ListFood> {
 
               // Tags
               _buildSectionTitle("Tags"),
-              TextFormField(
-                controller: _tagsController,
-                decoration: InputDecoration(
-                  hintText: "Enter tags (comma-separated)",
-                  filled: true,
-                  fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter at least one tag";
-                  }
-                  return null;
-                },
+              Wrap(
+                spacing: 8.0,
+                children: _predefinedTags.map((tag) {
+                  bool isSelected = _selectedTags.contains(tag);
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (isSelected) {
+                          _selectedTags.remove(tag);
+                        } else {
+                          _selectedTags.add(tag);
+                        }
+                      });
+                    },
+                    child: Chip(
+                      label: Text(tag),
+                      backgroundColor: isSelected
+                          ? Colors.green
+                          : (isDarkMode ? Colors.grey[800] : Colors.grey[300]),
+                      labelStyle: TextStyle(
+                        color: isSelected
+                            ? Colors.white
+                            : theme.colorScheme.onBackground,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
               const SizedBox(height: 16),
 

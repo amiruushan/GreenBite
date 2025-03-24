@@ -123,26 +123,26 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface, // ✅ Theme-based background
+      backgroundColor: theme.colorScheme.surface, //  Theme-based background
       appBar: AppBar(
         title: Text(
           "Green Bite Shop",
           style: TextStyle(
-            color: theme.colorScheme.onSurface, // ✅ Adaptive text color
+            color: theme.colorScheme.onSurface, //  Adaptive text color
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.transparent, // ✅ Transparent AppBar
-        elevation: 0, // ✅ Remove shadow
+        backgroundColor: Colors.transparent, //  Transparent AppBar
+        elevation: 0, //  Remove shadow
         iconTheme: IconThemeData(
-          color: theme.colorScheme.onSurface, // ✅ Icons adapt to theme
+          color: theme.colorScheme.onSurface, //  Icons adapt to theme
         ),
         actions: [
           IconButton(
             icon: Icon(
               Icons.inventory_2,
-              color: theme.colorScheme.onSurface, // ✅ Action icons adapt
+              color: theme.colorScheme.onSurface, //  Action icons adapt
             ),
             tooltip: "My Inventory",
             onPressed: () {
@@ -156,7 +156,7 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
           IconButton(
             icon: Icon(
               Icons.refresh,
-              color: theme.colorScheme.onSurface, // ✅ Action icons adapt
+              color: theme.colorScheme.onSurface, //  Action icons adapt
             ),
             onPressed: _fetchPoints,
           ),
@@ -165,7 +165,7 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
       body: isLoading
           ? Center(
               child: CircularProgressIndicator(
-                color: theme.colorScheme.primary, // ✅ Theme-based color
+                color: theme.colorScheme.primary, //  Theme-based color
               ),
             )
           : Padding(
@@ -194,7 +194,7 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onSurface, // ✅ Adaptive text color
+              color: theme.colorScheme.onSurface, //  Adaptive text color
             ),
           ),
           const SizedBox(height: 10),
@@ -203,7 +203,7 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.primary, // ✅ Theme-based color
+              color: theme.colorScheme.primary, //  Theme-based color
             ),
           ),
         ],
@@ -272,7 +272,7 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
     return Card(
       elevation: 6,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: theme.colorScheme.surface, // ✅ Theme-based card color
+      color: theme.colorScheme.surface, //  Theme-based card color
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -285,23 +285,23 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface, // ✅ Adaptive text color
+                color: theme.colorScheme.onSurface, //  Adaptive text color
               ),
             ),
             Text(
-              "Discount: \$$discount",
+              "Discount: Rs. $discount",
               style: TextStyle(
                 fontSize: 12,
-                color: theme.colorScheme.primary, // ✅ Theme-based color
+                color: theme.colorScheme.primary, //  Theme-based color
               ),
             ),
             ElevatedButton(
               onPressed: () => _purchaseDeal(dealId, ""),
               style: ElevatedButton.styleFrom(
                 backgroundColor:
-                    theme.colorScheme.primary, // ✅ Theme-based color
+                    theme.colorScheme.primary, //  Theme-based color
                 foregroundColor:
-                    theme.colorScheme.onPrimary, // ✅ Theme-based color
+                    theme.colorScheme.onPrimary, //  Theme-based color
               ),
               child: Text("Buy for $cost GBP"),
             ),
@@ -322,7 +322,7 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.primary, // ✅ Theme-based color
+              color: theme.colorScheme.primary, //  Theme-based color
             ),
           ),
           const SizedBox(height: 10),
@@ -339,14 +339,14 @@ class _GreenBiteShopScreenState extends State<GreenBiteShopScreen> {
     return Row(
       children: [
         Icon(Icons.check_circle,
-            color: theme.colorScheme.primary, size: 18), // ✅ Theme-based color
+            color: theme.colorScheme.primary, size: 18), //  Theme-based color
         const SizedBox(width: 8),
         Text(
           text,
           style: TextStyle(
             fontSize: 14,
             color: theme.colorScheme.onSurface
-                .withOpacity(0.7), // ✅ Adaptive text color
+                .withOpacity(0.7), //  Adaptive text color
           ),
         ),
       ],

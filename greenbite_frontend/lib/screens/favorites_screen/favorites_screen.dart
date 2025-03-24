@@ -115,18 +115,18 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           style: TextStyle(
             color: isDarkMode
                 ? Colors.white
-                : Colors.green, // ✅ Adaptive text color
+                : Colors.green, //  Adaptive text color
             fontSize: 30,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.transparent, // ✅ Transparent background
-        elevation: 0, // ✅ No shadow for a modern UI
+        backgroundColor: Colors.transparent, // Transparent background
+        elevation: 0, //  No shadow for a modern UI
         iconTheme: IconThemeData(
           color: Theme.of(context)
               .colorScheme
-              .onSurface, // ✅ Icons adapt to theme
+              .onBackground, // Icons adapt to theme
         ),
         actions: [
           IconButton(
@@ -139,7 +139,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             },
             color: Theme.of(context)
                 .colorScheme
-                .onSurface, // ✅ Action icons adapt
+                .onBackground, // Action icons adapt
           ),
         ],
       ),

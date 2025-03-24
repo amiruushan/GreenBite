@@ -9,11 +9,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    // ✅ Set your Stripe publishable key
+    //  Set your Stripe publishable key
     Stripe.publishableKey =
         "pk_test_51Qsh6fBlbt78FKd8ObfV5e9AMLen2F9efKqkjQmQZwtea7KIiPSGDbPcxak2dvfkKMv9E2wXu5YV1eVVPuGm3OzA00LqEk6B3Z";
 
-    // ✅ Apply Stripe settings
+    //  Apply Stripe settings
     await Stripe.instance.applySettings();
     print("Stripe initialized successfully");
   } catch (e) {
