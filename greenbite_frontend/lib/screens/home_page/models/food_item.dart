@@ -19,7 +19,9 @@ class FoodItem {
     required this.price,
     required this.quantity,
     required this.photo,
+
     this.tags = const [], // Default to empty list
+
     required this.restaurant,
     required this.shopId,
     required this.category,

@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'user_profile.dart';
 
 class UserProfileService {
-  // ✅ Fetch User Profile
+  //  Fetch User Profile
   static Future<UserProfile> fetchUserProfile() async {
     try {
       int? userId = await AuthService.getUserId(); // Retrieve user ID

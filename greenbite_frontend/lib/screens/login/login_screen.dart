@@ -93,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: isDarkMode
           ? Colors.grey[900]
-          : Colors.white, // ✅ Adaptive background color
+          : Colors.white, //  Adaptive background color
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
             const SizedBox(height: 10),
 
-            // ✅ Title & Subtitle
+            //  Title & Subtitle
             Text(
               "Welcome Back!",
               style: TextStyle(
@@ -111,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 fontWeight: FontWeight.bold,
                 color: isDarkMode
                     ? Colors.white
-                    : Colors.green, // ✅ Adaptive text color
+                    : Colors.green, //  Adaptive text color
               ),
             ),
             const SizedBox(height: 5),
@@ -121,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
               style: TextStyle(
                 color: isDarkMode
                     ? Colors.grey[400]
-                    : Colors.grey[600], // ✅ Adaptive text color
+                    : Colors.grey[600], //  Adaptive text color
                 fontSize: 16,
               ),
             ),
@@ -140,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 25),
 
-            // ✅ Email Text Field
+            // Email Text Field
             _CustomTextField(
               controller: emailController,
               label: "Email",
@@ -149,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 15),
 
-            // ✅ Password Text Field
+            //  Password Text Field
             _CustomTextField(
               controller: passwordController,
               label: "Password",
@@ -174,9 +174,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Text(
                   "Forgot Password?",
                   style: TextStyle(
-                    color: Colors.green, // ✅ Match "Register" color
+                    color: Colors.green, //  Match "Register" color
                     fontWeight:
-                        FontWeight.bold, // ✅ Match "Register" font weight
+                        FontWeight.bold, //  Match "Register" font weight
                   ),
                 ),
               ),
@@ -184,19 +184,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
             SizedBox(height: 25),
 
-            // ✅ Login Button
+            //  Login Button
             _isLoading
                 ? const CircularProgressIndicator()
                 : _CustomButton(
                     text: "Continue",
                     onPressed: login,
-                    backgroundColor: Colors.green, // ✅ Keep green for button
+                    backgroundColor: Colors.green, //  Keep green for button
                     textColor: Colors.white,
                     shadow: true,
                   ),
             const SizedBox(height: 15),
 
-            // ✅ Sign Up Link
+            //  Sign Up Link
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -205,7 +205,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     color: isDarkMode
                         ? Colors.grey[400]
-                        : Colors.black87, // ✅ Adaptive text color
+                        : Colors.black87, //  Adaptive text color
                   ),
                 ),
                 GestureDetector(
@@ -220,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Text(
                     "Register",
                     style: TextStyle(
-                      color: Colors.green, // ✅ Keep green for register link
+                      color: Colors.green, //   Keep green for register link
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -236,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-/// ✅ **Custom Text Field Component**
+///  **Custom Text Field Component**
 class _CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
@@ -262,33 +262,33 @@ class _CustomTextField extends StatelessWidget {
         labelStyle: TextStyle(
           color: isDarkMode
               ? Colors.grey[400]
-              : Colors.grey[700], // ✅ Adaptive label color
+              : Colors.grey[700], //  Adaptive label color
         ),
         prefixIcon: prefixIcon != null
-            ? Icon(prefixIcon, color: Colors.green) // ✅ Keep green for icon
+            ? Icon(prefixIcon, color: Colors.green) //  Keep green for icon
             : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
             color: isDarkMode
                 ? Colors.grey[600]!
-                : Colors.grey[400]!, // ✅ Adaptive border color
+                : Colors.grey[400]!, //  Adaptive border color
           ),
         ),
         filled: true,
         fillColor: isDarkMode
             ? Colors.grey[800]
-            : Colors.grey[100], // ✅ Adaptive background color
+            : Colors.grey[100], //  Adaptive background color
       ),
       style: TextStyle(
         color:
-            isDarkMode ? Colors.white : Colors.black, // ✅ Adaptive text color
+            isDarkMode ? Colors.white : Colors.black, //  Adaptive text color
       ),
     );
   }
 }
 
-/// ✅ **Custom Button Component**
+///  **Custom Button Component**
 class _CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
@@ -317,7 +317,7 @@ class _CustomButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          elevation: shadow ? 5 : 0, // ✅ Apply shadow if true
+          elevation: shadow ? 5 : 0, // Apply shadow if true
         ),
         child: Text(
           text,
